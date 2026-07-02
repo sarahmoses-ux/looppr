@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style> html{scroll-behavior:smooth;} body{margin:0;background:#F8F7FF;} </style>
+</helmet>
+<div style="font-family:'Hanken Grotesk',system-ui,sans-serif; color:#1E1B4B; background:#F8F7FF; min-height:100vh;">
+  <dc-import name="SiteNav" active="" hint-size="100%,66px"></dc-import>
+
+  <!-- Hero -->
+  <section style="background:#171433; padding:72px 24px 56px;">
+    <div style="max-width:760px; margin:0 auto;">
+      <a href="Drivers.dc.html" style="display:inline-flex; align-items:center; gap:8px; font-size:13px; color:#AFA9EC; text-decoration:none; margin-bottom:20px; transition:color .15s;" style-hover="color:#fff;">← Back to Drive with us</a>
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
+        <span style="width:48px;height:48px;border-radius:13px;background:#EF9F27;display:flex;align-items:center;justify-content:center;"><svg width="22" height="22" fill="none" stroke="#412402" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg></span>
+        <p style="font-size:13px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:#EF9F27; margin:0;">Driver application</p>
+      </div>
+      <h1 style="font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(2rem,4.5vw,3rem); font-weight:600; letter-spacing:-.025em; color:#fff; line-height:1.1; margin:0 0 14px;">Apply to drive with Looppr.</h1>
+      <p style="font-size:16px; color:#AFA9EC; line-height:1.6; margin:0;">Takes about 3 minutes. Background check is free and runs after approval. We'll be in touch within 24 hours.</p>
+    </div>
+  </section>
+
+  <!-- Form -->
+  <section style="padding:48px 24px 96px;">
+    <div style="max-width:760px; margin:0 auto;">
+      <sc-if value="{{ submitted }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff; border:1px solid #E8E6F4; border-radius:22px; padding:56px 44px; text-align:center;">
+          <div style="width:60px;height:60px;border-radius:50%;background:#E1F5EE;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;"><svg width="27" height="27" fill="none" stroke="#0F6E56" stroke-width="2.2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+          <h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:24px; font-weight:600; color:#1E1B4B; margin:0 0 10px;">Application received.</h2>
+          <p style="font-size:15px; color:#5A52C5; line-height:1.65; max-width:420px; margin:0 auto 8px;">We'll review your application and reach out within 24 hours. Once approved, your background check will be initiated — totally free.</p>
+          <p style="font-size:13px; color:#8885A0; margin:0 0 28px;">Keep an eye on your email and texts from drivers@getlooppr.com.</p>
+          <a href="Drivers.dc.html" style="display:inline-block; border:1.5px solid #E8E6F4; color:#5A52C5; padding:11px 24px; border-radius:10px; font-size:14px; font-weight:600; text-decoration:none;">Back to Drive with us</a>
+        </div>
+      </sc-if>
+      <sc-if value="{{ notSubmitted }}" hint-placeholder-val="{{ true }}">
+      <form onSubmit="{{ submit }}" style="display:flex; flex-direction:column; gap:24px;">
+
+        <!-- Personal info -->
+        <div style="background:#fff; border:1px solid #E8E6F4; border-radius:18px; padding:32px;">
+          <h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:17px; font-weight:600; color:#1E1B4B; margin:0 0 22px;">Personal information</h3>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+            <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">First name *</label><input required type="text" placeholder="Jamie" style="width:100%; padding:12px 14px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+            <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Last name *</label><input required type="text" placeholder="Rivera" style="width:100%; padding:12px 14px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+            <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Email address *</label><input required type="email" placeholder="jamie@email.com" style="width:100%; padding:12px 14px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+            <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Mobile number *</label><input required type="tel" placeholder="(405) 555-0100" style="width:100%; padding:12px 14px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">City you'll drive in *</label>
+              <select required style="width:100%; padding:12px 14px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box; appearance:none;" style-focus="border-color:#7C73E6; background:#fff;">
+                <option value="">Select city…</option>
+                <optgroup label="Oklahoma — Launching July 1, 2026">
+                  <option>Oklahoma City, OK</option><option>Edmond, OK</option><option>Norman, OK</option><option>Moore, OK</option>
+                </optgroup>
+                <optgroup label="Texas — Launching Feb 2027">
+                  <option>Dallas, TX</option><option>Fort Worth, TX</option><option>Plano, TX</option><option>Frisco, TX</option><option>Denton, TX</option><option>McKinney, TX</option><option>Houston, TX</option><option>Austin, TX</option><option>San Antonio, TX</option><option>Amarillo, TX</option>
+                </optgroup>
+                <optgroup label="Georgia — Launching Feb 2027">
+                  <option>Atlanta, GA</option><option>Alpharetta, GA</option><option>Roswell, GA</option><option>Sandy Springs, GA</option><option>Marietta, GA</option><option>Savannah, GA</option><option>Augusta, GA</option>
+                </optgroup>
+                <option>Other</option>
+              </select>
+            </div>
+            <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Date of birth *</label><input required type="date" style="width:100%; padding:12px 14px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+          </div>
+        </div>
+
+        <!-- Vehicle info -->
+        <div style="background:#fff; border:1px solid #E8E6F4; border-radius:18px; padding:32px;">
+          <h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:17px; font-weight:600; color:#1E1B4B; margin:0 0 22px;">Vehicle information</h3>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-bottom:16px;">
+            <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Year *</label><input required type="number" placeholder="2019" min="2010" max="2026" style="width:100%; padding:12px 14px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+            <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Make *</label><input required type="text" placeholder="Toyota" style="width:100%; padding:12px 14px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+            <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Model *</label><input required type="text" placeholder="Camry" style="width:100%; padding:12px 14px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+            <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Vehicle type *</label>
+              <select required style="width:100%; padding:12px 14px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box; appearance:none;" style-focus="border-color:#7C73E6; background:#fff;">
+                <option value="">Select…</option><option>Car / Sedan</option><option>SUV</option><option>Truck</option><option>Van / Minivan</option>
+              </select>
+            </div>
+            <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">License plate state *</label><input required type="text" placeholder="OK" maxlength="2" style="width:100%; padding:12px 14px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+          </div>
+        </div>
+
+        <!-- Availability & eligibility -->
+        <div style="background:#fff; border:1px solid #E8E6F4; border-radius:18px; padding:32px;">
+          <h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:17px; font-weight:600; color:#1E1B4B; margin:0 0 22px;">Availability &amp; eligibility</h3>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+            <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Hours available per week *</label>
+              <select required style="width:100%; padding:12px 14px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box; appearance:none;" style-focus="border-color:#7C73E6; background:#fff;">
+                <option value="">Select…</option><option>1–5 hrs</option><option>5–10 hrs</option><option>10–20 hrs</option><option>20–30 hrs</option><option>30+ hrs (full time)</option>
+              </select>
+            </div>
+            <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Preferred shift *</label>
+              <select required style="width:100%; padding:12px 14px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box; appearance:none;" style-focus="border-color:#7C73E6; background:#fff;">
+                <option value="">Select…</option><option>Morning (6 AM–12 PM)</option><option>Afternoon (12–6 PM)</option><option>Evening (6–10 PM)</option><option>Flexible / any time</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:16px;">
+            <label style="display:flex; align-items:flex-start; gap:12px; cursor:pointer;"><input required type="checkbox" style="margin-top:2px; accent-color:#7C73E6; width:16px; height:16px;"><span style="font-size:14px; color:#1E1B4B; line-height:1.5;">I have a valid driver's license and auto insurance in good standing.</span></label>
+            <label style="display:flex; align-items:flex-start; gap:12px; cursor:pointer;"><input required type="checkbox" style="margin-top:2px; accent-color:#7C73E6; width:16px; height:16px;"><span style="font-size:14px; color:#1E1B4B; line-height:1.5;">I am 18 years or older and legally eligible to work in the United States.</span></label>
+            <label style="display:flex; align-items:flex-start; gap:12px; cursor:pointer;"><input required type="checkbox" style="margin-top:2px; accent-color:#7C73E6; width:16px; height:16px;"><span style="font-size:14px; color:#1E1B4B; line-height:1.5;">I consent to a background check being run after my application is approved (free, no impact on credit).</span></label>
+          </div>
+          <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Why do you want to drive with Looppr? <span style="color:#8885A0; font-weight:400;">(optional)</span></label><textarea placeholder="Tell us a bit about yourself and why this fits your schedule…" style="width:100%; padding:12px 14px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box; resize:vertical; min-height:100px; line-height:1.6;" style-focus="border-color:#7C73E6; background:#fff;"></textarea></div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+          <p style="font-size:13px; color:#8885A0; margin:0; line-height:1.5;">Applications go to <strong style="color:#5A52C5;">drivers@getlooppr.com</strong>. We reply within 24 hours.</p>
+          <button type="submit" style="background:#1E1B4B; color:#fff; padding:15px 36px; border-radius:12px; font-size:15.5px; font-weight:600; border:none; cursor:pointer; font-family:inherit; box-shadow:0 6px 20px rgba(30,27,75,.22); transition:background .15s,transform .1s;" style-hover="background:#2E2880; transform:translateY(-1px);">Submit application</button>
+        </div>
+      </form>
+      </sc-if>
+    </div>
+  </section>
+  <dc-import name="SiteFooter" hint-size="100%,380px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = { submitted: false };
+  renderVals() {
+    return {
+      submitted: this.state.submitted,
+      notSubmitted: !this.state.submitted,
+      submit: (e) => { e.preventDefault(); this.setState({ submitted: true }); window.scrollTo(0, 0); },
+    };
+  }
+}
+</script>
+</body>
+</html>

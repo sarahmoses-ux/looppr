@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style> html{scroll-behavior:smooth;} body{margin:0;background:#F8F7FF;} </style>
+</helmet>
+<div style="font-family:'Hanken Grotesk',system-ui,sans-serif; color:#1E1B4B; background:#F8F7FF; min-height:100vh;">
+  <dc-import name="SiteNav" active="" hint-size="100%,66px"></dc-import>
+
+  <section style="background:#171433; padding:72px 24px 56px;">
+    <div style="max-width:760px; margin:0 auto;">
+      <a href="Contact.dc.html" style="display:inline-flex; align-items:center; gap:8px; font-size:13px; color:#AFA9EC; text-decoration:none; margin-bottom:20px; transition:color .15s;" style-hover="color:#fff;">← Back to contact</a>
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
+        <span style="width:48px;height:48px;border-radius:13px;background:#EEEDFE;display:flex;align-items:center;justify-content:center;"><svg width="22" height="22" fill="none" stroke="#5A52C5" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg></span>
+        <p style="font-size:13px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:#AFA9EC; margin:0;">General info request</p>
+      </div>
+      <h1 style="font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(2rem,4.5vw,3rem); font-weight:600; letter-spacing:-.025em; color:#fff; line-height:1.1; margin:0 0 14px;">What would you like to know?</h1>
+      <p style="font-size:16px; color:#AFA9EC; line-height:1.6; margin:0;">Media, investors, researchers, curious people — fill this out and we'll get back to you within 2 business hours.</p>
+    </div>
+  </section>
+
+  <section style="padding:48px 24px 96px;">
+    <div style="max-width:760px; margin:0 auto;">
+      <sc-if value="{{ submitted }}" hint-placeholder-val="{{ false }}">
+        <div style="background:#fff; border:1px solid #E8E6F4; border-radius:22px; padding:56px 44px; text-align:center;">
+          <div style="width:60px;height:60px;border-radius:50%;background:#EEEDFE;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;"><svg width="27" height="27" fill="none" stroke="#5A52C5" stroke-width="2.2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+          <h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:24px; font-weight:600; color:#1E1B4B; margin:0 0 10px;">Got it — we'll reach out soon.</h2>
+          <p style="font-size:15px; color:#5A52C5; line-height:1.65; max-width:420px; margin:0 auto 8px;">Expect a reply within 2 business hours at the email you provided. For urgent press inquiries call (405) 555-0192.</p>
+          <p style="font-size:13px; color:#8885A0; margin:0 0 28px;">General: <strong style="color:#5A52C5;">hello@getlooppr.com</strong></p>
+          <a href="Home.dc.html" style="display:inline-block; border:1.5px solid #E8E6F4; color:#5A52C5; padding:11px 24px; border-radius:10px; font-size:14px; font-weight:600; text-decoration:none;">Back to home</a>
+        </div>
+      </sc-if>
+      <sc-if value="{{ notSubmitted }}" hint-placeholder-val="{{ true }}">
+      <form onSubmit="{{ submit }}" style="display:flex; flex-direction:column; gap:24px;">
+
+        <div style="background:#fff; border:1px solid #E8E6F4; border-radius:18px; padding:32px;">
+          <h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:17px; font-weight:600; color:#1E1B4B; margin:0 0 22px;">About you</h3>
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+              <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">First name *</label><input required type="text" placeholder="Alex" style="width:100%; padding:12px 14px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+              <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Last name *</label><input required type="text" placeholder="Kim" style="width:100%; padding:12px 14px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+              <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Email *</label><input required type="email" placeholder="alex@example.com" style="width:100%; padding:12px 14px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+              <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Organization <span style="color:#8885A0; font-weight:400;">(optional)</span></label><input type="text" placeholder="TechCrunch / University of Oklahoma" style="width:100%; padding:12px 14px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+            </div>
+            <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">I'm reaching out as a… *</label>
+              <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:8px;">
+                <sc-for list="{{ categories }}" as="cat" hint-placeholder-count="6">
+                  <button type="button" onClick="{{ cat.pick }}" style="{{ cat.style }}">{{ cat.label }}</button>
+                </sc-for>
+              </div>
+            </div>
+            <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Your city / location *</label><input required type="text" placeholder="Dallas, TX" style="width:100%; padding:12px 14px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+          </div>
+        </div>
+
+        <div style="background:#fff; border:1px solid #E8E6F4; border-radius:18px; padding:32px;">
+          <h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:17px; font-weight:600; color:#1E1B4B; margin:0 0 22px;">Your question</h3>
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Subject *</label><input required type="text" placeholder="e.g. Expansion timeline for Dallas, press kit request…" style="width:100%; padding:12px 14px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+            <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Message *</label><textarea required placeholder="Share as much context as you'd like — the more detail, the more useful our reply will be." style="width:100%; padding:12px 14px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box; resize:vertical; min-height:140px; line-height:1.6;" style-focus="border-color:#7C73E6; background:#fff;"></textarea></div>
+            <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Preferred response method *</label>
+              <select required style="width:100%; padding:12px 14px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box; appearance:none;" style-focus="border-color:#7C73E6; background:#fff;">
+                <option>Email (reply to address above)</option><option>Phone call</option><option>Video call (Zoom / Google Meet)</option><option>No preference</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:14px;">
+          <p style="font-size:13px; color:#8885A0; margin:0;">We reply within 2 business hours. <strong style="color:#5A52C5;">hello@getlooppr.com</strong></p>
+          <button type="submit" style="background:#7C73E6; color:#fff; padding:15px 36px; border-radius:12px; font-size:15.5px; font-weight:600; border:none; cursor:pointer; font-family:inherit; box-shadow:0 6px 20px rgba(124,115,230,.35); transition:background .15s,transform .1s;" style-hover="background:#8d86e3; transform:translateY(-1px);">Send message</button>
+        </div>
+      </form>
+      </sc-if>
+    </div>
+  </section>
+  <dc-import name="SiteFooter" hint-size="100%,380px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = { submitted: false, cat: '' };
+
+  btnStyle(key) {
+    const sel = this.state.cat === key;
+    return `padding:11px 14px; border-radius:10px; cursor:pointer; font-family:inherit; font-size:13.5px; font-weight:600; text-align:center; transition:all .15s; ${sel ? 'border:1.5px solid #7C73E6; background:#EEEDFE; color:#3C3489;' : 'border:1.5px solid #E0DCF5; background:#F5F4FF; color:#5A52C5;'}`;
+  }
+
+  renderVals() {
+    const cats = [
+      { label: 'Customer', key: 'customer' },
+      { label: 'Journalist / press', key: 'press' },
+      { label: 'Investor', key: 'investor' },
+      { label: 'Researcher', key: 'researcher' },
+      { label: 'Job seeker', key: 'job' },
+      { label: 'Other', key: 'other' },
+    ].map(c => ({
+      label: c.label, key: c.key,
+      style: this.btnStyle(c.key),
+      pick: () => this.setState({ cat: c.key }),
+    }));
+    return {
+      submitted: this.state.submitted,
+      notSubmitted: !this.state.submitted,
+      categories: cats,
+      submit: (e) => { e.preventDefault(); this.setState({ submitted: true }); window.scrollTo(0, 0); },
+    };
+  }
+}
+</script>
+</body>
+</html>

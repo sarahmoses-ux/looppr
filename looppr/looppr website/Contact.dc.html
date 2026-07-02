@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style> html { scroll-behavior:smooth; } body { margin:0; background:#F8F7FF; } </style>
+</helmet>
+<div style="font-family:'Hanken Grotesk',system-ui,sans-serif; color:#1E1B4B; background:#F8F7FF; overflow-x:hidden;">
+  <dc-import name="SiteNav" active="" hint-size="100%,66px"></dc-import>
+
+  <!-- Hero -->
+  <section style="background:#1E1B4B; padding:80px 24px 64px;">
+    <div style="max-width:1140px; margin:0 auto;">
+      <p style="font-size:13px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:#AFA9EC; margin:0 0 14px;">Get in touch</p>
+      <h1 style="font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(2.2rem,5vw,3.4rem); font-weight:600; letter-spacing:-.025em; color:#fff; line-height:1.08; margin:0 0 14px;">We actually read these.</h1>
+      <p style="font-size:17px; color:#AFA9EC; line-height:1.65; max-width:520px; margin:0;">Questions, partnership inquiries, feedback, or just want to say hi — pick the right channel and we'll get back to you fast.</p>
+    </div>
+  </section>
+
+  <!-- Main grid -->
+  <section style="padding:64px 24px 84px;">
+    <div style="max-width:1140px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:48px; align-items:start;">
+
+      <!-- Left: channels -->
+      <div data-reveal>
+        <p style="font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:#7C73E6; margin:0 0 16px;">Direct channels</p>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <a href="InfoForm.dc.html" style="background:#fff; border:1px solid #E8E6F4; border-radius:15px; padding:20px 22px; display:flex; gap:15px; align-items:center; text-decoration:none; transition:border-color .15s,box-shadow .15s;" style-hover="border-color:#AFA9EC; box-shadow:0 6px 22px rgba(124,115,230,.1);">
+            <span style="width:42px;height:42px;border-radius:11px;background:#EEEDFE;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="20" height="20" fill="none" stroke="#5A52C5" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+            <span style="flex:1;"><span style="display:block; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:#8885A0;">Email</span><span style="display:block; font-size:15px; font-weight:600; color:#1E1B4B; margin:2px 0;">hello@getlooppr.com</span><span style="display:block; font-size:13px; color:#5A52C5;">General questions, order issues, feedback</span></span>
+            <span style="color:#AFA9EC; font-size:18px;">→</span>
+          </a>
+          <a href="BusinessForm.dc.html" style="background:#fff; border:1px solid #E8E6F4; border-radius:15px; padding:20px 22px; display:flex; gap:15px; align-items:center; text-decoration:none; transition:border-color .15s,box-shadow .15s;" style-hover="border-color:#AFA9EC; box-shadow:0 6px 22px rgba(124,115,230,.1);">
+            <span style="width:42px;height:42px;border-radius:11px;background:#E1F5EE;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="20" height="20" fill="none" stroke="#0F6E56" stroke-width="1.8" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg></span>
+            <span style="flex:1;"><span style="display:block; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:#8885A0;">Business sales</span><span style="display:block; font-size:15px; font-weight:600; color:#1E1B4B; margin:2px 0;">biz@getlooppr.com</span><span style="display:block; font-size:13px; color:#5A52C5;">Hotels, gyms, hosts, corporate accounts</span></span>
+            <span style="color:#AFA9EC; font-size:18px;">→</span>
+          </a>
+          <a href="PartnersForm.dc.html" style="background:#fff; border:1px solid #E8E6F4; border-radius:15px; padding:20px 22px; display:flex; gap:15px; align-items:center; text-decoration:none; transition:border-color .15s,box-shadow .15s;" style-hover="border-color:#AFA9EC; box-shadow:0 6px 22px rgba(124,115,230,.1);">
+            <span style="width:42px;height:42px;border-radius:11px;background:#FAEEDA;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="20" height="20" fill="none" stroke="#854F0B" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 13h4"/></svg></span>
+            <span style="flex:1;"><span style="display:block; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:#8885A0;">Laundromat partners</span><span style="display:block; font-size:15px; font-weight:600; color:#1E1B4B; margin:2px 0;">partners@getlooppr.com</span><span style="display:block; font-size:13px; color:#5A52C5;">Apply to become a partner laundromat</span></span>
+            <span style="color:#AFA9EC; font-size:18px;">→</span>
+          </a>
+          <a href="DriversForm.dc.html" style="background:#fff; border:1px solid #E8E6F4; border-radius:15px; padding:20px 22px; display:flex; gap:15px; align-items:center; text-decoration:none; transition:border-color .15s,box-shadow .15s;" style-hover="border-color:#AFA9EC; box-shadow:0 6px 22px rgba(124,115,230,.1);">
+            <span style="width:42px;height:42px;border-radius:11px;background:#FAECE7;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="20" height="20" fill="none" stroke="#993C1D" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg></span>
+            <span style="flex:1;"><span style="display:block; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:#8885A0;">Driver applications</span><span style="display:block; font-size:15px; font-weight:600; color:#1E1B4B; margin:2px 0;">drivers@getlooppr.com</span><span style="display:block; font-size:13px; color:#5A52C5;">Apply to drive, driver support</span></span>
+            <span style="color:#AFA9EC; font-size:18px;">→</span>
+          </a>
+        </div>
+        <div style="background:#EEEDFE; border-radius:14px; padding:18px 20px; margin-top:14px;">
+          <p style="font-size:13px; color:#5A52C5; line-height:1.6; margin:0;"><strong style="color:#2E2880; font-weight:600;">Response time:</strong> We reply to every message within 2 business hours during support hours. Urgent order issue? Text us at <strong style="color:#2E2880; font-weight:600;">(405) 555-0192</strong> — someone is always watching that line.</p>
+        </div>
+        <div style="background:#fff; border:1px solid #E8E6F4; border-radius:14px; padding:20px 22px; margin-top:12px;">
+          <p style="font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.06em; color:#8885A0; margin:0 0 12px;">Support hours</p>
+          <div style="display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid #F0EEE5;"><span style="font-size:13.5px; color:#5A52C5;">Monday – Friday</span><span style="font-size:13.5px; color:#1E1B4B; font-weight:600;">7 AM – 9 PM CT</span></div>
+          <div style="display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid #F0EEE5;"><span style="font-size:13.5px; color:#5A52C5;">Saturday</span><span style="font-size:13.5px; color:#1E1B4B; font-weight:600;">8 AM – 8 PM CT</span></div>
+          <div style="display:flex; justify-content:space-between; padding:7px 0;"><span style="font-size:13.5px; color:#5A52C5;">Sunday</span><span style="font-size:13.5px; color:#1E1B4B; font-weight:600;">9 AM – 6 PM CT</span></div>
+        </div>
+      </div>
+
+      <!-- Right: form -->
+      <div data-reveal data-reveal-delay="120">
+        <div style="background:#fff; border:1px solid #E8E6F4; border-radius:22px; padding:36px;">
+          <sc-if value="{{ notSubmitted }}" hint-placeholder-val="{{ true }}">
+          <div>
+            <p style="font-family:'Bricolage Grotesque',sans-serif; font-size:21px; font-weight:600; color:#1E1B4B; margin:0 0 6px;">Send us a message</p>
+            <p style="font-size:14px; color:#5A52C5; margin:0 0 24px; line-height:1.5;">Pick what this is about and we'll route it to the right person.</p>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:24px;">
+              <button type="button" onClick="{{ pickGeneral }}" style="{{ sbGeneral }}">General question</button>
+              <button type="button" onClick="{{ pickOrder }}" style="{{ sbOrder }}">Order issue</button>
+              <button type="button" onClick="{{ pickBiz }}" style="{{ sbBiz }}">Business inquiry</button>
+              <button type="button" onClick="{{ pickPartner }}" style="{{ sbPartner }}">Partner application</button>
+              <button type="button" onClick="{{ pickDrive }}" style="{{ sbDrive }}">Drive with us</button>
+              <button type="button" onClick="{{ pickFeedback }}" style="{{ sbFeedback }}">Feedback</button>
+            </div>
+            <form onSubmit="{{ submit }}">
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:16px;">
+                <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:6px;">First name</label><input type="text" required placeholder="Jamie" style="width:100%; padding:12px 14px; background:#F5F4FF; border:1px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+                <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:6px;">Last name</label><input type="text" placeholder="Rivera" style="width:100%; padding:12px 14px; background:#F5F4FF; border:1px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+              </div>
+              <div style="margin-bottom:16px;"><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:6px;">Email address</label><input type="email" required placeholder="jamie@example.com" style="width:100%; padding:12px 14px; background:#F5F4FF; border:1px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+              <sc-if value="{{ showPhone }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-bottom:16px;"><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:6px;">Phone number <span style="color:#8885A0; font-weight:400;">(optional)</span></label><input type="tel" placeholder="(405) 555-0100" style="width:100%; padding:12px 14px; background:#F5F4FF; border:1px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+              </sc-if>
+              <sc-if value="{{ showOrder }}" hint-placeholder-val="{{ false }}">
+                <div style="margin-bottom:16px;"><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:6px;">Order number <span style="color:#8885A0; font-weight:400;">(if applicable)</span></label><input type="text" placeholder="TF-0000" style="width:100%; padding:12px 14px; background:#F5F4FF; border:1px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+              </sc-if>
+              <div style="margin-bottom:20px;"><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:6px;">Message</label><textarea required placeholder="{{ msgPlaceholder }}" style="width:100%; padding:12px 14px; background:#F5F4FF; border:1px solid #E0DCF5; border-radius:10px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box; resize:vertical; min-height:120px; line-height:1.6;" style-focus="border-color:#7C73E6; background:#fff;"></textarea></div>
+              <button type="submit" style="width:100%; padding:14px; background:#1E1B4B; color:#fff; border:none; border-radius:11px; font-size:15px; font-weight:600; cursor:pointer; font-family:inherit; transition:background .15s,transform .1s;" style-hover="background:#332AB8; transform:translateY(-1px);">Send message</button>
+              <p style="font-size:12px; color:#8885A0; text-align:center; margin:12px 0 0; line-height:1.5;">We typically reply within 2 business hours. No spam, ever.</p>
+            </form>
+          </div>
+          </sc-if>
+          <sc-if value="{{ submitted }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align:center; padding:36px 16px;">
+            <div style="width:58px; height:58px; border-radius:50%; background:#E1F5EE; display:flex; align-items:center; justify-content:center; margin:0 auto 20px;"><svg width="27" height="27" fill="none" stroke="#0F6E56" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+            <h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:21px; font-weight:600; color:#1E1B4B; margin:0 0 10px;">Message sent.</h3>
+            <p style="font-size:15px; color:#5A52C5; line-height:1.65; max-width:360px; margin:0 auto;">We've got it and we'll reply to your email within 2 business hours. If it's urgent, text us at (405) 555-0192.</p>
+            <button onClick="{{ reset }}" style="margin-top:24px; background:none; border:1.5px solid #DDDCF0; border-radius:10px; padding:11px 24px; font-size:14px; font-weight:600; color:#5A52C5; cursor:pointer; font-family:inherit; transition:border-color .15s;" style-hover="border-color:#AFA9EC;">Send another message</button>
+          </div>
+          </sc-if>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <dc-import name="SiteFooter" hint-size="100%,380px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = { topic: '', submitted: false };
+
+  componentDidMount() { this.setupReveal(); }
+  setupReveal() {
+    if (this._revealed) return; this._revealed = true;
+    const run = () => {
+      const els = Array.from(document.querySelectorAll('[data-reveal]'));
+      if (!els.length) { setTimeout(run, 120); return; }
+      if (!('IntersectionObserver' in window)) return;
+      const vh = window.innerHeight || 800; const hidden = [];
+      els.forEach(el => {
+        if (el.getBoundingClientRect().top < vh * 0.85) return;
+        el.style.opacity = '0'; el.style.transform = 'translateY(26px)';
+        el.style.transition = 'opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1)';
+        hidden.push(el);
+      });
+      const io = new IntersectionObserver((es) => es.forEach(e => {
+        if (e.isIntersecting) {
+          const d = parseInt(e.target.getAttribute('data-reveal-delay')) || 0;
+          setTimeout(() => { e.target.style.opacity = '1'; e.target.style.transform = 'none'; }, d);
+          io.unobserve(e.target);
+        }
+      }), { threshold: 0.12, rootMargin: '0px 0px -7% 0px' });
+      hidden.forEach(el => io.observe(el));
+    };
+    run();
+  }
+
+  btnStyle(name) {
+    const base = "padding:12px 14px; border-radius:11px; cursor:pointer; text-align:center; font-family:inherit; font-weight:600; font-size:13.5px; transition:all .15s;";
+    if (this.state.topic === name) return base + " border:1.5px solid #7C73E6; background:#EEEDFE; color:#2E2880;";
+    return base + " border:1.5px solid #E0DCF5; background:#F5F4FF; color:#5A52C5;";
+  }
+
+  renderVals() {
+    const t = this.state.topic;
+    const placeholders = {
+      general: 'What would you like to know?',
+      order: 'Describe what happened with your order...',
+      biz: 'Tell us about your business and what you need...',
+      partner: 'Tell us about your laundromat — location, capacity, hours...',
+      drive: 'Tell us about yourself and your vehicle...',
+      feedback: 'What could we do better?'
+    };
+    const pick = (name) => () => this.setState({ topic: name });
+    return {
+      submitted: this.state.submitted,
+      notSubmitted: !this.state.submitted,
+      showOrder: t === 'order',
+      showPhone: t === 'biz' || t === 'partner' || t === 'drive',
+      msgPlaceholder: placeholders[t] || "Tell us what's on your mind...",
+      sbGeneral: this.btnStyle('general'),
+      sbOrder: this.btnStyle('order'),
+      sbBiz: this.btnStyle('biz'),
+      sbPartner: this.btnStyle('partner'),
+      sbDrive: this.btnStyle('drive'),
+      sbFeedback: this.btnStyle('feedback'),
+      pickGeneral: pick('general'),
+      pickOrder: pick('order'),
+      pickBiz: pick('biz'),
+      pickPartner: pick('partner'),
+      pickDrive: pick('drive'),
+      pickFeedback: pick('feedback'),
+      submit: (e) => { e.preventDefault(); this.setState({ submitted: true }); },
+      reset: () => this.setState({ topic: '', submitted: false }),
+    };
+  }
+}
+</script>
+</body>
+</html>

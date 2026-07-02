@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TidyFolds — Laundry, picked up. Clothes, brought back.</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: #F1EFE8;
+    color: #26215C;
+    line-height: 1.6;
+    font-size: 16px;
+  }
+  :root {
+    --purple:   #7F77DD;
+    --purple-d: #534AB7;
+    --purple-dk:#26215C;
+    --purple-l: #AFA9EC;
+    --purple-ll:#EEEDFE;
+    --teal:     #1D9E75;
+    --teal-l:   #E1F5EE;
+    --teal-d:   #085041;
+    --amber:    #EF9F27;
+    --amber-l:  #FAEEDA;
+    --linen:    #F1EFE8;
+    --linen-d:  #D3D1C7;
+    --ink:      #26215C;
+    --ink-m:    #534AB7;
+    --ink-l:    #888780;
+    --white:    #ffffff;
+  }
+  h1 { font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 500; line-height: 1.12; letter-spacing: -.02em; }
+  h2 { font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 500; line-height: 1.2; letter-spacing: -.01em; }
+  h3 { font-size: 1.1rem; font-weight: 500; }
+  p  { color: #534AB7; line-height: 1.7; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  section { padding: 96px 0; }
+
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(241,239,232,.94);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid #D3D1C7;
+    padding: 0 24px;
+  }
+  .nav-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .nav-logomark { width: 34px; height: 34px; border-radius: 9px; background: #7F77DD; display: flex; align-items: center; justify-content: center; }
+  .nav-logomark svg { width: 18px; height: 18px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .nav-wordmark { font-size: 17px; font-weight: 500; color: #26215C; }
+  .nav-wordmark span { color: #7F77DD; }
+  .nav-links { display: flex; align-items: center; gap: 28px; }
+  .nav-links a { font-size: 14px; color: #534AB7; text-decoration: none; transition: color .15s; }
+  .nav-links a:hover { color: #26215C; }
+  .nav-cta { background: #7F77DD; color: #fff !important; padding: 8px 18px; border-radius: 8px; font-weight: 500 !important; transition: background .15s !important; }
+  .nav-cta:hover { background: #534AB7 !important; color: #fff !important; }
+
+  .hero { min-height: 92vh; display: flex; align-items: center; padding: 80px 24px 60px; position: relative; overflow: hidden; }
+  .hero-bg { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse 65% 55% at 70% 38%, #CECBF6 0%, transparent 68%); opacity: .6; }
+  .hero-inner { max-width: 1100px; margin: 0 auto; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+  .hero-eyebrow { font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: #7F77DD; margin-bottom: 16px; }
+  .hero h1 { color: #26215C; margin-bottom: 22px; }
+  .hero h1 em { font-style: normal; color: #7F77DD; }
+  .hero-sub { font-size: 18px; color: #534AB7; margin-bottom: 36px; max-width: 440px; }
+  .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 48px; }
+  .btn-primary { background: #7F77DD; color: #fff; padding: 14px 28px; border-radius: 10px; font-size: 15px; font-weight: 500; text-decoration: none; transition: background .15s, transform .1s; display: inline-block; }
+  .btn-primary:hover { background: #534AB7; transform: translateY(-1px); }
+  .btn-outline { border: 1.5px solid #AFA9EC; color: #534AB7; padding: 14px 28px; border-radius: 10px; font-size: 15px; font-weight: 500; text-decoration: none; transition: all .15s; display: inline-block; }
+  .btn-outline:hover { border-color: #7F77DD; color: #26215C; }
+  .hero-stats { display: flex; gap: 32px; flex-wrap: wrap; }
+  .hero-stat-val { font-size: 22px; font-weight: 500; color: #26215C; display: block; }
+  .hero-stat-label { font-size: 12px; color: #888780; }
+
+  .hero-phone { background: #26215C; border-radius: 36px; padding: 20px 14px; width: 260px; margin: 0 auto; box-shadow: 0 32px 80px rgba(38,33,92,.22); }
+  .phone-notch { width: 80px; height: 6px; background: #3a3560; border-radius: 3px; margin: 0 auto 16px; }
+  .phone-screen { background: #F1EFE8; border-radius: 24px; overflow: hidden; font-size: 12px; }
+  .ps-header { background: #7F77DD; padding: 14px 14px 10px; }
+  .ps-header-greet { font-size: 11px; color: #EEEDFE; margin: 0 0 2px; }
+  .ps-header-title { font-size: 15px; font-weight: 500; color: #fff; margin: 0; }
+  .ps-body { padding: 12px 12px 14px; }
+  .ps-btn { background: #7F77DD; color: #fff; font-size: 12px; font-weight: 500; padding: 10px; border-radius: 8px; text-align: center; margin-bottom: 12px; }
+  .ps-section-label { font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: .06em; color: #888780; margin: 0 0 6px; }
+  .ps-item { display: flex; gap: 8px; align-items: center; padding: 7px 0; border-bottom: .5px solid #D3D1C7; }
+  .ps-item:last-child { border-bottom: none; }
+  .ps-dot { width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+  .ps-item-name { font-size: 11px; font-weight: 500; color: #26215C; margin: 0; }
+  .ps-item-sub { font-size: 9px; color: #888780; margin: 1px 0 0; }
+  .ps-track { margin-top: 12px; background: #fff; border-radius: 10px; padding: 10px 12px; border: .5px solid #D3D1C7; }
+  .ps-track-title { font-size: 11px; font-weight: 500; color: #26215C; margin: 0 0 8px; }
+  .ps-step { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; font-size: 10px; }
+  .ps-step:last-child { margin-bottom: 0; }
+  .ps-step-icon { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .ps-step-label { color: #534AB7; }
+  .ps-step-label.active { color: #26215C; font-weight: 500; }
+  .ps-step-label.dim { color: #888780; opacity: .6; }
+
+  .how { background: #fff; }
+  .section-eyebrow { font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: #7F77DD; margin-bottom: 12px; }
+  .section-title { color: #26215C; margin-bottom: 16px; }
+  .section-sub { font-size: 17px; color: #534AB7; max-width: 540px; margin-bottom: 56px; }
+  .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0; }
+  .step-item { padding: 32px; position: relative; }
+  .step-item::after { content: ''; position: absolute; top: 52px; right: 0; width: 1px; height: 40px; background: #D3D1C7; }
+  .step-item:last-child::after { display: none; }
+  .step-num { font-size: 11px; font-weight: 500; color: #7F77DD; background: #EEEDFE; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+  .step-item h3 { color: #26215C; margin-bottom: 8px; }
+  .step-item p { font-size: 14px; color: #534AB7; }
+
+  .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+  .feature-card { background: #fff; border: 1px solid #D3D1C7; border-radius: 16px; padding: 28px; transition: box-shadow .2s, transform .2s; }
+  .feature-card:hover { box-shadow: 0 8px 32px rgba(127,119,221,.12); transform: translateY(-2px); }
+  .feature-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+  .feature-icon svg { width: 22px; height: 22px; }
+  .feature-card h3 { color: #26215C; margin-bottom: 8px; }
+  .feature-card p { font-size: 14px; }
+
+  .pricing { background: #26215C; }
+  .pricing .section-eyebrow { color: #AFA9EC; }
+  .pricing .section-title { color: #fff; }
+  .pricing .section-sub { color: #AFA9EC; }
+  .plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+  .plan-card { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 16px; padding: 28px; position: relative; }
+  .plan-card.featured { background: #7F77DD; border-color: #AFA9EC; }
+  .plan-popular { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #EF9F27; color: #412402; font-size: 11px; font-weight: 500; padding: 3px 12px; border-radius: 20px; white-space: nowrap; }
+  .plan-name { font-size: 13px; font-weight: 500; color: rgba(255,255,255,.6); margin-bottom: 8px; }
+  .plan-card.featured .plan-name { color: rgba(255,255,255,.85); }
+  .plan-price { font-size: 36px; font-weight: 500; color: #fff; line-height: 1; margin-bottom: 4px; }
+  .plan-price span { font-size: 16px; font-weight: 400; opacity: .7; }
+  .plan-desc { font-size: 13px; color: rgba(255,255,255,.5); margin-bottom: 24px; margin-top: 6px; }
+  .plan-card.featured .plan-desc { color: rgba(255,255,255,.75); }
+  .plan-features { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .plan-features li { display: flex; gap: 10px; font-size: 13px; color: rgba(255,255,255,.75); align-items: flex-start; line-height: 1.5; }
+  .plan-check { color: #5DCAA5; flex-shrink: 0; }
+  .plan-card.featured .plan-features li { color: rgba(255,255,255,.92); }
+  .plan-cta { display: block; text-align: center; margin-top: 28px; padding: 12px; border-radius: 9px; font-size: 14px; font-weight: 500; text-decoration: none; transition: all .15s; }
+  .plan-cta-outline { border: 1px solid rgba(255,255,255,.2); color: #fff; }
+  .plan-cta-outline:hover { border-color: rgba(255,255,255,.5); background: rgba(255,255,255,.06); }
+  .plan-cta-solid { background: #fff; color: #534AB7; }
+  .plan-cta-solid:hover { background: #EEEDFE; }
+
+  .b2b { background: #F1EFE8; }
+  .b2b-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+  .seg-card { background: #fff; border: 1px solid #D3D1C7; border-radius: 12px; padding: 18px 20px; display: flex; gap: 14px; align-items: flex-start; margin-bottom: 12px; }
+  .seg-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .seg-icon svg { width: 18px; height: 18px; }
+  .seg-name { font-size: 14px; font-weight: 500; color: #26215C; margin: 0 0 3px; }
+  .seg-detail { font-size: 13px; color: #534AB7; margin: 0; }
+  .seg-vol { margin-left: auto; font-size: 12px; font-weight: 500; color: #085041; background: #E1F5EE; padding: 2px 9px; border-radius: 6px; white-space: nowrap; flex-shrink: 0; }
+
+  .testimonials { background: #fff; }
+  .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+  .testimonial-card { background: #F1EFE8; border-radius: 16px; padding: 28px; }
+  .testimonial-stars { color: #EF9F27; font-size: 14px; margin-bottom: 14px; letter-spacing: 2px; }
+  .testimonial-text { font-size: 15px; color: #26215C; margin-bottom: 20px; line-height: 1.65; font-style: italic; }
+  .testimonial-author { display: flex; align-items: center; gap: 12px; }
+  .testimonial-avatar { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 500; flex-shrink: 0; }
+  .testimonial-name { font-size: 13px; font-weight: 500; color: #26215C; margin: 0 0 1px; }
+  .testimonial-role { font-size: 12px; color: #888780; margin: 0; }
+
+  .partner-band { background: #1D9E75; padding: 96px 0; }
+  .partner-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+  .partner-band h2 { color: #fff; margin-bottom: 14px; }
+  .partner-band p { color: rgba(255,255,255,.82); font-size: 16px; }
+  .partner-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-top: 24px; }
+  .partner-list li { display: flex; gap: 10px; font-size: 14px; color: rgba(255,255,255,.85); }
+  .partner-check { color: #9FE1CB; flex-shrink: 0; }
+  .partner-earn { background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2); border-radius: 16px; padding: 28px; }
+  .pe-label { font-size: 11px; font-weight: 500; color: rgba(255,255,255,.55); text-transform: uppercase; letter-spacing: .06em; margin: 0 0 12px; }
+  .pe-row { display: flex; justify-content: space-between; font-size: 13px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,.12); }
+  .pe-row:last-child { border-bottom: none; font-weight: 500; font-size: 15px; }
+  .pe-row span:first-child { color: rgba(255,255,255,.65); }
+  .pe-row span:last-child { color: #fff; }
+  .btn-white { background: #fff; color: #085041; padding: 14px 28px; border-radius: 10px; font-size: 15px; font-weight: 500; text-decoration: none; display: inline-block; margin-top: 24px; transition: background .15s; }
+  .btn-white:hover { background: #E1F5EE; }
+
+  .driver-cta { background: #EEEDFE; border-radius: 24px; padding: 64px; display: grid; grid-template-columns: 1fr auto; gap: 40px; align-items: center; margin: 0 24px; }
+  .driver-cta h2 { color: #26215C; margin-bottom: 12px; }
+  .driver-stats { display: flex; gap: 32px; margin-top: 24px; flex-wrap: wrap; }
+  .d-stat-val { font-size: 24px; font-weight: 500; color: #534AB7; display: block; }
+  .d-stat-label { font-size: 12px; color: #534AB7; opacity: .7; }
+
+  .faq { background: #F1EFE8; }
+  .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; max-width: 900px; }
+  .faq-item { background: #fff; border: 1px solid #D3D1C7; border-radius: 12px; padding: 22px 24px; cursor: pointer; transition: border-color .15s; }
+  .faq-item:hover { border-color: #AFA9EC; }
+  .faq-q { font-size: 14px; font-weight: 500; color: #26215C; margin-bottom: 0; display: flex; justify-content: space-between; gap: 12px; }
+  .faq-arrow { color: #7F77DD; flex-shrink: 0; transition: transform .2s; }
+  .faq-a { font-size: 13px; color: #534AB7; line-height: 1.65; display: none; margin-top: 10px; }
+  .faq-item.open .faq-a { display: block; }
+  .faq-item.open .faq-arrow { transform: rotate(180deg); }
+
+  .final-cta { background: #26215C; text-align: center; padding: 120px 24px; }
+  .final-cta h2 { color: #fff; font-size: clamp(2rem, 5vw, 3.2rem); margin-bottom: 16px; }
+  .final-cta p { color: #AFA9EC; font-size: 18px; max-width: 480px; margin: 0 auto 36px; }
+  .final-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-hero { background: #7F77DD; color: #fff; padding: 16px 36px; border-radius: 10px; font-size: 16px; font-weight: 500; text-decoration: none; transition: background .15s; }
+  .btn-hero:hover { background: #534AB7; }
+  .btn-hero-outline { border: 1.5px solid rgba(255,255,255,.25); color: #fff; padding: 16px 36px; border-radius: 10px; font-size: 16px; font-weight: 500; text-decoration: none; transition: border-color .15s; }
+  .btn-hero-outline:hover { border-color: rgba(255,255,255,.6); }
+
+  footer { background: #26215C; border-top: 1px solid rgba(255,255,255,.08); padding: 56px 24px 32px; }
+  .footer-inner { max-width: 1100px; margin: 0 auto; }
+  .footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+  .footer-brand p { font-size: 14px; color: rgba(255,255,255,.45); margin-top: 12px; max-width: 260px; line-height: 1.6; }
+  .footer-logo { display: flex; align-items: center; gap: 8px; }
+  .footer-logo-mark { width: 30px; height: 30px; border-radius: 8px; background: #7F77DD; display: flex; align-items: center; justify-content: center; }
+  .footer-logo-mark svg { width: 14px; height: 14px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .footer-wordmark { font-size: 16px; font-weight: 500; color: #fff; }
+  .footer-wordmark span { color: #AFA9EC; }
+  .footer-col h4 { font-size: 12px; font-weight: 500; color: rgba(255,255,255,.35); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 14px; }
+  .footer-col a { display: block; font-size: 14px; color: rgba(255,255,255,.55); text-decoration: none; margin-bottom: 9px; transition: color .15s; }
+  .footer-col a:hover { color: #fff; }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,.08); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .footer-copy { font-size: 13px; color: rgba(255,255,255,.28); }
+  .footer-legal { display: flex; gap: 20px; }
+  .footer-legal a { font-size: 13px; color: rgba(255,255,255,.28); text-decoration: none; }
+  .footer-legal a:hover { color: rgba(255,255,255,.6); }
+
+  .fade-up { opacity: 0; transform: translateY(24px); transition: opacity .6s ease, transform .6s ease; }
+  .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 768px) {
+    section { padding: 64px 0; }
+    .hero-inner { grid-template-columns: 1fr; gap: 40px; }
+    .hero-phone { display: none; }
+    .b2b-inner { grid-template-columns: 1fr; gap: 40px; }
+    .partner-inner { grid-template-columns: 1fr; gap: 32px; }
+    .faq-grid { grid-template-columns: 1fr; }
+    .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+    .driver-cta { grid-template-columns: 1fr; padding: 40px 28px; margin: 0 16px; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="#">
+      <div class="nav-logomark">
+        <svg viewBox="0 0 24 24"><path d="M6 8c0-2.2 1.8-4 4-4h4a4 4 0 0 1 0 8h-4a4 4 0 0 0 0 8h4a4 4 0 0 0 4-4"/></svg>
+      </div>
+      <span class="nav-wordmark">Tidy<span>Folds</span></span>
+    </a>
+    <div class="nav-links">
+      <a href="#how-it-works">How it works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#business">For business</a>
+      <a href="#partners">Laundromat partners</a>
+      <a href="#drive">Drive with us</a>
+      <a href="#schedule" class="nav-cta">Schedule pickup</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-inner">
+    <div>
+      <p class="hero-eyebrow">Now available in Edmond &amp; OKC</p>
+      <h1>Laundry,<br><em>picked up.</em><br>Clothes, back.</h1>
+      <p class="hero-sub">Schedule a pickup in 60 seconds. A nearby laundromat washes and folds. Your clothes come home clean — usually by tomorrow morning.</p>
+      <div class="hero-actions">
+        <a href="#schedule" class="btn-primary">Schedule your first pickup</a>
+        <a href="#how-it-works" class="btn-outline">See how it works</a>
+      </div>
+      <div class="hero-stats">
+        <div><span class="hero-stat-val">$0</span><span class="hero-stat-label">First pickup free</span></div>
+        <div><span class="hero-stat-val">24 hr</span><span class="hero-stat-label">Average turnaround</span></div>
+        <div><span class="hero-stat-val">4.9 ★</span><span class="hero-stat-label">Avg platform rating</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="hero-phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="ps-header">
+            <p class="ps-header-greet">Good morning, Jamie</p>
+            <p class="ps-header-title">Edmond, OK · 3 nearby</p>
+          </div>
+          <div class="ps-body">
+            <div class="ps-btn">Schedule a pickup</div>
+            <p class="ps-section-label">Nearby partners</p>
+            <div class="ps-item">
+              <div class="ps-dot" style="background:#E1F5EE">
+                <svg width="14" height="14" fill="none" stroke="#085041" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 13h4"/></svg>
+              </div>
+              <div><p class="ps-item-name">Suds &amp; Fold</p><p class="ps-item-sub">0.4 mi · 4.9 ★ · Open now</p></div>
+            </div>
+            <div class="ps-item">
+              <div class="ps-dot" style="background:#EEEDFE">
+                <svg width="14" height="14" fill="none" stroke="#3C3489" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 13h4"/></svg>
+              </div>
+              <div><p class="ps-item-name">Sparkle Wash</p><p class="ps-item-sub">0.9 mi · 4.7 ★ · Open now</p></div>
+            </div>
+            <div class="ps-track">
+              <p class="ps-track-title">Order #TF-4821 — in progress</p>
+              <div class="ps-step">
+                <div class="ps-step-icon" style="background:#E1F5EE"><svg width="10" height="10" fill="none" stroke="#085041" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></div>
+                <span class="ps-step-label">Picked up · 2:14 PM</span>
+              </div>
+              <div class="ps-step">
+                <div class="ps-step-icon" style="background:#EEEDFE"><svg width="10" height="10" fill="none" stroke="#534AB7" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2"/></svg></div>
+                <span class="ps-step-label active">Washing now — Suds &amp; Fold</span>
+              </div>
+              <div class="ps-step">
+                <div class="ps-step-icon" style="background:#F1EFE8"><svg width="10" height="10" fill="none" stroke="#B4B2A9" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></div>
+                <span class="ps-step-label dim">Delivery · Est. 9:00 AM</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="how" id="how-it-works">
+  <div class="container">
+    <p class="section-eyebrow fade-up">How it works</p>
+    <h2 class="section-title fade-up">From your door to clean in four steps</h2>
+    <p class="section-sub fade-up">We handle the pickup, the laundromat, and the delivery. You handle nothing.</p>
+    <div class="steps-grid fade-up">
+      <div class="step-item">
+        <div class="step-num">1</div>
+        <h3>Schedule a pickup</h3>
+        <p>Open the app, set your address and preferences — detergent, temperature, fold style — and pick a time. Takes 60 seconds.</p>
+      </div>
+      <div class="step-item">
+        <div class="step-num">2</div>
+        <h3>We collect your laundry</h3>
+        <p>A TidyFolds driver comes to your door with a labeled bag. Leave your laundry outside — they handle the rest.</p>
+      </div>
+      <div class="step-item">
+        <div class="step-num">3</div>
+        <h3>A local laundromat washes it</h3>
+        <p>Your clothes go to a vetted partner nearby. Washed, dried, and folded exactly to your preferences.</p>
+      </div>
+      <div class="step-item">
+        <div class="step-num">4</div>
+        <h3>Clean clothes at your door</h3>
+        <p>Your driver returns the next morning — or same day if you choose express. Fresh, folded, ready.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="features" style="background:#F1EFE8; padding:96px 0;">
+  <div class="container">
+    <p class="section-eyebrow fade-up">Features</p>
+    <h2 class="section-title fade-up">Built around how people actually do laundry</h2>
+    <p class="section-sub fade-up">Not a generic delivery app with laundry bolted on. Every detail is designed for this one thing.</p>
+    <div class="features-grid fade-up">
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#EEEDFE"><svg fill="none" stroke="#534AB7" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 5-7 13-7 13S5 14 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5"/></svg></div>
+        <h3>Real-time tracking</h3>
+        <p>Watch your order move from pickup to wash to delivery on a live map. No guessing when it arrives.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#E1F5EE"><svg fill="none" stroke="#0F6E56" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="M9 12h6M9 16h4"/></svg></div>
+        <h3>Saved preferences</h3>
+        <p>Set your detergent, water temperature, and fold style once. Every order uses them automatically.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#FAEEDA"><svg fill="none" stroke="#854F0B" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+        <h3>Express 4-hour service</h3>
+        <p>Need it back faster? Choose express at checkout and your order jumps to the front of the queue.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#EEEDFE"><svg fill="none" stroke="#534AB7" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <h3>Two-way ratings</h3>
+        <p>Rate your driver and laundromat. The whole platform stays accountable — high standards on every order.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#E1F5EE"><svg fill="none" stroke="#0F6E56" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+        <h3>Scheduled recurring pickups</h3>
+        <p>Set a weekly pickup day and forget about laundry entirely. Reschedule any time from the app.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon" style="background:#FAEEDA"><svg fill="none" stroke="#854F0B" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        <h3>Stain treatment add-on</h3>
+        <p>Flag items for pre-treatment at checkout. Our partner laundromats handle them with extra care.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pricing" id="pricing">
+  <div class="container">
+    <p class="section-eyebrow fade-up">Pricing</p>
+    <h2 class="section-title fade-up">Simple. No surprises.</h2>
+    <p class="section-sub fade-up">Pay per order, or subscribe and the delivery fee disappears. Your first pickup is always free.</p>
+    <div class="plans-grid fade-up">
+      <div class="plan-card">
+        <p class="plan-name">Pay-per-use</p>
+        <p class="plan-price">$0<span>/mo</span></p>
+        <p class="plan-desc">No subscription. Order when you need it.</p>
+        <ul class="plan-features">
+          <li><span class="plan-check">✓</span> $1.59 per lb, wash &amp; fold</li>
+          <li><span class="plan-check">✓</span> $4.99 delivery fee per order</li>
+          <li><span class="plan-check">✓</span> Real-time tracking</li>
+          <li><span class="plan-check">✓</span> Saved preferences</li>
+          <li><span class="plan-check">✓</span> 100% of tips to your driver</li>
+        </ul>
+        <a href="#schedule" class="plan-cta plan-cta-outline">Get started free</a>
+      </div>
+      <div class="plan-card featured">
+        <div class="plan-popular">Most popular</div>
+        <p class="plan-name">TidyFolds+</p>
+        <p class="plan-price">$14.99<span>/mo</span></p>
+        <p class="plan-desc">Pays for itself at 3 orders a month.</p>
+        <ul class="plan-features">
+          <li><span class="plan-check">✓</span> $1.59 per lb, wash &amp; fold</li>
+          <li><span class="plan-check">✓</span> Free delivery on every order</li>
+          <li><span class="plan-check">✓</span> Priority driver matching</li>
+          <li><span class="plan-check">✓</span> 10% off express upgrades</li>
+          <li><span class="plan-check">✓</span> Favorite laundromat always first</li>
+          <li><span class="plan-check">✓</span> Order streak rewards</li>
+        </ul>
+        <a href="#schedule" class="plan-cta plan-cta-solid">Try free for 30 days</a>
+      </div>
+      <div class="plan-card">
+        <p class="plan-name">TidyBiz</p>
+        <p class="plan-price">$49.99<span>/mo</span></p>
+        <p class="plan-desc">For hotels, gyms, and Airbnb hosts.</p>
+        <ul class="plan-features">
+          <li><span class="plan-check">✓</span> $1.29 per lb (volume rate)</li>
+          <li><span class="plan-check">✓</span> Free delivery, all orders</li>
+          <li><span class="plan-check">✓</span> Monthly invoice billing</li>
+          <li><span class="plan-check">✓</span> Dedicated account manager</li>
+          <li><span class="plan-check">✓</span> 8-hour SLA guarantee</li>
+          <li><span class="plan-check">✓</span> Up to 5 team members</li>
+        </ul>
+        <a href="#business" class="plan-cta plan-cta-outline">Contact sales</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="b2b" id="business">
+  <div class="container">
+    <div class="b2b-inner">
+      <div>
+        <p class="section-eyebrow fade-up">For business</p>
+        <h2 class="section-title fade-up">Your laundry operations, handled.</h2>
+        <p style="font-size:16px; color:#534AB7; margin-bottom:32px; max-width:460px; line-height:1.7;" class="fade-up">Hotels, gyms, Airbnb superhosts, and med spas use TidyFolds to handle linen turnaround without the staffing headache. We show up daily on your schedule and invoice you monthly.</p>
+        <ul style="list-style:none; display:flex; flex-direction:column; gap:12px; margin-bottom:36px;" class="fade-up">
+          <li style="display:flex; gap:12px; font-size:15px; color:#534AB7;"><span style="color:#1D9E75;">✓</span> 8-hour turnaround SLA, guaranteed</li>
+          <li style="display:flex; gap:12px; font-size:15px; color:#534AB7;"><span style="color:#1D9E75;">✓</span> Same laundromat handles your account every time</li>
+          <li style="display:flex; gap:12px; font-size:15px; color:#534AB7;"><span style="color:#1D9E75;">✓</span> Dedicated account manager for 50+ lbs/day</li>
+          <li style="display:flex; gap:12px; font-size:15px; color:#534AB7;"><span style="color:#1D9E75;">✓</span> First week free — no contract, no credit card</li>
+        </ul>
+        <a href="mailto:biz@tidyfolds.com" class="btn-primary fade-up">Talk to our business team</a>
+      </div>
+      <div class="fade-up">
+        <div class="seg-card">
+          <div class="seg-icon" style="background:#EEEDFE"><svg fill="none" stroke="#534AB7" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+          <div><p class="seg-name">Airbnb superhosts</p><p class="seg-detail">Turnover linens between every guest, on time.</p></div>
+          <span class="seg-vol">8–20 lbs/day</span>
+        </div>
+        <div class="seg-card">
+          <div class="seg-icon" style="background:#E1F5EE"><svg fill="none" stroke="#0F6E56" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 13h4"/></svg></div>
+          <div><p class="seg-name">Boutique hotels</p><p class="seg-detail">Linens, towels, staff uniforms — daily or on surge.</p></div>
+          <span class="seg-vol">50–200 lbs/day</span>
+        </div>
+        <div class="seg-card">
+          <div class="seg-icon" style="background:#FAEEDA"><svg fill="none" stroke="#854F0B" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M3 21v-2a7 7 0 0 1 7-7h4a7 7 0 0 1 7 7v2"/></svg></div>
+          <div><p class="seg-name">Gyms &amp; studios</p><p class="seg-detail">Towels, mats, and apparel — predictable schedule.</p></div>
+          <span class="seg-vol">30–80 lbs/day</span>
+        </div>
+        <div class="seg-card">
+          <div class="seg-icon" style="background:#FAECE7"><svg fill="none" stroke="#993C1D" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+          <div><p class="seg-name">Med spas &amp; salons</p><p class="seg-detail">Robes and treatment linens — premium care.</p></div>
+          <span class="seg-vol">10–30 lbs/day</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="testimonials">
+  <div class="container">
+    <p class="section-eyebrow fade-up">What people say</p>
+    <h2 class="section-title fade-up" style="margin-bottom:48px;">Real customers, real laundry</h2>
+    <div class="testimonials-grid fade-up">
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"I work 50-hour weeks. I used to spend every Sunday doing laundry. Now I schedule a pickup Friday morning and it's back Saturday. I actually have a weekend again."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar" style="background:#EEEDFE; color:#3C3489;">MK</div>
+          <div><p class="testimonial-name">Maya K.</p><p class="testimonial-role">TidyFolds+ member · Edmond, OK</p></div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"I run three Airbnbs. Before TidyFolds I was doing linen runs myself between guests. Now I just leave bags out and they come back folded. It changed my whole operation."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar" style="background:#E1F5EE; color:#085041;">DL</div>
+          <div><p class="testimonial-name">Derek L.</p><p class="testimonial-role">Airbnb superhost · TidyBiz plan</p></div>
+        </div>
+      </div>
+      <div class="testimonial-card">
+        <div class="testimonial-stars">★★★★★</div>
+        <p class="testimonial-text">"The preference card won me over. I have a wool sweater that has to be cold-washed and laid flat. I set it once, and every single order has come back perfect."</p>
+        <div class="testimonial-author">
+          <div class="testimonial-avatar" style="background:#FAEEDA; color:#633806;">SR</div>
+          <div><p class="testimonial-name">Sandra R.</p><p class="testimonial-role">TidyFolds+ member · OKC</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="partner-band" id="partners">
+  <div class="container">
+    <div class="partner-inner">
+      <div>
+        <p style="font-size:12px; font-weight:500; letter-spacing:.08em; text-transform:uppercase; color:rgba(255,255,255,.5); margin-bottom:12px;">For laundromats</p>
+        <h2>Turn idle machines into steady income.</h2>
+        <p style="margin-top:12px;">We send you wash-and-fold orders from local customers during your slow hours. You do what you already do — we handle the customers, the drivers, and the payment.</p>
+        <ul class="partner-list">
+          <li><span class="partner-check">✓</span> Zero upfront cost to join</li>
+          <li><span class="partner-check">✓</span> Orders arrive mostly Mon–Thu mornings</li>
+          <li><span class="partner-check">✓</span> Weekly direct deposit every Friday</li>
+          <li><span class="partner-check">✓</span> You set your capacity limit</li>
+          <li><span class="partner-check">✓</span> Live within 10 days of applying</li>
+        </ul>
+        <a href="mailto:partners@tidyfolds.com" class="btn-white">Apply to become a partner</a>
+      </div>
+      <div>
+        <div class="partner-earn">
+          <p class="pe-label">Example earnings · 20 orders/week</p>
+          <div class="pe-row"><span>300 lbs × $1.59</span><span>$477/wk</span></div>
+          <div class="pe-row"><span>Platform fee (20%)</span><span>− $95</span></div>
+          <div class="pe-row"><span>Supplies estimate</span><span>− $40</span></div>
+          <div class="pe-row"><span>Your weekly payout</span><span>~$342</span></div>
+        </div>
+        <div style="margin-top:16px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:12px; padding:20px 22px;">
+          <p style="font-size:13px; color:rgba(255,255,255,.65); line-height:1.65; font-style:italic; margin:0;">"We were running at half capacity on Tuesday mornings. TidyFolds fills that gap completely — and the orders just show up. I don't do anything differently."</p>
+          <p style="font-size:12px; color:rgba(255,255,255,.38); margin:10px 0 0;">— Pilot partner, Suds &amp; Fold, Tulsa OK</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="drive" style="background:#F1EFE8; padding:72px 0;">
+  <div class="driver-cta fade-up">
+    <div>
+      <p style="font-size:12px; font-weight:500; letter-spacing:.08em; text-transform:uppercase; color:#7F77DD; margin-bottom:12px;">Drive with TidyFolds</p>
+      <h2>Earn up to $25/hr on your schedule.</h2>
+      <p style="margin-top:12px; color:#534AB7; font-size:16px; max-width:480px;">Pick up laundry, drop it at a partner laundromat, deliver it back clean. Short routes, flexible hours, and a guaranteed $18/hr minimum your first two weeks.</p>
+      <div class="driver-stats">
+        <div><span class="d-stat-val">$18/hr</span><span class="d-stat-label">Guaranteed first 2 weeks</span></div>
+        <div><span class="d-stat-val">100%</span><span class="d-stat-label">Tips go directly to you</span></div>
+        <div><span class="d-stat-val">Friday</span><span class="d-stat-label">Weekly direct deposit</span></div>
+      </div>
+    </div>
+    <a href="mailto:drivers@tidyfolds.com" class="btn-primary" style="white-space:nowrap; flex-shrink:0;">Apply to drive</a>
+  </div>
+</section>
+
+<section class="faq" id="faq">
+  <div class="container">
+    <p class="section-eyebrow fade-up">FAQ</p>
+    <h2 class="section-title fade-up" style="margin-bottom:40px;">Questions people actually ask</h2>
+    <div class="faq-grid fade-up">
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">How long does it take? <span class="faq-arrow">▾</span></div>
+        <div class="faq-a">Standard orders are returned the next morning — most within 18–22 hours. Express orders are returned within 4 hours. We confirm your expected window when you place the order.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">What if something gets lost or damaged? <span class="faq-arrow">▾</span></div>
+        <div class="faq-a">TidyFolds covers damage claims up to $300 per order. Contact support within 48 hours of delivery and we'll make it right — no runaround, no fine print.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">Can I request a specific detergent? <span class="faq-arrow">▾</span></div>
+        <div class="faq-a">Yes. Your preference card lets you choose from common detergents or request fragrance-free washing. You can also flag allergens. Preferences are saved and applied to every order automatically.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">How does TidyFolds+ pay for itself? <span class="faq-arrow">▾</span></div>
+        <div class="faq-a">Each delivery costs $4.99. TidyFolds+ is $14.99/month and removes the delivery fee on every order. At 3 pickups per month you break even. Most Plus members do 4–6 pickups monthly, saving $5–$15 over pay-per-use.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">Which areas do you serve? <span class="faq-arrow">▾</span></div>
+        <div class="faq-a">We currently serve Edmond and Oklahoma City. Expanding to Tulsa and Norman in early 2026. Enter your address in the app to check coverage in your specific neighborhood.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">Can I cancel TidyFolds+ anytime? <span class="faq-arrow">▾</span></div>
+        <div class="faq-a">Yes — cancel anytime from the app, no phone call required. Cancel before your 30-day trial ends and you'll never be charged. No cancellation fees, ever.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="final-cta" id="schedule">
+  <h2>Your first pickup is free.</h2>
+  <p>No subscription required. Schedule in 60 seconds and we handle the rest.</p>
+  <div class="final-actions">
+    <a href="#" class="btn-hero">Schedule a pickup</a>
+    <a href="#how-it-works" class="btn-hero-outline">See how it works</a>
+  </div>
+  <p style="font-size:13px; color:rgba(255,255,255,.3); margin-top:24px;">Available on iOS &amp; Android · No credit card to get started</p>
+</section>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <div class="footer-logo-mark">
+            <svg viewBox="0 0 24 24"><path d="M6 8c0-2.2 1.8-4 4-4h4a4 4 0 0 1 0 8h-4a4 4 0 0 0 0 8h4a4 4 0 0 0 4-4"/></svg>
+          </div>
+          <span class="footer-wordmark">Tidy<span>Folds</span></span>
+        </div>
+        <p>Laundry pickup and delivery connecting customers to local laundromats in Edmond and Oklahoma City.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Customers</h4>
+        <a href="#how-it-works">How it works</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#faq">FAQ</a>
+        <a href="#schedule">Schedule pickup</a>
+      </div>
+      <div class="footer-col">
+        <h4>Business</h4>
+        <a href="#business">Business accounts</a>
+        <a href="#partners">Laundromat partners</a>
+        <a href="#drive">Drive with us</a>
+        <a href="mailto:biz@tidyfolds.com">Contact sales</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="about.html">About</a>
+        <a href="#">Blog</a>
+        <a href="mailto:hello@tidyfolds.com">Contact</a>
+        <a href="contact.html">Contact</a>
+        <a href="#">Careers</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2025 TidyFolds Inc. · Edmond, Oklahoma</p>
+      <div class="footer-legal">
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="#">Accessibility</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+  function toggleFaq(el) { el.classList.toggle('open'); }
+</script>
+</body>
+</html>

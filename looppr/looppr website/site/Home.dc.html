@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  html { scroll-behavior:smooth; }
+  body { margin:0; background:#F8F7FF; }
+  @keyframes tf-spin { to { transform:rotate(360deg); } }
+  @keyframes tf-floaty { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-10px); } }
+  @keyframes tf-floaty2 { 0%,100% { transform:translateY(0); } 50% { transform:translateY(8px); } }
+  @keyframes tf-pulse { 0% { box-shadow:0 0 0 0 rgba(124,115,230,.4); } 70% { box-shadow:0 0 0 14px rgba(124,115,230,0); } 100% { box-shadow:0 0 0 0 rgba(124,115,230,0); } }
+  @keyframes tf-tick { 0%,100% { transform:translateY(0); } 25% { transform:translateY(-2px) rotate(-3deg); } 75% { transform:translateY(2px) rotate(3deg); } }
+</style>
+</helmet>
+<div style="font-family:'Hanken Grotesk',system-ui,sans-serif; color:#1E1B4B; background:#F8F7FF; overflow-x:hidden;">
+  <dc-import name="SiteNav" active="" hint-size="100%,66px"></dc-import>
+
+  <!-- ============ HERO: PHONE ============ -->
+  <sc-if value="{{ heroPhone }}" hint-placeholder-val="{{ true }}">
+  <section style="position:relative; padding:84px 24px 72px; overflow:hidden;">
+    <div style="position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse 60% 60% at 74% 36%, #D7D3F7 0%, transparent 64%); opacity:.7;"></div>
+    <div style="position:relative; max-width:1140px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit,minmax(330px,1fr)); gap:56px; align-items:center;">
+      <div data-reveal>
+        <div style="display:inline-flex; align-items:center; gap:8px; background:#fff; border:1px solid #E5E3F2; border-radius:30px; padding:6px 14px 6px 8px; font-size:13px; font-weight:600; color:#5A52C5; margin-bottom:24px; box-shadow:0 2px 10px rgba(30,27,75,.05);"><span style="background:#7C73E6; color:#fff; font-size:11px; padding:2px 8px; border-radius:20px; font-weight:700;">July 1</span>Launching in OKC, Edmond, Norman &amp; Moore</div>
+        <h1 style="font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(2.7rem,6vw,4.4rem); font-weight:600; line-height:1.04; letter-spacing:-.025em; color:#1E1B4B; margin:0 0 22px;">Laundry,<br><em style="font-style:italic; color:#7C73E6;">handled.</em></h1>
+        <p style="font-size:18.5px; color:#5A52C5; line-height:1.6; max-width:460px; margin:0 0 34px;">Schedule a pickup in 60 seconds. A vetted local laundromat washes and folds exactly how you like. Back at your door by tomorrow morning — free first order.</p>
+        <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:42px;">
+          <a href="#schedule" style="background:#1E1B4B; color:#fff; padding:15px 28px; border-radius:11px; font-size:15.5px; font-weight:600; text-decoration:none; box-shadow:0 6px 20px rgba(30,27,75,.22); transition:transform .12s,background .15s;" style-hover="transform:translateY(-2px); background:#332AB8;">Schedule your first pickup</a>
+          <a href="#how" style="background:#fff; border:1.5px solid #DDDCF0; color:#5A52C5; padding:15px 26px; border-radius:11px; font-size:15.5px; font-weight:600; text-decoration:none; transition:border-color .15s,color .15s;" style-hover="border-color:#AFA9EC; color:#1E1B4B;">See how it works</a>
+        </div>
+        <div style="display:flex; gap:34px; flex-wrap:wrap;">
+          <div><span style="font-family:'Bricolage Grotesque',sans-serif; font-size:24px; font-weight:600; color:#1E1B4B; display:block; line-height:1;">Free</span><span style="font-size:12.5px; color:#8885A0;">First pickup, on us</span></div>
+          <div style="width:1px; background:#DDDCF0;"></div>
+          <div><span style="font-family:'Bricolage Grotesque',sans-serif; font-size:24px; font-weight:600; color:#1E1B4B; display:block; line-height:1;">~24 hr</span><span style="font-size:12.5px; color:#8885A0;">Average turnaround</span></div>
+          <div style="width:1px; background:#DDDCF0;"></div>
+          <div><span style="font-family:'Bricolage Grotesque',sans-serif; font-size:24px; font-weight:600; color:#1E1B4B; display:block; line-height:1;">4.9★</span><span style="font-size:12.5px; color:#8885A0;">Avg platform rating</span></div>
+        </div>
+      </div>
+      <div data-reveal data-reveal-delay="140" style="display:flex; justify-content:center;">
+        <div style="position:relative;">
+          <div style="position:absolute; top:24px; left:-30px; background:#fff; border:1px solid #E8E6F4; border-radius:14px; padding:11px 15px; box-shadow:0 14px 34px rgba(30,27,75,.14); animation:tf-floaty 5s ease-in-out infinite; z-index:3;">
+            <div style="display:flex; align-items:center; gap:9px;"><span style="width:30px;height:30px;border-radius:8px;background:#E1F5EE;display:flex;align-items:center;justify-content:center;"><svg width="15" height="15" fill="none" stroke="#085041" stroke-width="2.4" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></span><div><p style="margin:0;font-size:12px;font-weight:600;color:#1E1B4B;">Picked up</p><p style="margin:0;font-size:10.5px;color:#8885A0;">2:14 PM · on time</p></div></div>
+          </div>
+          <div style="position:absolute; bottom:40px; right:-26px; background:#fff; border:1px solid #E8E6F4; border-radius:14px; padding:11px 15px; box-shadow:0 14px 34px rgba(30,27,75,.14); animation:tf-floaty2 6s ease-in-out infinite; z-index:3;">
+            <div style="display:flex; align-items:center; gap:9px;"><span style="width:30px;height:30px;border-radius:8px;background:#FAEEDA;display:flex;align-items:center;justify-content:center;font-size:15px;animation:tf-tick 2.4s ease-in-out infinite;">🧺</span><div><p style="margin:0;font-size:12px;font-weight:600;color:#1E1B4B;">Folded with care</p><p style="margin:0;font-size:10.5px;color:#8885A0;">Your fold preset</p></div></div>
+          </div>
+          <div style="background:#1E1B4B; border-radius:40px; padding:14px; width:280px; box-shadow:0 40px 90px rgba(30,27,75,.3); position:relative;">
+            <div style="background:#F8F7FF; border-radius:28px; overflow:hidden;">
+              <div style="background:linear-gradient(150deg,#7C73E6,#5A52C5); padding:34px 18px 16px;">
+                <div style="display:flex; align-items:center; gap:7px; margin-bottom:8px;"><img src="uploads/looppr-mark-on-dark.png" style="width:18px;height:18px;object-fit:contain;"><span style="font-size:13px; font-weight:700; color:#fff; letter-spacing:-.01em;">Looppr</span></div>
+                <p style="margin:0; font-size:15px; font-weight:600; color:#fff;">Edmond, OK · 3 nearby</p>
+              </div>
+              <div style="padding:14px 14px 16px;">
+                <div style="background:#1E1B4B; color:#fff; font-size:13px; font-weight:600; padding:12px; border-radius:11px; text-align:center; margin-bottom:14px;">＋ Schedule a pickup</div>
+                <div style="background:#fff; border:1px solid #E8E6F4; border-radius:14px; padding:13px 14px;">
+                  <p style="margin:0 0 10px; font-size:12px; font-weight:600; color:#1E1B4B;">Order #LP-4821</p>
+                  <div style="display:flex; align-items:center; gap:9px; margin-bottom:9px;"><span style="width:20px;height:20px;border-radius:50%;background:#E1F5EE;display:flex;align-items:center;justify-content:center;"><svg width="11" height="11" fill="none" stroke="#085041" stroke-width="2.6" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></span><span style="font-size:11.5px; color:#8885A0;">Picked up · 2:14 PM</span></div>
+                  <div style="display:flex; align-items:center; gap:9px; margin-bottom:9px;"><span style="width:20px;height:20px;border-radius:50%;border:2px solid #CFCBF2;border-top-color:#7C73E6;animation:tf-spin 1s linear infinite;"></span><span style="font-size:11.5px; color:#1E1B4B; font-weight:600;">Washing now · Suds &amp; Fold</span></div>
+                  <div style="display:flex; align-items:center; gap:9px;"><span style="width:20px;height:20px;border-radius:50%;background:#F8F7FF;border:1px solid #E0DCF5;display:flex;align-items:center;justify-content:center;"><svg width="10" height="10" fill="none" stroke="#B4B2A9" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></span><span style="font-size:11.5px; color:#aaa89e;">Delivery · Est. 9:00 AM</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <!-- ============ HERO: SPLIT ============ -->
+  <sc-if value="{{ heroSplit }}" hint-placeholder-val="{{ false }}">
+  <section style="position:relative; padding:90px 24px 78px; background:#1E1B4B; overflow:hidden;">
+    <div style="position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse 55% 65% at 82% 44%, #2E2880 0%, transparent 62%);"></div>
+    <div style="position:relative; max-width:1140px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit,minmax(330px,1fr)); gap:56px; align-items:center;">
+      <div data-reveal>
+        <p style="font-size:13px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:#AFA9EC; margin:0 0 18px;">Wash &amp; fold, on demand</p>
+        <h1 style="font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(2.8rem,6.4vw,5rem); font-weight:600; line-height:1.0; letter-spacing:-.03em; color:#fff; margin:0 0 24px;"><em style="font-style:normal;">Laundry,</em><br><em style="font-style:italic; color:#AFA9EC;">handled.</em></h1>
+        <p style="font-size:19px; color:#CFCBF2; line-height:1.6; max-width:440px; margin:0 0 34px;">We pick it up, a local laundromat washes and folds it exactly how you like, and it's back at your door by morning.</p>
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <a href="#schedule" style="background:#fff; color:#1E1B4B; padding:15px 28px; border-radius:11px; font-size:15.5px; font-weight:600; text-decoration:none; transition:transform .12s;" style-hover="transform:translateY(-2px);">Start free</a>
+          <a href="#how" style="border:1.5px solid rgba(255,255,255,.3); color:#fff; padding:15px 26px; border-radius:11px; font-size:15.5px; font-weight:600; text-decoration:none; transition:border-color .15s;" style-hover="border-color:rgba(255,255,255,.7);">How it works</a>
+        </div>
+      </div>
+      <div data-reveal data-reveal-delay="140" style="display:flex; flex-direction:column; gap:14px;">
+        <div style="background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.13); border-radius:18px; padding:20px; backdrop-filter:blur(6px); animation:tf-floaty 6s ease-in-out infinite;">
+          <div style="display:flex; align-items:center; gap:13px;"><span style="width:44px;height:44px;border-radius:12px;background:#E1F5EE;display:flex;align-items:center;justify-content:center;"><svg width="22" height="22" fill="none" stroke="#085041" stroke-width="2" viewBox="0 0 24 24"><path d="M3 7h18M3 7l2 13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2l2-13M9 7V5a3 3 0 0 1 6 0v2"/></svg></span><div><p style="margin:0;font-size:15px;font-weight:600;color:#fff;">1 · We collect</p><p style="margin:2px 0 0;font-size:13px;color:#AFA9EC;">A driver grabs your bag at the door.</p></div></div>
+        </div>
+        <div style="background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.13); border-radius:18px; padding:20px; backdrop-filter:blur(6px); margin-left:28px; animation:tf-floaty2 7s ease-in-out infinite;">
+          <div style="display:flex; align-items:center; gap:13px;"><span style="width:44px;height:44px;border-radius:12px;background:#EEEDFE;display:flex;align-items:center;justify-content:center;"><span style="width:18px;height:18px;border-radius:50%;border:2.5px solid #CFCBF2;border-top-color:#7C73E6;animation:tf-spin 1.1s linear infinite;"></span></span><div><p style="margin:0;font-size:15px;font-weight:600;color:#fff;">2 · Local laundromat washes</p><p style="margin:2px 0 0;font-size:13px;color:#AFA9EC;">Your detergent, temp &amp; fold preset.</p></div></div>
+        </div>
+        <div style="background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.13); border-radius:18px; padding:20px; backdrop-filter:blur(6px); animation:tf-floaty 6.5s ease-in-out infinite;">
+          <div style="display:flex; align-items:center; gap:13px;"><span style="width:44px;height:44px;border-radius:12px;background:#FAEEDA;display:flex;align-items:center;justify-content:center;font-size:20px;">🚪</span><div><p style="margin:0;font-size:15px;font-weight:600;color:#fff;">3 · Back by morning</p><p style="margin:2px 0 0;font-size:13px;color:#AFA9EC;">Fresh, folded, ready to put away.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <!-- ============ HERO: CENTERED ============ -->
+  <sc-if value="{{ heroCentered }}" hint-placeholder-val="{{ false }}">
+  <section style="position:relative; padding:96px 24px 84px; text-align:center; overflow:hidden;">
+    <div style="position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse 50% 50% at 50% 24%, #D7D3F7 0%, transparent 60%); opacity:.8;"></div>
+    <div style="position:relative; max-width:840px; margin:0 auto;" data-reveal>
+      <div style="display:inline-flex; align-items:center; gap:8px; background:#fff; border:1px solid #E5E3F2; border-radius:30px; padding:7px 16px; font-size:13px; font-weight:600; color:#5A52C5; margin-bottom:28px; box-shadow:0 2px 10px rgba(30,27,75,.05);">★ 4.9 average · Looppr · 12,000+ orders</div>
+      <h1 style="font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(2.8rem,7vw,5.2rem); font-weight:600; line-height:1.02; letter-spacing:-.03em; color:#1E1B4B; margin:0 0 24px;">Laundry,<br><span style="color:#7C73E6; font-style:italic;">handled.</span></h1>
+      <p style="font-size:19px; color:#5A52C5; line-height:1.6; max-width:520px; margin:0 auto 36px;">Schedule a pickup, a local laundromat handles the rest, and your clothes are back clean and folded by tomorrow morning.</p>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-bottom:46px;">
+        <a href="#schedule" style="background:#1E1B4B; color:#fff; padding:16px 32px; border-radius:11px; font-size:16px; font-weight:600; text-decoration:none; box-shadow:0 6px 20px rgba(30,27,75,.22); transition:transform .12s;" style-hover="transform:translateY(-2px);">Schedule your first pickup — free</a>
+      </div>
+      <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+        <div style="background:#fff; border:1px solid #E8E6F4; border-radius:14px; padding:14px 20px; display:flex; align-items:center; gap:11px; box-shadow:0 8px 24px rgba(30,27,75,.07); animation:tf-floaty 5.5s ease-in-out infinite;"><span style="width:34px;height:34px;border-radius:9px;background:#E1F5EE;display:flex;align-items:center;justify-content:center;"><svg width="17" height="17" fill="none" stroke="#085041" stroke-width="2" viewBox="0 0 24 24"><path d="M3 7h18M3 7l2 13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2l2-13"/></svg></span><span style="font-size:13.5px;font-weight:600;color:#1E1B4B;">We pick up</span></div>
+        <div style="background:#fff; border:1px solid #E8E6F4; border-radius:14px; padding:14px 20px; display:flex; align-items:center; gap:11px; box-shadow:0 8px 24px rgba(30,27,75,.07); animation:tf-floaty2 6.5s ease-in-out infinite;"><span style="width:34px;height:34px;border-radius:9px;background:#EEEDFE;display:flex;align-items:center;justify-content:center;"><span style="width:15px;height:15px;border-radius:50%;border:2.4px solid #CFCBF2;border-top-color:#7C73E6;animation:tf-spin 1.1s linear infinite;"></span></span><span style="font-size:13.5px;font-weight:600;color:#1E1B4B;">They wash &amp; fold</span></div>
+        <div style="background:#fff; border:1px solid #E8E6F4; border-radius:14px; padding:14px 20px; display:flex; align-items:center; gap:11px; box-shadow:0 8px 24px rgba(30,27,75,.07); animation:tf-floaty 6s ease-in-out infinite;"><span style="width:34px;height:34px;border-radius:9px;background:#FAEEDA;display:flex;align-items:center;justify-content:center;font-size:17px;">🚪</span><span style="font-size:13.5px;font-weight:600;color:#1E1B4B;">Back by morning</span></div>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <!-- ============ MARQUEE / WHAT WE HANDLE ============ -->
+  <div style="border-top:1px solid #E5E3F2; border-bottom:1px solid #E5E3F2; background:#F0EFFF; padding:20px 24px;">
+    <div style="max-width:1140px; margin:0 auto; display:flex; flex-wrap:wrap; gap:14px 30px; align-items:center; justify-content:center; font-size:14px; color:#7c7a72; font-weight:500;">
+      <span style="font-weight:600; color:#5A52C5;">We handle</span>
+      <span>Everyday wash &amp; fold</span><span style="color:#C5C3E0;">·</span>
+      <span>Delicates &amp; wool</span><span style="color:#C5C3E0;">·</span>
+      <span>Bedding &amp; linens</span><span style="color:#C5C3E0;">·</span>
+      <span>Stain pre-treatment</span><span style="color:#C5C3E0;">·</span>
+      <span>Hang-dry items</span><span style="color:#C5C3E0;">·</span>
+      <span>Commercial volume</span>
+    </div>
+  </div>
+
+  <!-- ============ USER ROUTING ============ -->
+  <section style="background:#F8F7FF; padding:72px 24px 0;">
+    <div style="max-width:1140px; margin:0 auto;">
+      <div style="text-align:center; margin-bottom:36px;">
+        <p style="font-size:13px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:#7C73E6; margin:0 0 10px;">Find your path</p>
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(1.7rem,3.4vw,2.4rem); font-weight:600; letter-spacing:-.02em; color:#1E1B4B; margin:0;">Who are you here as?</h2>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin-bottom:80px;">
+        <a href="#schedule" style="text-decoration:none; background:#fff; border:1.5px solid #E8E6F4; border-radius:18px; padding:28px 24px; display:flex; flex-direction:column; gap:14px; transition:box-shadow .2s,transform .2s,border-color .2s;" style-hover="box-shadow:0 12px 36px rgba(124,115,230,.14); transform:translateY(-3px); border-color:#7C73E6;">
+          <span style="width:44px;height:44px;border-radius:12px;background:#EEEDFE;display:flex;align-items:center;justify-content:center;"><svg width="21" height="21" fill="none" stroke="#5A52C5" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 7h18M3 7l2 13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2l2-13"/></svg></span>
+          <div><p style="font-size:16px; font-weight:700; color:#1E1B4B; margin:0 0 4px;">I need laundry done</p><p style="font-size:13.5px; color:#8885A0; line-height:1.5; margin:0;">Schedule a pickup, set your preferences, get it back clean.</p></div>
+          <span style="font-size:13.5px; font-weight:600; color:#7C73E6;">Get started free →</span>
+        </a>
+        <a href="BusinessForm.dc.html" style="text-decoration:none; background:#fff; border:1.5px solid #E8E6F4; border-radius:18px; padding:28px 24px; display:flex; flex-direction:column; gap:14px; transition:box-shadow .2s,transform .2s,border-color .2s;" style-hover="box-shadow:0 12px 36px rgba(124,115,230,.14); transform:translateY(-3px); border-color:#7C73E6;">
+          <span style="width:44px;height:44px;border-radius:12px;background:#E1F5EE;display:flex;align-items:center;justify-content:center;"><svg width="21" height="21" fill="none" stroke="#0F6E56" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3"/></svg></span>
+          <div><p style="font-size:16px; font-weight:700; color:#1E1B4B; margin:0 0 4px;">I run a business</p><p style="font-size:13.5px; color:#8885A0; line-height:1.5; margin:0;">Hotels, gyms, Airbnb hosts — linen turnaround with an SLA.</p></div>
+          <span style="font-size:13.5px; font-weight:600; color:#1D9E75;">Contact our biz team →</span>
+        </a>
+        <a href="PartnersForm.dc.html" style="text-decoration:none; background:#fff; border:1.5px solid #E8E6F4; border-radius:18px; padding:28px 24px; display:flex; flex-direction:column; gap:14px; transition:box-shadow .2s,transform .2s,border-color .2s;" style-hover="box-shadow:0 12px 36px rgba(124,115,230,.14); transform:translateY(-3px); border-color:#7C73E6;">
+          <span style="width:44px;height:44px;border-radius:12px;background:#FAEEDA;display:flex;align-items:center;justify-content:center;"><svg width="21" height="21" fill="none" stroke="#854F0B" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 13h4"/></svg></span>
+          <div><p style="font-size:16px; font-weight:700; color:#1E1B4B; margin:0 0 4px;">I own a laundromat</p><p style="font-size:13.5px; color:#8885A0; line-height:1.5; margin:0;">Fill idle machines with wash-and-fold orders. Zero cost to join.</p></div>
+          <span style="font-size:13.5px; font-weight:600; color:#C77A12;">Apply to partner →</span>
+        </a>
+        <a href="DriversForm.dc.html" style="text-decoration:none; background:#fff; border:1.5px solid #E8E6F4; border-radius:18px; padding:28px 24px; display:flex; flex-direction:column; gap:14px; transition:box-shadow .2s,transform .2s,border-color .2s;" style-hover="box-shadow:0 12px 36px rgba(124,115,230,.14); transform:translateY(-3px); border-color:#7C73E6;">
+          <span style="width:44px;height:44px;border-radius:12px;background:#FAECE7;display:flex;align-items:center;justify-content:center;"><svg width="21" height="21" fill="none" stroke="#993C1D" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg></span>
+          <div><p style="font-size:16px; font-weight:700; color:#1E1B4B; margin:0 0 4px;">I want to drive</p><p style="font-size:13.5px; color:#8885A0; line-height:1.5; margin:0;">Earn up to $25/hr on your own schedule. No food, no spills.</p></div>
+          <span style="font-size:13.5px; font-weight:600; color:#993C1D;">Apply to drive →</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ LAUNCH TIMELINE ============ -->
+  <section style="background:#171433; padding:56px 24px;">
+    <div style="max-width:1140px; margin:0 auto;">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:0; position:relative;">
+        <div style="padding:0 24px 0 0; position:relative;">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+            <span style="width:32px;height:32px;border-radius:50%;background:#5DCAA5;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><svg width="14" height="14" fill="none" stroke="#fff" stroke-width="2.5" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></span>
+            <span style="flex:1;height:2px;background:rgba(255,255,255,.15);"></span>
+          </div>
+          <p style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#5DCAA5;margin:0 0 4px;">Now</p>
+          <p style="font-size:15px;font-weight:600;color:#fff;margin:0 0 4px;">Beta &amp; building</p>
+          <p style="font-size:13px;color:rgba(255,255,255,.5);margin:0;line-height:1.5;">Partners onboarded, drivers trained, app tested.</p>
+        </div>
+        <div style="padding:0 24px; position:relative;">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+            <span style="width:32px;height:32px;border-radius:50%;background:#7C73E6;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 0 4px rgba(124,115,230,.25);"><span style="width:10px;height:10px;border-radius:50%;background:#fff;"></span></span>
+            <span style="flex:1;height:2px;background:rgba(255,255,255,.15);"></span>
+          </div>
+          <p style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#7C73E6;margin:0 0 4px;">July 1, 2026</p>
+          <p style="font-size:15px;font-weight:600;color:#fff;margin:0 0 4px;">OKC metro launch</p>
+          <p style="font-size:13px;color:rgba(255,255,255,.5);margin:0;line-height:1.5;">OKC, Edmond, Norman &amp; Moore go live.</p>
+        </div>
+        <div style="padding:0 24px; position:relative;">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+            <span style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><span style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.3);"></span></span>
+            <span style="flex:1;height:2px;background:rgba(255,255,255,.1);"></span>
+          </div>
+          <p style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.4);margin:0 0 4px;">Late 2026</p>
+          <p style="font-size:15px;font-weight:600;color:rgba(255,255,255,.7);margin:0 0 4px;">Tulsa + more OK</p>
+          <p style="font-size:13px;color:rgba(255,255,255,.35);margin:0;line-height:1.5;">Expanding across Oklahoma.</p>
+        </div>
+        <div style="padding:0 0 0 24px; position:relative;">
+          <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+            <span style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.08);border:2px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><span style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.2);"></span></span>
+          </div>
+          <p style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.3);margin:0 0 4px;">Feb 2027</p>
+          <p style="font-size:15px;font-weight:600;color:rgba(255,255,255,.5);margin:0 0 4px;">Texas &amp; Georgia</p>
+          <p style="font-size:13px;color:rgba(255,255,255,.3);margin:0;line-height:1.5;">Dallas, Atlanta metro and more.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ HOW IT WORKS ============ -->
+  <section id="how" style="background:#fff; padding:96px 24px;">
+    <div style="max-width:1140px; margin:0 auto;">
+      <div data-reveal style="max-width:600px; margin-bottom:56px;">
+        <p style="font-size:13px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:#7C73E6; margin:0 0 12px;">How it works</p>
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(1.9rem,3.8vw,2.7rem); font-weight:600; letter-spacing:-.02em; color:#1E1B4B; margin:0 0 14px; line-height:1.12;">From your door to clean, in four steps</h2>
+        <p style="font-size:17px; color:#5A52C5; line-height:1.6; margin:0;">We handle the pickup, the laundromat, and the delivery. You handle nothing.</p>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px;">
+        <div data-reveal data-reveal-delay="0" style="background:#F5F4FF; border:1px solid #E8E6F5; border-radius:18px; padding:28px;">
+          <div style="width:38px; height:38px; border-radius:11px; background:#EEEDFE; color:#5A52C5; font-weight:600; display:flex; align-items:center; justify-content:center; margin-bottom:18px; font-family:'Bricolage Grotesque',sans-serif;">1</div>
+          <h3 style="font-size:16.5px; font-weight:600; color:#1E1B4B; margin:0 0 8px;">Schedule a pickup</h3>
+          <p style="font-size:14px; color:#5A52C5; line-height:1.6; margin:0;">Set your address, detergent, temperature and fold style, then pick a window. Takes 60 seconds.</p>
+        </div>
+        <div data-reveal data-reveal-delay="90" style="background:#F5F4FF; border:1px solid #E8E6F5; border-radius:18px; padding:28px;">
+          <div style="width:38px; height:38px; border-radius:11px; background:#EEEDFE; color:#5A52C5; font-weight:600; display:flex; align-items:center; justify-content:center; margin-bottom:18px; font-family:'Bricolage Grotesque',sans-serif;">2</div>
+          <h3 style="font-size:16.5px; font-weight:600; color:#1E1B4B; margin:0 0 8px;">We collect your bag</h3>
+          <p style="font-size:14px; color:#5A52C5; line-height:1.6; margin:0;">A Looppr driver comes to your door with a labeled bag. Leave it out — they take it from there.</p>
+        </div>
+        <div data-reveal data-reveal-delay="180" style="background:#F5F4FF; border:1px solid #E8E6F5; border-radius:18px; padding:28px;">
+          <div style="width:38px; height:38px; border-radius:11px; background:#EEEDFE; color:#5A52C5; font-weight:600; display:flex; align-items:center; justify-content:center; margin-bottom:18px; font-family:'Bricolage Grotesque',sans-serif;">3</div>
+          <h3 style="font-size:16.5px; font-weight:600; color:#1E1B4B; margin:0 0 8px;">A local laundromat washes it</h3>
+          <p style="font-size:14px; color:#5A52C5; line-height:1.6; margin:0;">Your clothes go to a vetted partner nearby — washed, dried and folded to your saved preferences.</p>
+        </div>
+        <div data-reveal data-reveal-delay="270" style="background:#F5F4FF; border:1px solid #E8E6F5; border-radius:18px; padding:28px;">
+          <div style="width:38px; height:38px; border-radius:11px; background:#EEEDFE; color:#5A52C5; font-weight:600; display:flex; align-items:center; justify-content:center; margin-bottom:18px; font-family:'Bricolage Grotesque',sans-serif;">4</div>
+          <h3 style="font-size:16.5px; font-weight:600; color:#1E1B4B; margin:0 0 8px;">Clean clothes at your door</h3>
+          <p style="font-size:14px; color:#5A52C5; line-height:1.6; margin:0;">Your driver returns the next morning — or same day with express. Fresh, folded, ready.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ FEATURES ============ -->
+  <section style="background:#F8F7FF; padding:96px 24px;">
+    <div style="max-width:1140px; margin:0 auto;">
+      <div data-reveal style="max-width:600px; margin-bottom:48px;">
+        <p style="font-size:13px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:#7C73E6; margin:0 0 12px;">Why it's better</p>
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(1.9rem,3.8vw,2.7rem); font-weight:600; letter-spacing:-.02em; color:#1E1B4B; margin:0; line-height:1.12;">Built around how people actually do laundry</h2>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px;">
+        <div data-reveal style="background:#fff; border:1px solid #E8E6F4; border-radius:18px; padding:28px; transition:transform .2s,box-shadow .2s;" style-hover="transform:translateY(-3px); box-shadow:0 16px 40px rgba(124,115,230,.13);">
+          <div style="width:46px;height:46px;border-radius:13px;background:#EEEDFE;display:flex;align-items:center;justify-content:center;margin-bottom:18px;"><svg width="22" height="22" fill="none" stroke="#5A52C5" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 1 7 7c0 5-7 13-7 13S5 14 5 9a7 7 0 0 1 7-7z"/><circle cx="12" cy="9" r="2.5"/></svg></div>
+          <h3 style="font-size:16.5px;font-weight:600;color:#1E1B4B;margin:0 0 8px;">Real-time tracking</h3>
+          <p style="font-size:14px;color:#5A52C5;line-height:1.6;margin:0;">Watch your order move from pickup to wash to delivery on a live map. No guessing when it lands.</p>
+        </div>
+        <div data-reveal data-reveal-delay="80" style="background:#fff; border:1px solid #E8E6F4; border-radius:18px; padding:28px; transition:transform .2s,box-shadow .2s;" style-hover="transform:translateY(-3px); box-shadow:0 16px 40px rgba(124,115,230,.13);">
+          <div style="width:46px;height:46px;border-radius:13px;background:#E1F5EE;display:flex;align-items:center;justify-content:center;margin-bottom:18px;"><svg width="22" height="22" fill="none" stroke="#0F6E56" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="M9 12h6M9 16h4"/></svg></div>
+          <h3 style="font-size:16.5px;font-weight:600;color:#1E1B4B;margin:0 0 8px;">Preferences that stick</h3>
+          <p style="font-size:14px;color:#5A52C5;line-height:1.6;margin:0;">Set detergent, water temp and fold style once. Every order after uses them automatically.</p>
+        </div>
+        <div data-reveal data-reveal-delay="160" style="background:#fff; border:1px solid #E8E6F4; border-radius:18px; padding:28px; transition:transform .2s,box-shadow .2s;" style-hover="transform:translateY(-3px); box-shadow:0 16px 40px rgba(124,115,230,.13);">
+          <div style="width:46px;height:46px;border-radius:13px;background:#FAEEDA;display:flex;align-items:center;justify-content:center;margin-bottom:18px;"><svg width="22" height="22" fill="none" stroke="#854F0B" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+          <h3 style="font-size:16.5px;font-weight:600;color:#1E1B4B;margin:0 0 8px;">Express 4-hour service</h3>
+          <p style="font-size:14px;color:#5A52C5;line-height:1.6;margin:0;">Need it fast? Choose express at checkout and your order jumps to the front of the queue.</p>
+        </div>
+        <div data-reveal style="background:#fff; border:1px solid #E8E6F4; border-radius:18px; padding:28px; transition:transform .2s,box-shadow .2s;" style-hover="transform:translateY(-3px); box-shadow:0 16px 40px rgba(124,115,230,.13);">
+          <div style="width:46px;height:46px;border-radius:13px;background:#EEEDFE;display:flex;align-items:center;justify-content:center;margin-bottom:18px;"><svg width="22" height="22" fill="none" stroke="#5A52C5" stroke-width="1.8" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></div>
+          <h3 style="font-size:16.5px;font-weight:600;color:#1E1B4B;margin:0 0 8px;">Two-way ratings</h3>
+          <p style="font-size:14px;color:#5A52C5;line-height:1.6;margin:0;">Rate your driver and laundromat. High standards stay high — on every single order.</p>
+        </div>
+        <div data-reveal data-reveal-delay="80" style="background:#fff; border:1px solid #E8E6F4; border-radius:18px; padding:28px; transition:transform .2s,box-shadow .2s;" style-hover="transform:translateY(-3px); box-shadow:0 16px 40px rgba(124,115,230,.13);">
+          <div style="width:46px;height:46px;border-radius:13px;background:#E1F5EE;display:flex;align-items:center;justify-content:center;margin-bottom:18px;"><svg width="22" height="22" fill="none" stroke="#0F6E56" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+          <h3 style="font-size:16.5px;font-weight:600;color:#1E1B4B;margin:0 0 8px;">Recurring pickups</h3>
+          <p style="font-size:14px;color:#5A52C5;line-height:1.6;margin:0;">Set a weekly pickup day and forget laundry entirely. Reschedule any time from the app.</p>
+        </div>
+        <div data-reveal data-reveal-delay="160" style="background:#fff; border:1px solid #E8E6F4; border-radius:18px; padding:28px; transition:transform .2s,box-shadow .2s;" style-hover="transform:translateY(-3px); box-shadow:0 16px 40px rgba(124,115,230,.13);">
+          <div style="width:46px;height:46px;border-radius:13px;background:#FAEEDA;display:flex;align-items:center;justify-content:center;margin-bottom:18px;"><svg width="22" height="22" fill="none" stroke="#854F0B" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <h3 style="font-size:16.5px;font-weight:600;color:#1E1B4B;margin:0 0 8px;">$300 protection</h3>
+          <p style="font-size:14px;color:#5A52C5;line-height:1.6;margin:0;">Every order is covered up to $300. If something goes wrong, we make it right the same day.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRICING ============ -->
+  <section id="pricing" style="background:#171433; padding:96px 24px;">
+    <div style="max-width:1140px; margin:0 auto;">
+      <div data-reveal style="text-align:center; max-width:560px; margin:0 auto 52px;">
+        <p style="font-size:13px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:#AFA9EC; margin:0 0 12px;">Pricing</p>
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(1.9rem,3.8vw,2.7rem); font-weight:600; letter-spacing:-.02em; color:#fff; margin:0 0 14px; line-height:1.12;">Simple. No surprises.</h2>
+        <p style="font-size:17px; color:#AFA9EC; line-height:1.6; margin:0;">Pay per order, or subscribe and the delivery fee disappears. Your first pickup is always free.</p>
+      </div>
+
+      <!-- Pricing: CARDS -->
+      <sc-if value="{{ priceCards }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:16px; align-items:start;">
+        <div data-reveal style="background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); border-radius:20px; padding:30px;">
+          <p style="font-size:13px; font-weight:600; color:rgba(255,255,255,.6); margin:0 0 10px;">Pay-per-use</p>
+          <p style="font-family:'Bricolage Grotesque',sans-serif; font-size:40px; font-weight:600; color:#fff; line-height:1; margin:0;">$0<span style="font-size:16px; font-weight:400; opacity:.6;">/mo</span></p>
+          <p style="font-size:13px; color:rgba(255,255,255,.5); margin:8px 0 24px;">No subscription. Order when you need it.</p>
+          <div style="display:flex; flex-direction:column; gap:11px; margin-bottom:28px;">
+            <p style="display:flex; gap:10px; font-size:13.5px; color:rgba(255,255,255,.78); margin:0;"><span style="color:#5DCAA5;">✓</span>$1.59 per lb, wash &amp; fold</p>
+            <p style="display:flex; gap:10px; font-size:13.5px; color:rgba(255,255,255,.78); margin:0;"><span style="color:#5DCAA5;">✓</span>$4.99 delivery per order</p>
+            <p style="display:flex; gap:10px; font-size:13.5px; color:rgba(255,255,255,.78); margin:0;"><span style="color:#5DCAA5;">✓</span>Real-time tracking</p>
+            <p style="display:flex; gap:10px; font-size:13.5px; color:rgba(255,255,255,.78); margin:0;"><span style="color:#5DCAA5;">✓</span>100% of tips to your driver</p>
+          </div>
+          <a href="#schedule" style="display:block; text-align:center; border:1px solid rgba(255,255,255,.25); color:#fff; padding:13px; border-radius:10px; font-size:14.5px; font-weight:600; text-decoration:none; transition:background .15s;" style-hover="background:rgba(255,255,255,.08);">Get started free</a>
+        </div>
+        <div data-reveal data-reveal-delay="90" style="background:linear-gradient(165deg,#8b83e6,#6c63d4); border:1px solid #AFA9EC; border-radius:20px; padding:30px; position:relative; box-shadow:0 24px 60px rgba(100,92,210,.4);">
+          <div style="position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:#EF9F27; color:#412402; font-size:11px; font-weight:700; padding:4px 14px; border-radius:20px; white-space:nowrap;">MOST POPULAR</div>
+          <p style="font-size:13px; font-weight:600; color:rgba(255,255,255,.85); margin:0 0 10px;">Looppr+</p>
+          <p style="font-family:'Bricolage Grotesque',sans-serif; font-size:40px; font-weight:600; color:#fff; line-height:1; margin:0;">$14.99<span style="font-size:16px; font-weight:400; opacity:.75;">/mo</span></p>
+          <p style="font-size:13px; color:rgba(255,255,255,.8); margin:8px 0 24px;">Pays for itself at 3 orders a month.</p>
+          <div style="display:flex; flex-direction:column; gap:11px; margin-bottom:28px;">
+            <p style="display:flex; gap:10px; font-size:13.5px; color:#fff; margin:0;"><span>✓</span>$1.59 per lb, wash &amp; fold</p>
+            <p style="display:flex; gap:10px; font-size:13.5px; color:#fff; margin:0;"><span>✓</span>Free delivery on every order</p>
+            <p style="display:flex; gap:10px; font-size:13.5px; color:#fff; margin:0;"><span>✓</span>Priority driver matching</p>
+            <p style="display:flex; gap:10px; font-size:13.5px; color:#fff; margin:0;"><span>✓</span>10% off express upgrades</p>
+            <p style="display:flex; gap:10px; font-size:13.5px; color:#fff; margin:0;"><span>✓</span>Favorite laundromat always first</p>
+          </div>
+          <a href="#schedule" style="display:block; text-align:center; background:#fff; color:#5A52C5; padding:13px; border-radius:10px; font-size:14.5px; font-weight:600; text-decoration:none; transition:background .15s;" style-hover="background:#EEEDFE;">Try free for 30 days</a>
+        </div>
+        <div data-reveal data-reveal-delay="180" style="background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); border-radius:20px; padding:30px;">
+          <p style="font-size:13px; font-weight:600; color:rgba(255,255,255,.6); margin:0 0 10px;">LoopprBiz</p>
+          <p style="font-family:'Bricolage Grotesque',sans-serif; font-size:40px; font-weight:600; color:#fff; line-height:1; margin:0;">$49.99<span style="font-size:16px; font-weight:400; opacity:.6;">/mo</span></p>
+          <p style="font-size:13px; color:rgba(255,255,255,.5); margin:8px 0 24px;">For hotels, gyms &amp; Airbnb hosts.</p>
+          <div style="display:flex; flex-direction:column; gap:11px; margin-bottom:28px;">
+            <p style="display:flex; gap:10px; font-size:13.5px; color:rgba(255,255,255,.78); margin:0;"><span style="color:#5DCAA5;">✓</span>$1.29 per lb (volume rate)</p>
+            <p style="display:flex; gap:10px; font-size:13.5px; color:rgba(255,255,255,.78); margin:0;"><span style="color:#5DCAA5;">✓</span>Free delivery, all orders</p>
+            <p style="display:flex; gap:10px; font-size:13.5px; color:rgba(255,255,255,.78); margin:0;"><span style="color:#5DCAA5;">✓</span>Monthly invoice billing</p>
+            <p style="display:flex; gap:10px; font-size:13.5px; color:rgba(255,255,255,.78); margin:0;"><span style="color:#5DCAA5;">✓</span>Dedicated account manager</p>
+            <p style="display:flex; gap:10px; font-size:13.5px; color:rgba(255,255,255,.78); margin:0;"><span style="color:#5DCAA5;">✓</span>8-hour SLA guarantee</p>
+          </div>
+          <a href="Business.dc.html" style="display:block; text-align:center; border:1px solid rgba(255,255,255,.25); color:#fff; padding:13px; border-radius:10px; font-size:14.5px; font-weight:600; text-decoration:none; transition:background .15s;" style-hover="background:rgba(255,255,255,.08);">Contact sales</a>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- Pricing: SPOTLIGHT -->
+      <sc-if value="{{ priceSpotlight }}" hint-placeholder-val="{{ false }}">
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px; align-items:stretch; max-width:900px; margin:0 auto;">
+        <div data-reveal style="background:linear-gradient(165deg,#8b83e6,#6c63d4); border-radius:24px; padding:40px; box-shadow:0 24px 60px rgba(100,92,210,.4); display:flex; flex-direction:column;">
+          <div style="display:inline-flex; align-self:flex-start; align-items:center; gap:7px; background:rgba(255,255,255,.18); color:#fff; font-size:12px; font-weight:600; padding:5px 13px; border-radius:20px; margin-bottom:20px;">★ Recommended</div>
+          <p style="font-size:15px; font-weight:600; color:rgba(255,255,255,.85); margin:0 0 6px;">Looppr+ membership</p>
+          <p style="font-family:'Bricolage Grotesque',sans-serif; font-size:56px; font-weight:600; color:#fff; line-height:1; margin:0;">$14.99<span style="font-size:18px; font-weight:400; opacity:.75;">/mo</span></p>
+          <p style="font-size:15px; color:rgba(255,255,255,.82); margin:14px 0 26px; line-height:1.6;">Free delivery on every order, priority drivers, and your favorite laundromat first. Most members do 4–6 pickups a month and save $5–$15 over pay-as-you-go.</p>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:11px 16px; margin-bottom:30px;">
+            <p style="display:flex; gap:9px; font-size:13.5px; color:#fff; margin:0;"><span>✓</span>Free delivery</p>
+            <p style="display:flex; gap:9px; font-size:13.5px; color:#fff; margin:0;"><span>✓</span>$1.59/lb wash &amp; fold</p>
+            <p style="display:flex; gap:9px; font-size:13.5px; color:#fff; margin:0;"><span>✓</span>Priority matching</p>
+            <p style="display:flex; gap:9px; font-size:13.5px; color:#fff; margin:0;"><span>✓</span>10% off express</p>
+            <p style="display:flex; gap:9px; font-size:13.5px; color:#fff; margin:0;"><span>✓</span>Streak rewards</p>
+            <p style="display:flex; gap:9px; font-size:13.5px; color:#fff; margin:0;"><span>✓</span>Cancel anytime</p>
+          </div>
+          <a href="#schedule" style="margin-top:auto; display:block; text-align:center; background:#fff; color:#5A52C5; padding:15px; border-radius:11px; font-size:15.5px; font-weight:600; text-decoration:none; transition:background .15s;" style-hover="background:#EEEDFE;">Try free for 30 days</a>
+        </div>
+        <div data-reveal data-reveal-delay="100" style="display:flex; flex-direction:column; gap:14px;">
+          <div style="background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); border-radius:18px; padding:26px; flex:1;">
+            <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;"><p style="font-size:14px; font-weight:600; color:#fff; margin:0;">Pay-per-use</p><p style="font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:600; color:#fff; margin:0;">$0<span style="font-size:13px; opacity:.6;">/mo</span></p></div>
+            <p style="font-size:13.5px; color:rgba(255,255,255,.6); line-height:1.6; margin:0 0 14px;">No subscription. $1.59/lb plus a $4.99 delivery fee per order. Perfect for the occasional pickup.</p>
+            <a href="#schedule" style="font-size:13.5px; font-weight:600; color:#AFA9EC; text-decoration:none;">Start free →</a>
+          </div>
+          <div style="background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.12); border-radius:18px; padding:26px; flex:1;">
+            <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;"><p style="font-size:14px; font-weight:600; color:#fff; margin:0;">LoopprBiz</p><p style="font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:600; color:#fff; margin:0;">$49.99<span style="font-size:13px; opacity:.6;">/mo</span></p></div>
+            <p style="font-size:13.5px; color:rgba(255,255,255,.6); line-height:1.6; margin:0 0 14px;">Volume rate of $1.29/lb, invoice billing, a dedicated manager and an 8-hour SLA for hotels, gyms &amp; hosts.</p>
+            <a href="Business.dc.html" style="font-size:13.5px; font-weight:600; color:#AFA9EC; text-decoration:none;">Contact sales →</a>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <p data-reveal style="text-align:center; font-size:13px; color:rgba(255,255,255,.4); margin:32px 0 0;">All plans include $300 order protection · No credit card to get started · Cancel anytime</p>
+    </div>
+  </section>
+
+  <!-- ============ THREE SIDES ============ -->
+  <section style="background:#fff; padding:96px 24px;">
+    <div style="max-width:1140px; margin:0 auto;">
+      <div data-reveal style="max-width:600px; margin-bottom:44px;">
+        <p style="font-size:13px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:#7C73E6; margin:0 0 12px;">A marketplace, not a warehouse</p>
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(1.9rem,3.8vw,2.7rem); font-weight:600; letter-spacing:-.02em; color:#1E1B4B; margin:0; line-height:1.12;">Three sides, one clean loop</h2>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px;">
+        <a href="Business.dc.html" data-reveal style="text-decoration:none; background:#EEEDFE; border:1px solid #E0DEF6; border-radius:20px; padding:30px; display:block; transition:transform .2s;" style-hover="transform:translateY(-3px);">
+          <div style="width:46px;height:46px;border-radius:13px;background:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:18px;"><svg width="22" height="22" fill="none" stroke="#5A52C5" stroke-width="1.8" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-3"/></svg></div>
+          <h3 style="font-size:18px;font-weight:600;color:#1E1B4B;margin:0 0 8px; font-family:'Bricolage Grotesque',sans-serif;">For business →</h3>
+          <p style="font-size:14px;color:#5A52C5;line-height:1.6;margin:0;">Hotels, gyms, Airbnb hosts and med spas — daily linen turnaround with an 8-hour SLA and monthly billing.</p>
+        </a>
+        <a href="Partners.dc.html" data-reveal data-reveal-delay="90" style="text-decoration:none; background:#E1F5EE; border:1px solid #CBEBE0; border-radius:20px; padding:30px; display:block; transition:transform .2s;" style-hover="transform:translateY(-3px);">
+          <div style="width:46px;height:46px;border-radius:13px;background:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:18px;"><svg width="22" height="22" fill="none" stroke="#0F6E56" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 13h4"/></svg></div>
+          <h3 style="font-size:18px;font-weight:600;color:#1E1B4B;margin:0 0 8px; font-family:'Bricolage Grotesque',sans-serif;">Laundromat partners →</h3>
+          <p style="font-size:14px;color:#5A52C5;line-height:1.6;margin:0;">Turn idle machines into steady income. We send wash-and-fold orders during your slow hours. Zero cost to join.</p>
+        </a>
+        <a href="Drivers.dc.html" data-reveal data-reveal-delay="180" style="text-decoration:none; background:#FAEEDA; border:1px solid #F0E1C6; border-radius:20px; padding:30px; display:block; transition:transform .2s;" style-hover="transform:translateY(-3px);">
+          <div style="width:46px;height:46px;border-radius:13px;background:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:18px;"><svg width="22" height="22" fill="none" stroke="#854F0B" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg></div>
+          <h3 style="font-size:18px;font-weight:600;color:#1E1B4B;margin:0 0 8px; font-family:'Bricolage Grotesque',sans-serif;">Drive with us →</h3>
+          <p style="font-size:14px;color:#5A52C5;line-height:1.6;margin:0;">Earn up to $25/hr on your own schedule. Short routes, flexible hours, 100% of tips, weekly direct deposit.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TESTIMONIALS ============ -->
+  <section style="background:#F8F7FF; padding:96px 24px;">
+    <div style="max-width:1140px; margin:0 auto;">
+      <div data-reveal style="max-width:600px; margin-bottom:44px;">
+        <p style="font-size:13px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:#7C73E6; margin:0 0 12px;">What people say</p>
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(1.9rem,3.8vw,2.7rem); font-weight:600; letter-spacing:-.02em; color:#1E1B4B; margin:0; line-height:1.12;">Real customers, real laundry</h2>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px;">
+        <div data-reveal style="background:#fff; border:1px solid #E8E6F4; border-radius:20px; padding:30px;">
+          <div style="color:#EF9F27; font-size:14px; letter-spacing:2px; margin-bottom:14px;">★★★★★</div>
+          <p style="font-size:15.5px; color:#1E1B4B; line-height:1.65; margin:0 0 22px;">"I work 50-hour weeks and used to spend every Sunday on laundry. Now I schedule Friday and it's back Saturday. I have a weekend again."</p>
+          <div style="display:flex; align-items:center; gap:12px;"><span style="width:38px;height:38px;border-radius:50%;background:#EEEDFE;color:#2E2880;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;">MK</span><div><p style="margin:0;font-size:13.5px;font-weight:600;color:#1E1B4B;">Maya K.</p><p style="margin:0;font-size:12.5px;color:#8885A0;">Looppr+ · Edmond, OK</p></div></div>
+        </div>
+        <div data-reveal data-reveal-delay="90" style="background:#fff; border:1px solid #E8E6F4; border-radius:20px; padding:30px;">
+          <div style="color:#EF9F27; font-size:14px; letter-spacing:2px; margin-bottom:14px;">★★★★★</div>
+          <p style="font-size:15.5px; color:#1E1B4B; line-height:1.65; margin:0 0 22px;">"I run three Airbnbs. I used to do linen runs myself between guests. Now I leave bags out and they come back folded. It changed my whole operation."</p>
+          <div style="display:flex; align-items:center; gap:12px;"><span style="width:38px;height:38px;border-radius:50%;background:#E1F5EE;color:#085041;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;">DL</span><div><p style="margin:0;font-size:13.5px;font-weight:600;color:#1E1B4B;">Derek L.</p><p style="margin:0;font-size:12.5px;color:#8885A0;">Superhost · LoopprBiz</p></div></div>
+        </div>
+        <div data-reveal data-reveal-delay="180" style="background:#fff; border:1px solid #E8E6F4; border-radius:20px; padding:30px;">
+          <div style="color:#EF9F27; font-size:14px; letter-spacing:2px; margin-bottom:14px;">★★★★★</div>
+          <p style="font-size:15.5px; color:#1E1B4B; line-height:1.65; margin:0 0 22px;">"The preference card won me over. I have a wool sweater that must be cold-washed and laid flat. Set it once — every order comes back perfect."</p>
+          <div style="display:flex; align-items:center; gap:12px;"><span style="width:38px;height:38px;border-radius:50%;background:#FAEEDA;color:#633806;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;">SR</span><div><p style="margin:0;font-size:13.5px;font-weight:600;color:#1E1B4B;">Sandra R.</p><p style="margin:0;font-size:12.5px;color:#8885A0;">Looppr+ · OKC</p></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SCHEDULE FLOW ============ -->
+  <section id="schedule" style="background:#171433; padding:96px 24px;">
+    <div style="max-width:960px; margin:0 auto;">
+      <div style="text-align:center; margin-bottom:48px;">
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(2rem,4.5vw,3.1rem); font-weight:600; letter-spacing:-.025em; color:#fff; margin:0 0 12px; line-height:1.08;">Your first pickup is free.</h2>
+        <p style="font-size:17px; color:#AFA9EC; margin:0;">No card required. Takes 60 seconds.</p>
+      </div>
+
+      <!-- Step indicator -->
+      <sc-if value="{{ notDone }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex; align-items:center; justify-content:center; gap:0; margin-bottom:40px;">
+        <div style="display:flex; align-items:center; gap:10px;"><div style="width:30px; height:30px; border-radius:50%; background:{{ s1bg }}; color:{{ s1col }}; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; transition:background .3s;">{{ s1label }}</div><span style="font-size:13px; font-weight:600; color:{{ s1tcol }}; transition:color .3s;">Address</span></div>
+        <div style="width:40px; height:1px; background:rgba(255,255,255,.18); margin:0 8px;"></div>
+        <div style="display:flex; align-items:center; gap:10px;"><div style="width:30px; height:30px; border-radius:50%; background:{{ s2bg }}; color:{{ s2col }}; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; transition:background .3s;">{{ s2label }}</div><span style="font-size:13px; font-weight:600; color:{{ s2tcol }}; transition:color .3s;">Preferences</span></div>
+        <div style="width:40px; height:1px; background:rgba(255,255,255,.18); margin:0 8px;"></div>
+        <div style="display:flex; align-items:center; gap:10px;"><div style="width:30px; height:30px; border-radius:50%; background:{{ s3bg }}; color:{{ s3col }}; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; transition:background .3s;">{{ s3label }}</div><span style="font-size:13px; font-weight:600; color:{{ s3tcol }}; transition:color .3s;">Confirm</span></div>
+      </div>
+      </sc-if>
+
+      <!-- Card shell -->
+      <div style="background:#fff; border-radius:22px; overflow:hidden; box-shadow:0 32px 80px rgba(0,0,0,.28);">
+
+        <!-- Step 1: Address + window -->
+        <sc-if value="{{ isStep1 }}" hint-placeholder-val="{{ true }}">
+        <div style="padding:40px 44px 36px;">
+          <p style="font-family:'Bricolage Grotesque',sans-serif; font-size:20px; font-weight:600; color:#1E1B4B; margin:0 0 6px;">Where should we pick up?</p>
+          <p style="font-size:14px; color:#8885A0; margin:0 0 28px;">Enter your address and pick a time window that works for you.</p>
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Street address</label><input type="text" placeholder="123 Maple Ave, Edmond, OK" style="width:100%; padding:13px 16px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:11px; font-size:14.5px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+              <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Pickup date</label><input type="date" style="width:100%; padding:13px 16px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:11px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+              <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Pickup window</label>
+                <select style="width:100%; padding:13px 16px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:11px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box; appearance:none;" style-focus="border-color:#7C73E6; background:#fff;">
+                  <option>Morning (7–10 AM)</option>
+                  <option>Midday (10 AM–1 PM)</option>
+                  <option>Afternoon (1–5 PM)</option>
+                  <option>Evening (5–8 PM)</option>
+                </select>
+              </div>
+            </div>
+            <div style="background:#EEEDFE; border-radius:11px; padding:14px 16px; display:flex; gap:11px; align-items:center;"><span style="color:#7C73E6; font-size:16px; flex-shrink:0;">★</span><p style="margin:0; font-size:13px; color:#5A52C5; line-height:1.5;">Your first pickup is free — no card needed until your second order.</p></div>
+          </div>
+          <div style="display:flex; justify-content:flex-end; margin-top:28px;">
+            <button type="button" onClick="{{ next }}" style="background:#1E1B4B; color:#fff; padding:14px 32px; border-radius:11px; font-size:15px; font-weight:600; border:none; cursor:pointer; font-family:inherit; transition:background .15s,transform .1s;" style-hover="background:#332AB8; transform:translateY(-1px);">Next: Preferences →</button>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- Step 2: Wash preferences -->
+        <sc-if value="{{ isStep2 }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:40px 44px 36px;">
+          <p style="font-family:'Bricolage Grotesque',sans-serif; font-size:20px; font-weight:600; color:#1E1B4B; margin:0 0 6px;">How do you like your laundry done?</p>
+          <p style="font-size:14px; color:#8885A0; margin:0 0 28px;">Set it once — every future order uses these automatically.</p>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px;">
+            <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Detergent</label>
+              <select style="width:100%; padding:13px 16px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:11px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box; appearance:none;" style-focus="border-color:#7C73E6; background:#fff;">
+                <option>Tide Original</option><option>Tide Free &amp; Gentle</option><option>Gain</option><option>All Free &amp; Clear</option><option>My own (leave in bag)</option>
+              </select>
+            </div>
+            <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Water temperature</label>
+              <select style="width:100%; padding:13px 16px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:11px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box; appearance:none;" style-focus="border-color:#7C73E6; background:#fff;">
+                <option>Cold (recommended)</option><option>Warm</option><option>Hot</option>
+              </select>
+            </div>
+            <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Fold style</label>
+              <select style="width:100%; padding:13px 16px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:11px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box; appearance:none;" style-focus="border-color:#7C73E6; background:#fff;">
+                <option>Standard fold</option><option>Rolled (space-saving)</option><option>Hang on hangers</option><option>No preference</option>
+              </select>
+            </div>
+            <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Anything special?</label>
+              <select style="width:100%; padding:13px 16px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:11px; font-size:14px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box; appearance:none;" style-focus="border-color:#7C73E6; background:#fff;">
+                <option>Nothing extra</option><option>Stain pre-treatment (+$4)</option><option>Hang-dry delicates (+$3)</option><option>Both add-ons</option>
+              </select>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:28px; flex-wrap:wrap; gap:12px;">
+            <button type="button" onClick="{{ back }}" style="background:none; border:1.5px solid #DDDCF0; color:#5A52C5; padding:13px 22px; border-radius:11px; font-size:14.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:border-color .15s;" style-hover="border-color:#AFA9EC;">← Back</button>
+            <button type="button" onClick="{{ next }}" style="background:#1E1B4B; color:#fff; padding:14px 32px; border-radius:11px; font-size:15px; font-weight:600; border:none; cursor:pointer; font-family:inherit; transition:background .15s,transform .1s;" style-hover="background:#332AB8; transform:translateY(-1px);">Next: Confirm →</button>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- Step 3: Contact + submit -->
+        <sc-if value="{{ isStep3 }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:40px 44px 36px;">
+          <p style="font-family:'Bricolage Grotesque',sans-serif; font-size:20px; font-weight:600; color:#1E1B4B; margin:0 0 6px;">Almost there — where should we reach you?</p>
+          <p style="font-size:14px; color:#8885A0; margin:0 0 28px;">We'll text you when your driver is en route and when your order is ready.</p>
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+              <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">First name</label><input type="text" placeholder="Jamie" style="width:100%; padding:13px 16px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:11px; font-size:14.5px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+              <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Last name</label><input type="text" placeholder="Rivera" style="width:100%; padding:13px 16px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:11px; font-size:14.5px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+            </div>
+            <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Mobile number</label><input type="tel" placeholder="(405) 555-0100" style="width:100%; padding:13px 16px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:11px; font-size:14.5px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+            <div><label style="display:block; font-size:13px; font-weight:600; color:#1E1B4B; margin-bottom:7px;">Email</label><input type="email" placeholder="jamie@example.com" style="width:100%; padding:13px 16px; background:#F5F4FF; border:1.5px solid #E0DCF5; border-radius:11px; font-size:14.5px; color:#1E1B4B; font-family:inherit; outline:none; box-sizing:border-box;" style-focus="border-color:#7C73E6; background:#fff;"></div>
+            <div style="background:#F5F4FF; border:1px solid #E8E6F4; border-radius:11px; padding:16px 18px;">
+              <p style="font-size:12.5px; color:#8885A0; line-height:1.6; margin:0;">By scheduling you agree to our <a href="#" style="color:#7C73E6; font-weight:600; text-decoration:none;">Terms</a> and <a href="#" style="color:#7C73E6; font-weight:600; text-decoration:none;">Privacy policy</a>. Standard message rates may apply for SMS updates.</p>
+            </div>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:28px; flex-wrap:wrap; gap:12px;">
+            <button type="button" onClick="{{ back }}" style="background:none; border:1.5px solid #DDDCF0; color:#5A52C5; padding:13px 22px; border-radius:11px; font-size:14.5px; font-weight:600; cursor:pointer; font-family:inherit; transition:border-color .15s;" style-hover="border-color:#AFA9EC;">← Back</button>
+            <button type="button" onClick="{{ submit }}" style="background:#7C73E6; color:#fff; padding:14px 36px; border-radius:11px; font-size:15px; font-weight:600; border:none; cursor:pointer; font-family:inherit; box-shadow:0 6px 20px rgba(124,115,230,.35); transition:background .15s,transform .1s;" style-hover="background:#8d86e3; transform:translateY(-1px);">Confirm free pickup</button>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- Done -->
+        <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:56px 44px; text-align:center;">
+          <div style="width:64px; height:64px; border-radius:50%; background:#E1F5EE; display:flex; align-items:center; justify-content:center; margin:0 auto 22px;"><svg width="29" height="29" fill="none" stroke="#0F6E56" stroke-width="2.2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+          <h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:24px; font-weight:600; color:#1E1B4B; margin:0 0 10px;">You're booked.</h3>
+          <p style="font-size:15.5px; color:#5A52C5; line-height:1.65; max-width:400px; margin:0 auto 10px;">Your pickup is confirmed. We'll text you 30 minutes before your driver arrives. Your first pickup is completely free — enjoy it.</p>
+          <p style="font-size:13px; color:#8885A0; margin:0 0 28px;">Check your texts for a confirmation from Looppr.</p>
+          <button type="button" onClick="{{ reset }}" style="background:none; border:1.5px solid #DDDCF0; color:#5A52C5; padding:11px 22px; border-radius:10px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:border-color .15s;" style-hover="border-color:#AFA9EC;">Schedule another pickup</button>
+        </div>
+        </sc-if>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Mobile sticky CTA -->
+  <div style="position:fixed; bottom:0; left:0; right:0; z-index:100; padding:12px 16px 20px; background:rgba(248,247,255,.96); backdrop-filter:blur(12px); border-top:1px solid #DDDCF0; display:none;" data-mobile-cta>
+    <a href="#schedule" style="display:block; text-align:center; background:#7C73E6; color:#fff; padding:15px; border-radius:12px; font-size:16px; font-weight:700; text-decoration:none; box-shadow:0 6px 20px rgba(124,115,230,.35);">Schedule your free pickup →</a>
+  </div>
+
+  <dc-import name="SiteFooter" hint-size="100%,380px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{
+  &quot;$preview&quot;: {&quot;width&quot;: 1280, &quot;height&quot;: 900},
+  &quot;heroVariant&quot;: {
+    &quot;editor&quot;: &quot;enum&quot;,
+    &quot;options&quot;: [&quot;phone&quot;, &quot;split&quot;, &quot;centered&quot;],
+    &quot;default&quot;: &quot;phone&quot;,
+    &quot;tsType&quot;: &quot;'phone'|'split'|'centered'&quot;
+  },
+  &quot;pricingVariant&quot;: {
+    &quot;editor&quot;: &quot;enum&quot;,
+    &quot;options&quot;: [&quot;cards&quot;, &quot;spotlight&quot;],
+    &quot;default&quot;: &quot;cards&quot;,
+    &quot;tsType&quot;: &quot;'cards'|'spotlight'&quot;
+  }
+}">
+class Component extends DCLogic {
+  state = { step: 1 };
+
+  componentDidMount() {
+    this.setupReveal();
+    this.setupMobileCta();
+  }
+
+  setupMobileCta() {
+    const bar = document.querySelector('[data-mobile-cta]');
+    if (!bar) return;
+    const show = () => { bar.style.display = window.innerWidth <= 768 ? 'block' : 'none'; };
+    show();
+    window.addEventListener('resize', show);
+  }
+
+  setupReveal() {
+    if (this._revealed) return;
+    this._revealed = true;
+    const run = () => {
+      const els = Array.from(document.querySelectorAll('[data-reveal]'));
+      if (!els.length) { setTimeout(run, 120); return; }
+      if (!('IntersectionObserver' in window)) return;
+      const vh = window.innerHeight || 800;
+      const hidden = [];
+      els.forEach(el => {
+        const top = el.getBoundingClientRect().top;
+        if (top < vh * 0.85) return;
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(26px)';
+        el.style.transition = 'opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1)';
+        el.style.willChange = 'opacity, transform';
+        hidden.push(el);
+      });
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            const d = parseInt(e.target.getAttribute('data-reveal-delay')) || 0;
+            setTimeout(() => { e.target.style.opacity = '1'; e.target.style.transform = 'none'; }, d);
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -7% 0px' });
+      hidden.forEach(el => io.observe(el));
+    };
+    run();
+  }
+
+  stepStyle(n) {
+    const s = this.state.step;
+    if (s > n) return { bg: '#5DCAA5', col: '#fff', tcol: 'rgba(255,255,255,.65)', label: '✓' };
+    if (s === n) return { bg: '#7C73E6', col: '#fff', tcol: '#fff', label: String(n) };
+    return { bg: 'rgba(255,255,255,.1)', col: 'rgba(255,255,255,.4)', tcol: 'rgba(255,255,255,.35)', label: String(n) };
+  }
+
+  renderVals() {
+    const hv = this.props.heroVariant || 'phone';
+    const pv = this.props.pricingVariant || 'cards';
+    const s = this.state.step;
+    const done = s === 4;
+
+    const go = (n) => () => {
+      this.setState({ step: n });
+      if (n > 1) {
+        setTimeout(() => {
+          const el = document.getElementById('schedule');
+          if (el) el.scrollIntoView ? undefined : window.scrollTo(0, el.offsetTop - 80);
+        }, 60);
+      }
+    };
+
+    const s1 = this.stepStyle(1);
+    const s2 = this.stepStyle(2);
+    const s3 = this.stepStyle(3);
+
+    return {
+      heroPhone: hv === 'phone',
+      heroSplit: hv === 'split',
+      heroCentered: hv === 'centered',
+      priceCards: pv === 'cards',
+      priceSpotlight: pv === 'spotlight',
+
+      isStep1: s === 1,
+      isStep2: s === 2,
+      isStep3: s === 3,
+      isDone: done,
+      notDone: !done,
+
+      next: go(Math.min(s + 1, 4)),
+      back: go(Math.max(s - 1, 1)),
+      submit: go(4),
+      reset: go(1),
+
+      s1bg: s1.bg, s1col: s1.col, s1tcol: s1.tcol, s1label: s1.label,
+      s2bg: s2.bg, s2col: s2.col, s2tcol: s2.tcol, s2label: s2.label,
+      s3bg: s3.bg, s3col: s3.col, s3tcol: s3.tcol, s3label: s3.label,
+    };
+  }
+}
+</script>
+</body>
+</html>

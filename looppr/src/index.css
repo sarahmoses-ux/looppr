@@ -1,0 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+@config '../tailwind.config.js';
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-linen text-ink font-sans antialiased;
+}
+
+*:focus-visible {
+  @apply outline-2 outline-offset-2 outline-periwinkle;
+}

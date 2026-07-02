@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style> html{scroll-behavior:smooth;} body{margin:0;background:#F8F7FF;} </style>
+</helmet>
+<div style="font-family:'Hanken Grotesk',system-ui,sans-serif; color:#1E1B4B; background:#F8F7FF; overflow-x:hidden;">
+  <dc-import name="SiteNav" active="" hint-size="100%,66px"></dc-import>
+
+  <!-- Hero -->
+  <section style="position:relative; padding:88px 24px 64px; text-align:center; background:#171433; overflow:hidden;">
+    <div style="position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse 55% 65% at 50% 0%, #2E2880 0%, transparent 68%);"></div>
+    <div style="position:relative; max-width:720px; margin:0 auto;">
+      <p style="font-size:13px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:#AFA9EC; margin:0 0 16px;">Coverage map</p>
+      <h1 style="font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(2.3rem,5vw,3.6rem); font-weight:600; letter-spacing:-.025em; color:#fff; line-height:1.08; margin:0 0 18px;">Looppr is coming<br>to your city.</h1>
+      <p style="font-size:17px; color:#AFA9EC; line-height:1.6; margin:0 0 32px;">We're live across the OKC metro, expanding into Texas and Georgia in 2026. Enter the waitlist and be first when we arrive.</p>
+
+      <!-- IP location card -->
+      <div style="display:inline-flex; align-items:center; gap:12px; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.14); border-radius:16px; padding:16px 22px; margin-bottom:0;">
+        <span style="width:38px; height:38px; border-radius:50%; background:{{ dotBg }}; display:flex; align-items:center; justify-content:center; flex-shrink:0; box-shadow:{{ dotShadow }};">
+          <span style="width:11px; height:11px; border-radius:50%; background:{{ dotColor }};"></span>
+        </span>
+        <div style="text-align:left;">
+          <p style="margin:0; font-size:15px; font-weight:600; color:#fff;">{{ locationLabel }}</p>
+          <p style="margin:0; font-size:13px; color:#AFA9EC;">{{ locationSub }}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Oklahoma -->
+  <section style="padding:80px 24px 0;">
+    <div style="max-width:1140px; margin:0 auto;">
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:32px;">
+        <span style="font-size:28px;">🤠</span>
+        <div>
+          <h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(1.6rem,3.2vw,2.2rem); font-weight:600; letter-spacing:-.02em; color:#1E1B4B; margin:0;">Oklahoma</h2>
+          <p style="font-size:14px; color:#8885A0; margin:0;">4 cities · Launching July 1, 2026</p>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px; margin-bottom:64px;">
+        <sc-for list="{{ okCities }}" as="city" hint-placeholder-count="8">
+          <div style="background:#fff; border:1.5px solid {{ city.border }}; border-radius:16px; padding:24px; position:relative; transition:box-shadow .2s,transform .2s;" style-hover="box-shadow:0 10px 32px rgba(30,27,75,.1); transform:translateY(-2px);">
+            <sc-if value="{{ city.isYou }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute; top:14px; right:14px; background:#7C73E6; color:#fff; font-size:10px; font-weight:700; padding:3px 9px; border-radius:10px; letter-spacing:.04em;">YOU'RE HERE</div>
+            </sc-if>
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+              <span style="width:10px; height:10px; border-radius:50%; background:{{ city.dot }}; flex-shrink:0; box-shadow:{{ city.dotGlow }};"></span>
+              <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:{{ city.statusColor }};">{{ city.status }}</span>
+            </div>
+            <h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:20px; font-weight:600; color:#1E1B4B; margin:0 0 4px;">{{ city.name }}</h3>
+            <p style="font-size:13px; color:#8885A0; margin:0 0 14px;">{{ city.region }}</p>
+            <sc-if value="{{ city.live }}" hint-placeholder-val="{{ false }}">
+              <a href="Home.dc.html#schedule" style="display:inline-flex; align-items:center; gap:6px; background:#1E1B4B; color:#fff; font-size:13px; font-weight:600; text-decoration:none; padding:9px 16px; border-radius:9px; transition:background .15s;" style-hover="background:#2E2880;">Schedule pickup →</a>
+            </sc-if>
+            <sc-if value="{{ city.waitlist }}" hint-placeholder-val="{{ false }}">
+              <button type="button" onClick="{{ city.join }}" style="background:none; border:1.5px solid #E8E6F4; color:#5A52C5; font-size:13px; font-weight:600; padding:9px 16px; border-radius:9px; cursor:pointer; font-family:inherit; transition:border-color .15s;" style-hover="border-color:#7C73E6;">Join waitlist</button>
+            </sc-if>
+            <sc-if value="{{ city.joined }}" hint-placeholder-val="{{ false }}">
+              <span style="display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:#1D9E75;"><svg width="14" height="14" fill="none" stroke="#1D9E75" stroke-width="2.4" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>You're on the list</span>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- Texas -->
+  <section style="padding:0 24px 80px;">
+    <div style="max-width:1140px; margin:0 auto;">
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:32px;">
+        <span style="font-size:28px;">⭐</span>
+        <div>
+          <h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(1.6rem,3.2vw,2.2rem); font-weight:600; letter-spacing:-.02em; color:#1E1B4B; margin:0;">Texas</h2>
+          <p style="font-size:14px; color:#8885A0; margin:0;">Launching Feb 2027</p>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px;">
+        <sc-for list="{{ txCities }}" as="city" hint-placeholder-count="10">
+          <div style="background:#fff; border:1.5px solid {{ city.border }}; border-radius:16px; padding:24px; position:relative; transition:box-shadow .2s,transform .2s;" style-hover="box-shadow:0 10px 32px rgba(30,27,75,.1); transform:translateY(-2px);">
+            <sc-if value="{{ city.isYou }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute; top:14px; right:14px; background:#7C73E6; color:#fff; font-size:10px; font-weight:700; padding:3px 9px; border-radius:10px; letter-spacing:.04em;">YOU'RE HERE</div>
+            </sc-if>
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+              <span style="width:10px; height:10px; border-radius:50%; background:{{ city.dot }}; flex-shrink:0;"></span>
+              <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:{{ city.statusColor }};">{{ city.status }}</span>
+            </div>
+            <h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:20px; font-weight:600; color:#1E1B4B; margin:0 0 4px;">{{ city.name }}</h3>
+            <p style="font-size:13px; color:#8885A0; margin:0 0 14px;">{{ city.region }}</p>
+            <button type="button" onClick="{{ city.join }}" style="background:none; border:1.5px solid #E8E6F4; color:#5A52C5; font-size:13px; font-weight:600; padding:9px 16px; border-radius:9px; cursor:pointer; font-family:inherit; transition:border-color .15s;" style-hover="border-color:#7C73E6;">
+              <sc-if value="{{ city.joined }}" hint-placeholder-val="{{ false }}">
+                ✓ On the list
+              </sc-if>
+              <sc-if value="{{ city.waitlist }}" hint-placeholder-val="{{ true }}">
+                Join waitlist
+              </sc-if>
+            </button>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- Georgia -->
+  <section style="padding:0 24px 80px;">
+    <div style="max-width:1140px; margin:0 auto;">
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:32px;">
+        <span style="font-size:28px;">🍑</span>
+        <div>
+          <h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(1.6rem,3.2vw,2.2rem); font-weight:600; letter-spacing:-.02em; color:#1E1B4B; margin:0;">Georgia</h2>
+          <p style="font-size:14px; color:#8885A0; margin:0;">Launching Feb 2027</p>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:14px;">
+        <sc-for list="{{ gaCities }}" as="city" hint-placeholder-count="10">
+          <div style="background:#fff; border:1.5px solid {{ city.border }}; border-radius:16px; padding:24px; position:relative; transition:box-shadow .2s,transform .2s;" style-hover="box-shadow:0 10px 32px rgba(30,27,75,.1); transform:translateY(-2px);">
+            <sc-if value="{{ city.isYou }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute; top:14px; right:14px; background:#7C73E6; color:#fff; font-size:10px; font-weight:700; padding:3px 9px; border-radius:10px; letter-spacing:.04em;">YOU'RE HERE</div>
+            </sc-if>
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+              <span style="width:10px; height:10px; border-radius:50%; background:{{ city.dot }}; flex-shrink:0;"></span>
+              <span style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:{{ city.statusColor }};">{{ city.status }}</span>
+            </div>
+            <h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:20px; font-weight:600; color:#1E1B4B; margin:0 0 4px;">{{ city.name }}</h3>
+            <p style="font-size:13px; color:#8885A0; margin:0 0 14px;">{{ city.region }}</p>
+            <button type="button" onClick="{{ city.join }}" style="background:none; border:1.5px solid #E8E6F4; color:#5A52C5; font-size:13px; font-weight:600; padding:9px 16px; border-radius:9px; cursor:pointer; font-family:inherit; transition:border-color .15s;" style-hover="border-color:#7C73E6;">
+              <sc-if value="{{ city.joined }}" hint-placeholder-val="{{ false }}">✓ On the list</sc-if>
+              <sc-if value="{{ city.waitlist }}" hint-placeholder-val="{{ true }}">Join waitlist</sc-if>
+            </button>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section style="background:#171433; padding:88px 24px; text-align:center;">
+    <div style="max-width:540px; margin:0 auto;">
+      <h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(1.8rem,4vw,2.6rem); font-weight:600; letter-spacing:-.02em; color:#fff; margin:0 0 14px; line-height:1.12;">Don't see your city?</h2>
+      <p style="font-size:16px; color:#AFA9EC; line-height:1.6; margin:0 0 30px;">We're expanding fast. Drop your email and we'll let you know the moment Looppr arrives near you.</p>
+      <sc-if value="{{ globalJoined }}" hint-placeholder-val="{{ false }}">
+        <div style="background:rgba(93,202,165,.15); border:1px solid rgba(93,202,165,.3); border-radius:14px; padding:18px 24px;"><p style="font-size:15px; color:#9FE1CB; margin:0; font-weight:600;">You're on the list — we'll reach out soon.</p></div>
+      </sc-if>
+      <sc-if value="{{ globalForm }}" hint-placeholder-val="{{ true }}">
+        <form onSubmit="{{ globalSignup }}" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+          <input type="email" required placeholder="your@email.com" style="flex:1; min-width:200px; max-width:320px; padding:14px 18px; border-radius:11px; border:1px solid rgba(255,255,255,.15); background:rgba(255,255,255,.08); color:#fff; font-size:15px; font-family:inherit; outline:none;" style-focus="border-color:rgba(255,255,255,.4);">
+          <button type="submit" style="background:#7C73E6; color:#fff; padding:14px 26px; border-radius:11px; border:none; font-size:15px; font-weight:600; cursor:pointer; font-family:inherit; transition:background .15s;" style-hover="background:#8d86e3;">Notify me</button>
+        </form>
+      </sc-if>
+    </div>
+  </section>
+
+  <dc-import name="SiteFooter" hint-size="100%,380px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = {
+    userCity: null,
+    userState: null,
+    loading: true,
+    joined: {},
+    globalJoined: false,
+  };
+
+  componentDidMount() {
+    this.detectLocation();
+  }
+
+  async detectLocation() {
+    try {
+      const r = await fetch('https://ipapi.co/json/');
+      const d = await r.json();
+      this.setState({ userCity: d.city || null, userState: d.region_code || null, loading: false });
+    } catch(e) {
+      this.setState({ loading: false });
+    }
+  }
+
+  joinWaitlist(key) {
+    this.setState(s => ({ joined: { ...s.joined, [key]: true } }));
+  }
+
+  makeCity(name, region, key, isLive, eta) {
+    const userMatch = !this.state.loading &&
+      this.state.userCity &&
+      (this.state.userCity.toLowerCase().includes(name.toLowerCase()) ||
+       name.toLowerCase().includes(this.state.userCity.toLowerCase()));
+    const joined = !!this.state.joined[key];
+    return {
+      name, region, key,
+      live: isLive,
+      waitlist: !isLive && !joined,
+      joined: !isLive && joined,
+      isYou: userMatch,
+      status: isLive ? 'Live now' : (eta || 'Coming soon'),
+      statusColor: isLive ? '#1D9E75' : '#8885A0',
+      dot: isLive ? '#5DCAA5' : '#C5C3E0',
+      dotGlow: isLive ? '0 0 8px #5DCAA5' : 'none',
+      border: userMatch ? '#7C73E6' : (isLive ? '#C5E8DC' : '#E8E6F4'),
+      join: () => this.joinWaitlist(key),
+    };
+  }
+
+  renderVals() {
+    const { userCity, userState, loading } = this.state;
+    const isOK = userState === 'OK';
+    const isTX = userState === 'TX';
+
+    // Location hero label
+    let locationLabel, locationSub, dotColor, dotBg, dotShadow;
+    if (loading) {
+      locationLabel = 'Detecting your location…';
+      locationSub = 'Checking coverage near you';
+      dotColor = '#AFA9EC'; dotBg = 'rgba(175,169,236,.15)'; dotShadow = 'none';
+    } else if (!userCity) {
+      locationLabel = 'Location unavailable';
+      locationSub = 'Browse cities below to check coverage';
+      dotColor = '#8885A0'; dotBg = 'rgba(136,133,160,.15)'; dotShadow = 'none';
+    } else {
+      const liveNow = isOK && (userCity.toLowerCase().includes('edmond') || userCity.toLowerCase().includes('oklahoma'));
+      if (liveNow) {
+        locationLabel = `${userCity}, OK — Looppr is live!`;
+        locationSub = 'Schedule your first free pickup now';
+        dotColor = '#5DCAA5'; dotBg = 'rgba(93,202,165,.15)'; dotShadow = '0 0 10px rgba(93,202,165,.5)';
+      } else {
+        locationLabel = `${userCity}${userState ? ', ' + userState : ''} — coming soon`;
+        locationSub = 'Join the waitlist to be first when we launch';
+        dotColor = '#7C73E6'; dotBg = 'rgba(124,115,230,.15)'; dotShadow = '0 0 10px rgba(124,115,230,.4)';
+      }
+    }
+
+    const okCities = [
+      this.makeCity('Oklahoma City', 'Oklahoma County', 'okc', false, 'July 1, 2026'),
+      this.makeCity('Edmond', 'Oklahoma County', 'edmond', false, 'July 1, 2026'),
+      this.makeCity('Norman', 'Cleveland County', 'norman', false, 'July 1, 2026'),
+      this.makeCity('Moore', 'Cleveland County', 'moore', false, 'July 1, 2026'),
+      this.makeCity('Tulsa', 'Tulsa County', 'tulsa', false, 'Feb 2027'),
+      this.makeCity('Broken Arrow', 'Tulsa County', 'broken-arrow', false, 'Feb 2027'),
+      this.makeCity('Lawton', 'Comanche County', 'lawton', false, 'Feb 2027'),
+      this.makeCity('Stillwater', 'Payne County', 'stillwater', false, 'Feb 2027'),
+    ];
+
+    const txCities = [
+      this.makeCity('Dallas', 'Dallas County', 'dallas', false, 'Feb 2027'),
+      this.makeCity('Fort Worth', 'Tarrant County', 'fort-worth', false, 'Feb 2027'),
+      this.makeCity('Plano', 'Collin County', 'plano', false, 'Feb 2027'),
+      this.makeCity('Frisco', 'Collin County', 'frisco', false, 'Feb 2027'),
+      this.makeCity('Houston', 'Harris County', 'houston', false, 'Feb 2027'),
+      this.makeCity('Austin', 'Travis County', 'austin', false, 'Feb 2027'),
+      this.makeCity('San Antonio', 'Bexar County', 'san-antonio', false, 'Feb 2027'),
+      this.makeCity('Denton', 'Denton County', 'denton', false, 'Feb 2027'),
+      this.makeCity('McKinney', 'Collin County', 'mckinney', false, 'Feb 2027'),
+      this.makeCity('Amarillo', 'Potter County', 'amarillo', false, 'Feb 2027'),
+    ];
+
+    const gaCities = [
+      this.makeCity('Atlanta', 'Fulton County', 'atlanta', false, 'Feb 2027'),
+      this.makeCity('Alpharetta', 'Fulton County', 'alpharetta', false, 'Feb 2027'),
+      this.makeCity('Roswell', 'Fulton County', 'roswell', false, 'Feb 2027'),
+      this.makeCity('Sandy Springs', 'Fulton County', 'sandy-springs', false, 'Feb 2027'),
+      this.makeCity('Marietta', 'Cobb County', 'marietta', false, 'Feb 2027'),
+      this.makeCity('Savannah', 'Chatham County', 'savannah', false, 'Feb 2027'),
+      this.makeCity('Augusta', 'Richmond County', 'augusta', false, 'Feb 2027'),
+      this.makeCity('Columbus', 'Muscogee County', 'columbus-ga', false, 'Feb 2027'),
+      this.makeCity('Macon', 'Bibb County', 'macon', false, 'Feb 2027'),
+      this.makeCity('Warner Robins', 'Houston County', 'warner-robins', false, 'Feb 2027'),
+    ];
+
+    return {
+      locationLabel, locationSub, dotColor, dotBg, dotShadow,
+      okCities, txCities, gaCities,
+      globalJoined: this.state.globalJoined,
+      globalForm: !this.state.globalJoined,
+      globalSignup: (e) => { e.preventDefault(); this.setState({ globalJoined: true }); },
+    };
+  }
+}
+</script>
+</body>
+</html>

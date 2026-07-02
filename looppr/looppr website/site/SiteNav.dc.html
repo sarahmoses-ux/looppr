@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+</helmet>
+<div style="position:sticky; top:0; z-index:200; font-family:'Hanken Grotesk',system-ui,sans-serif;">
+<div style="background:#7C73E6; padding:10px 24px; text-align:center; display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap;">
+  <span style="font-size:13px; font-weight:600; color:#fff; letter-spacing:.01em;">🚀 Looppr launches July 1, 2026 in OKC, Edmond, Norman &amp; Moore</span>
+  <span style="display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.18); border-radius:20px; padding:4px 12px;">
+    <span style="font-size:12px; font-weight:700; color:#fff; font-family:'Bricolage Grotesque',sans-serif; letter-spacing:.04em;">{{ countdown }}</span>
+  </span>
+  <a href="Home.dc.html#schedule" style="font-size:12px; font-weight:700; color:#fff; text-decoration:underline; white-space:nowrap; opacity:.9;">Join the waitlist →</a>
+</div>
+<header style="background:rgba(248,247,255,.92); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border-bottom:1px solid #DDDCF0;">
+  <div style="max-width:1140px; margin:0 auto; padding:0 24px; display:flex; align-items:center; justify-content:space-between; height:66px;">
+    <a href="Home.dc.html" style="display:flex; align-items:center; gap:11px; text-decoration:none;">
+      <span style="width:36px; height:36px; display:flex; align-items:center; justify-content:center;">
+        <img src="uploads/looppr-mark-transparent.png" style="width:36px; height:36px; object-fit:contain;">
+      </span>
+      <span style="font-family:'Bricolage Grotesque',sans-serif; font-size:19px; font-weight:600; letter-spacing:-.01em; color:#1E1B4B; font-weight:700; letter-spacing:-.02em;">Looppr</span>
+    </a>
+
+    <nav style="display:flex; align-items:center; gap:6px;" data-desktop-nav>
+      <a href="Pricing.dc.html" style="position:relative; font-size:14.5px; color:{{ pricingColor }}; font-weight:{{ pricingWeight }}; text-decoration:none; padding:8px 14px; border-radius:8px; transition:color .15s,background .15s;" style-hover="background:#E9E7DD; color:#1E1B4B;">Pricing</a>
+      <a href="Business.dc.html" style="position:relative; font-size:14.5px; color:{{ businessColor }}; font-weight:{{ businessWeight }}; text-decoration:none; padding:8px 14px; border-radius:8px; transition:color .15s,background .15s;" style-hover="background:#E9E7DD; color:#1E1B4B;">For business</a>
+      <a href="Partners.dc.html" style="position:relative; font-size:14.5px; color:{{ partnersColor }}; font-weight:{{ partnersWeight }}; text-decoration:none; padding:8px 14px; border-radius:8px; transition:color .15s,background .15s;" style-hover="background:#E9E7DD; color:#1E1B4B;">Partners</a>
+      <a href="Drivers.dc.html" style="position:relative; font-size:14.5px; color:{{ driveColor }}; font-weight:{{ driveWeight }}; text-decoration:none; padding:8px 14px; border-radius:8px; transition:color .15s,background .15s;" style-hover="background:#E9E7DD; color:#1E1B4B;">Drive</a>
+      <a href="Cities.dc.html" style="position:relative; font-size:14.5px; color:{{ citiesColor }}; font-weight:{{ citiesWeight }}; text-decoration:none; padding:8px 14px; border-radius:8px; transition:color .15s,background .15s;" style-hover="background:#E9E7DD; color:#1E1B4B;">Cities</a>
+      <a href="Home.dc.html#schedule" style="margin-left:10px; background:#1E1B4B; color:#fff; font-size:14px; font-weight:600; text-decoration:none; padding:10px 20px; border-radius:9px; transition:background .15s,transform .12s; box-shadow:0 2px 10px rgba(30,27,75,.18);" style-hover="background:#332AB8; transform:translateY(-1px);">Schedule pickup</a>
+    </nav>
+
+    <button onClick="{{ toggle }}" aria-label="Menu" style="display:none; background:none; border:none; cursor:pointer; padding:8px; color:#1E1B4B;" data-burger>
+      <svg viewBox="0 0 24 24" style="width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round;"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+  </div>
+
+  <sc-if value="{{ open }}" hint-placeholder-val="{{ false }}">
+    <div style="border-top:1px solid #DDDCF0; background:rgba(241,239,232,.97); padding:10px 16px 18px;" data-mobile-menu>
+      <a href="Pricing.dc.html" style="display:block; font-size:16px; color:#1E1B4B; text-decoration:none; padding:13px 12px; border-radius:9px; font-weight:500;" style-hover="background:#E9E7DD;">Pricing</a>
+      <a href="Business.dc.html" style="display:block; font-size:16px; color:#1E1B4B; text-decoration:none; padding:13px 12px; border-radius:9px; font-weight:500;" style-hover="background:#E9E7DD;">For business</a>
+      <a href="Partners.dc.html" style="display:block; font-size:16px; color:#1E1B4B; text-decoration:none; padding:13px 12px; border-radius:9px; font-weight:500;" style-hover="background:#E9E7DD;">Laundromat partners</a>
+      <a href="Drivers.dc.html" style="display:block; font-size:16px; color:#1E1B4B; text-decoration:none; padding:13px 12px; border-radius:9px; font-weight:500;" style-hover="background:#E9E7DD;">Drive with us</a>
+      <a href="About.dc.html" style="display:block; font-size:16px; color:#1E1B4B; text-decoration:none; padding:13px 12px; border-radius:9px; font-weight:500;" style-hover="background:#E9E7DD;">About</a>
+      <a href="Contact.dc.html" style="display:block; font-size:16px; color:#1E1B4B; text-decoration:none; padding:13px 12px; border-radius:9px; font-weight:500;" style-hover="background:#E9E7DD;">Contact</a>
+      <a href="Cities.dc.html" style="display:block; font-size:16px; color:#1E1B4B; text-decoration:none; padding:13px 12px; border-radius:9px; font-weight:500;" style-hover="background:#E9E7DD;">Cities</a>
+      <a href="Home.dc.html#schedule" style="display:block; text-align:center; margin-top:10px; background:#1E1B4B; color:#fff; font-size:16px; font-weight:600; text-decoration:none; padding:14px; border-radius:10px;">Schedule pickup</a>
+    </div>
+  </sc-if>
+</header>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:66},&quot;active&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;&quot;,&quot;pricing&quot;,&quot;business&quot;,&quot;partners&quot;,&quot;drive&quot;,&quot;cities&quot;],&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = { open: false, countdown: '' };
+
+  tick() {
+    const launch = new Date('2026-07-01T00:00:00-05:00');
+    const now = new Date();
+    const diff = launch - now;
+    if (diff <= 0) { this.setState({ countdown: 'Live now!' }); return; }
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    this.setState({ countdown: `${d}d ${h}h ${m}m ${s}s` });
+  }
+
+  componentDidMount() {
+    this.tick();
+    this._timer = setInterval(() => this.tick(), 1000);
+    this.applyResponsive();
+    this._onResize = () => this.applyResponsive();
+    window.addEventListener('resize', this._onResize);
+  }
+  componentWillUnmount() {
+    clearInterval(this._timer);
+    window.removeEventListener('resize', this._onResize);
+  }
+  applyResponsive() {
+    const navs = document.querySelectorAll('[data-desktop-nav]');
+    const burgers = document.querySelectorAll('[data-burger]');
+    if (!navs.length || !burgers.length) return;
+    const mobile = window.innerWidth <= 860;
+    navs.forEach(n => n.style.display = mobile ? 'none' : 'flex');
+    burgers.forEach(b => b.style.display = mobile ? 'flex' : 'none');
+    if (!mobile && this.state.open) this.setState({ open: false });
+  }
+
+  renderVals() {
+    const a = this.props.active || '';
+    const col = (k) => a === k ? '#1E1B4B' : '#5A52C5';
+    const wt = (k) => a === k ? '600' : '500';
+    return {
+      open: this.state.open,
+      toggle: () => this.setState(s => ({ open: !s.open })),
+      pricingColor: col('pricing'), pricingWeight: wt('pricing'),
+      businessColor: col('business'), businessWeight: wt('business'),
+      partnersColor: col('partners'), partnersWeight: wt('partners'),
+      driveColor: col('drive'), driveWeight: wt('drive'),
+      citiesColor: col('cities'), citiesWeight: wt('cities'),
+      countdown: this.state.countdown,
+    };
+  }
+}
+</script>
+</body>
+</html>
