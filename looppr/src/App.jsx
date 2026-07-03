@@ -4,7 +4,9 @@ import AppLayout from './layouts/AppLayout'
 import ProtectedRoute from './routes/ProtectedRoute'
 import Landing from './pages/Landing'
 import SignIn from './pages/SignIn'
+import LoginVerify from './pages/LoginVerify'
 import SignUp from './pages/SignUp'
+import VerifyEmail from './pages/VerifyEmail'
 import Home from './pages/Home'
 import Book from './pages/Book'
 import ComingSoon from './pages/ComingSoon'
@@ -41,6 +43,15 @@ function App() {
 
       <Route path="/signup" element={<SignUp />} />
       <Route path="/login" element={<SignIn />} />
+      <Route path="/login/verify" element={<LoginVerify />} />
+      <Route
+        path="/verify-email"
+        element={
+          <ProtectedRoute requireVerified={false}>
+            <VerifyEmail />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/forgot-password"
         element={<ComingSoon title="Password reset" />}

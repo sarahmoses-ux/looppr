@@ -1,11 +1,13 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import { setAccessToken } from '../services/api'
+import { setAccessToken, setAuthFailureHandler } from '../services/api'
 import {
   fetchMe,
   loginClient,
   logout as logoutRequest,
   refreshSession,
   registerClient,
+  resendLoginOtp,
+  verifyLoginOtp,
 } from '../services/authApi'
 
 const AuthContext = createContext(null)
@@ -13,6 +15,13 @@ const AuthContext = createContext(null)
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
   const [status, setStatus] = useState('loading') // loading | authenticated | guest
+
+  useEffect(() => {
+    setAuthFailureHandler(() => {
+      setUser(null)
+      setStatus('guest')
+    })
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -38,11 +47,22 @@ export function AuthProvider({ children }) {
     setStatus('authenticated')
   }
 
+  // Step 1: password check. Does NOT complete sign-in — the backend emails
+  // an OTP and returns a challengeToken that must be verified next.
   async function login(payload) {
-    const { accessToken, user: loggedInUser } = await loginClient(payload)
+    return loginClient(payload)
+  }
+
+  // Step 2: completes sign-in once the emailed OTP is verified.
+  async function completeLogin(challengeToken, code) {
+    const { accessToken, user: loggedInUser } = await verifyLoginOtp(challengeToken, code)
     setAccessToken(accessToken)
     setUser(loggedInUser)
     setStatus('authenticated')
+  }
+
+  async function resendLoginCode(challengeToken) {
+    return resendLoginOtp(challengeToken)
   }
 
   async function logout() {
@@ -58,7 +78,17 @@ export function AuthProvider({ children }) {
   }
 
   const value = useMemo(
-    () => ({ user, status, register, login, logout, refreshUser }),
+    () => ({
+      user,
+      status,
+      register,
+      login,
+      completeLogin,
+      resendLoginCode,
+      logout,
+      refreshUser,
+      setUser,
+    }),
     [user, status],
   )
 

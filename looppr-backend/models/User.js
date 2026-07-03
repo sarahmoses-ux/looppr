@@ -15,6 +15,10 @@ const userSchema = new mongoose.Schema(
     passwordHash: { type: String, required: true, select: false },
     role: { type: String, enum: ['client'], default: 'client' },
     isVerified: { type: Boolean, default: false },
+    otpHash: { type: String, select: false },
+    otpExpiresAt: { type: Date, select: false },
+    otpAttempts: { type: Number, default: 0, select: false },
+    otpLastSentAt: { type: Date, select: false },
   },
   { timestamps: true },
 )

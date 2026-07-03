@@ -90,7 +90,7 @@ export default function Book() {
     })
 
     return (
-      <div className="mx-auto max-w-lg px-6 py-16 text-center">
+      <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-16 text-center">
         <span className="text-3xl">🎉</span>
         <h1 className="mt-4 font-display text-2xl font-semibold text-ink">You're on the list!</h1>
         <p className="mt-3 text-sm leading-relaxed text-ink/65">
@@ -107,7 +107,7 @@ export default function Book() {
   }
 
   return (
-    <div className="mx-auto max-w-lg px-6 py-12">
+    <div className="mx-auto max-w-2xl px-4 sm:px-6 lg:px-8 py-12">
       <p className="text-sm font-semibold uppercase tracking-[0.08em] text-periwinkle">
         Schedule a pickup
       </p>

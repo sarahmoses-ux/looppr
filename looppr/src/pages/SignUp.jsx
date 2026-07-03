@@ -44,11 +44,14 @@ export default function SignUp() {
     setStatus('pending')
     try {
       await register(form)
-      navigate('/home')
+      navigate('/verify-email')
     } catch (err) {
       const message =
+        err.response?.data?.details?.[0]?.message ||
         err.response?.data?.message ||
-        'Something went wrong creating your account. Please try again.'
+        (err.response
+          ? 'Something went wrong creating your account. Please try again.'
+          : 'Could not reach the server. Check your connection and try again.')
       setFormError(message)
       setStatus('idle')
     }
@@ -107,7 +110,7 @@ export default function SignUp() {
         />
 
         {formError && (
-          <p role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-xs font-medium text-red-600">
+          <p role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
             {formError}
           </p>
         )}
@@ -121,7 +124,7 @@ export default function SignUp() {
           {status === 'pending' ? 'Creating account…' : 'Create account'}
         </Button>
 
-        <p className="text-center text-xs leading-relaxed text-ink/50">
+        <p className="text-center text-sm leading-relaxed text-ink/50">
           By continuing you agree to Looppr’s{' '}
           <Link to="/terms" className="underline hover:text-ink">
             Terms
@@ -134,7 +137,7 @@ export default function SignUp() {
         </p>
       </form>
 
-      <p className="mt-8 text-center text-sm text-ink/60">
+      <p className="mt-8 text-center text-base text-ink/60">
         Already have an account?{' '}
         <Link to="/login" className="font-semibold text-ink hover:underline">
           Sign in

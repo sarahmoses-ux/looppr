@@ -24,9 +24,9 @@ export default function LaunchBar() {
   }, [])
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-4 bg-periwinkle px-6 py-2.5 text-center">
+    <div className="flex flex-wrap items-center justify-center gap-4 bg-periwinkle px-4 sm:px-6 lg:px-8 py-2.5 text-center">
       <span className="text-xs font-semibold text-white sm:text-sm">
-        🚀 Looppr launches July 1, 2026 in OKC, Edmond, Norman &amp; Moore
+        🚀 Looppr launches July 23, 2026 in OKC, Edmond, Norman &amp; Moore
       </span>
       <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 font-display text-xs font-bold tracking-wide text-white">
         {countdown}

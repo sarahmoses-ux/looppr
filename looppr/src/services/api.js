@@ -49,8 +49,10 @@ api.interceptors.response.use(
         setAccessToken(data.accessToken)
         original.headers.Authorization = `Bearer ${data.accessToken}`
         return api(original)
-      } catch {
+      } catch (refreshError) {
         setAccessToken(null)
+        onAuthFailure?.()
+        return Promise.reject(refreshError)
       }
     }
 

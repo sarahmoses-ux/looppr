@@ -17,7 +17,7 @@ export default function Navbar() {
 
   return (
     <header className="border-b border-line bg-linen/90 backdrop-blur">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+      <nav className="mx-auto flex max-w-[1600px] items-center justify-between px-4 sm:px-6 lg:px-8 py-4">
         <Link to="/" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
           <img src={logoOnDark} alt="Looppr" className="h-9 w-9 rounded-lg" />
           <span className="font-display text-xl font-semibold tracking-tight text-ink">
@@ -115,7 +115,7 @@ export default function Navbar() {
       </nav>
 
       {open && (
-        <div className="border-t border-ink/8 bg-linen px-6 py-4 md:hidden">
+        <div className="border-t border-ink/8 bg-linen px-4 sm:px-6 lg:px-8 py-4 md:hidden">
           <div className="flex flex-col gap-1">
             {LINKS.map((link) => (
               <a

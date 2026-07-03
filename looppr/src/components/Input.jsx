@@ -34,16 +34,16 @@ export default function Input({ label, id, error, className = '', type = 'text',
 
   return (
     <div className={className}>
-      <label htmlFor={id} className="block text-sm font-medium text-ink/80">
+      <label htmlFor={id} className="block text-base font-medium text-ink/80">
         {label}
       </label>
-      <div className="relative mt-1.5">
+      <div className="relative mt-2">
         <input
           id={id}
           type={inputType}
           aria-invalid={!!error}
           aria-describedby={error ? `${id}-error` : undefined}
-          className={`w-full rounded-xl border bg-white px-4 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-ink/35 ${
+          className={`w-full rounded-xl border bg-white px-4 py-3.5 text-base text-ink outline-none transition-colors placeholder:text-ink/35 ${
             isPassword ? 'pr-11' : ''
           } ${error ? 'border-red-400 focus:border-red-500' : 'border-line focus:border-periwinkle'}`}
           {...rest}
@@ -62,7 +62,7 @@ export default function Input({ label, id, error, className = '', type = 'text',
         )}
       </div>
       {error && (
-        <p id={`${id}-error`} role="alert" className="mt-1.5 text-xs font-medium text-red-600">
+        <p id={`${id}-error`} role="alert" className="mt-1.5 text-sm font-medium text-red-600">
           {error}
         </p>
       )}

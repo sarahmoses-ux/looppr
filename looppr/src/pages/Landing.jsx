@@ -102,7 +102,7 @@ export default function Landing() {
           }}
         />
 
-        <div className="relative mx-auto grid max-w-6xl gap-12 px-6 pb-20 pt-16 md:grid-cols-2 md:items-center md:pb-28 md:pt-24">
+        <div className="relative mx-auto grid max-w-[1600px] gap-12 px-4 sm:px-6 lg:px-8 pb-20 pt-16 md:grid-cols-2 md:items-center md:pb-28 md:pt-24">
           <div>
             <p className="font-sans text-sm font-semibold uppercase tracking-[0.18em] text-periwinkle">
               Wash. Fold. Delivered.
@@ -150,7 +150,7 @@ export default function Landing() {
       </section>
 
       <section id="how-it-works" className="border-t border-line bg-linen-soft">
-        <div className="mx-auto max-w-6xl px-6 py-20">
+        <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8 py-20">
           <h2 className="font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
             How Looppr works
           </h2>
@@ -172,7 +172,7 @@ export default function Landing() {
         </div>
       </section>
 
-      <section id="pricing" className="mx-auto max-w-6xl px-6 py-20">
+      <section id="pricing" className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8 py-20">
         <div className="max-w-xl">
           <p className="text-sm font-semibold uppercase tracking-[0.08em] text-periwinkle">
             Pricing
@@ -251,7 +251,7 @@ export default function Landing() {
       </section>
 
       <section id="why-loopr" className="border-t border-line bg-linen-soft">
-        <div className="mx-auto max-w-6xl px-6 py-20">
+        <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8 py-20">
           <div className="grid gap-12 md:grid-cols-[0.9fr_1.1fr] md:items-start">
             <h2 className="font-display text-3xl font-semibold leading-tight tracking-tight text-ink sm:text-4xl">
               Built to feel like a great local service, not a shipping label.
@@ -285,7 +285,7 @@ export default function Landing() {
               'radial-gradient(circle at 20% 20%, rgba(124,115,230,0.4), transparent 40%), radial-gradient(circle at 85% 80%, rgba(124,115,230,0.25), transparent 38%)',
           }}
         />
-        <div className="relative mx-auto flex max-w-6xl flex-col items-center gap-6 px-6 py-20 text-center">
+        <div className="relative mx-auto flex max-w-[1600px] flex-col items-center gap-6 px-4 sm:px-6 lg:px-8 py-20 text-center">
           <img src={logoTransparent} alt="" className="h-12 w-12" />
           <h2 className="max-w-xl font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Your first pickup is a couple minutes away.

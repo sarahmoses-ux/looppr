@@ -94,7 +94,7 @@ function FooterLink({ href, children }) {
 export default function Footer() {
   return (
     <footer className="bg-ink-footer text-white/60">
-      <div className="mx-auto max-w-6xl px-6 py-16">
+      <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid gap-12 sm:grid-cols-2 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
           <div>
             <Link to="/" className="flex items-center gap-2.5">

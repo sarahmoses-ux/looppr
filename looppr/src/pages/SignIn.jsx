@@ -35,13 +35,17 @@ export default function SignIn() {
 
     setStatus('pending')
     try {
-      await login(form)
-      navigate(location.state?.from || '/home')
+      const { challengeToken, email } = await login(form)
+      navigate('/login/verify', { state: { challengeToken, email, from: location.state?.from } })
     } catch (err) {
       const message =
         err.response?.status === 429
           ? 'Too many attempts. Please wait a bit and try again.'
-          : err.response?.data?.message || 'Incorrect email or password.'
+          : err.response?.data?.details?.[0]?.message ||
+            err.response?.data?.message ||
+            (err.response
+              ? 'Incorrect email or password.'
+              : 'Could not reach the server. Check your connection and try again.')
       setFormError(message)
       setStatus('idle')
     }
@@ -77,15 +81,15 @@ export default function SignIn() {
             error={errors.password}
             placeholder="••••••••"
           />
-          <div className="mt-2 text-right">
-            <Link to="/forgot-password" className="text-xs font-medium text-periwinkle hover:underline">
+          <div className="mt-2.5 text-right">
+            <Link to="/forgot-password" className="text-sm font-medium text-periwinkle hover:underline">
               Forgot password?
             </Link>
           </div>
         </div>
 
         {formError && (
-          <p role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-xs font-medium text-red-600">
+          <p role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
             {formError}
           </p>
         )}
@@ -100,7 +104,7 @@ export default function SignIn() {
         </Button>
       </form>
 
-      <p className="mt-8 text-center text-sm text-ink/60">
+      <p className="mt-8 text-center text-base text-ink/60">
         New to Looppr?{' '}
         <Link to="/signup" className="font-semibold text-ink hover:underline">
           Create an account

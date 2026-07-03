@@ -1,8 +1,8 @@
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 
-export default function ProtectedRoute({ children }) {
-  const { status } = useAuth()
+export default function ProtectedRoute({ children, requireVerified = true }) {
+  const { status, user } = useAuth()
   const location = useLocation()
 
   if (status === 'loading') {
@@ -15,6 +15,10 @@ export default function ProtectedRoute({ children }) {
 
   if (status === 'guest') {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />
+  }
+
+  if (requireVerified && !user?.isVerified) {
+    return <Navigate to="/verify-email" replace />
   }
 
   return children
