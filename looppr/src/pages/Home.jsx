@@ -1,58 +1,43 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import Button from '../components/Button'
-import { fetchMyPickups } from '../services/pickupApi'
+import SEO from '../components/SEO'
+import { fetchMyPickups, fetchMyStats } from '../services/pickupApi'
+import { PickupCard } from './Orders'
 
-function EmptyOrdersIllustration() {
-  return (
-    <svg viewBox="0 0 96 96" className="h-20 w-20 text-periwinkle-muted" fill="none" aria-hidden="true">
-      <rect x="18" y="30" width="60" height="46" rx="10" stroke="currentColor" strokeWidth="2.5" />
-      <path d="M18 44h60" stroke="currentColor" strokeWidth="2.5" />
-      <circle cx="48" cy="37" r="3" fill="currentColor" />
-      <path
-        d="M34 30v-6a14 14 0 0 1 28 0v6"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-      />
-    </svg>
-  )
+// Mapbox GL is a large dependency — only fetch it when the dashboard is
+// actually visited, not as part of the main app bundle.
+const PickupMap = lazy(() => import('../components/PickupMap'))
+
+function formatMoney(amount) {
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount || 0)
 }
 
-const WINDOW_LABELS = {
-  morning: 'Morning · 8am – 11am',
-  afternoon: 'Afternoon · 12pm – 3pm',
-  evening: 'Evening · 4pm – 7pm',
-}
+function StatsStrip({ user, stats }) {
+  const memberSince = user?.createdAt
+    ? new Date(user.createdAt).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })
+    : '—'
 
-const STATUS_STYLES = {
-  requested: 'bg-periwinkle-soft text-periwinkle-text',
-  confirmed: 'bg-success-soft text-success-dark',
-  cancelled: 'bg-red-50 text-red-600',
-}
-
-function PickupCard({ pickup }) {
-  const dateLabel = new Date(pickup.preferredDate).toLocaleDateString(undefined, {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-  })
+  const items = [
+    { label: 'Orders', value: stats === null ? null : stats.totalOrders },
+    { label: 'Total spent', value: stats === null ? null : formatMoney(stats.totalSpent) },
+    { label: 'Member since', value: memberSince },
+  ]
 
   return (
-    <div className="flex items-center justify-between gap-4 rounded-2xl border border-line px-5 py-4">
-      <div>
-        <p className="font-medium text-ink">
-          {dateLabel} · {WINDOW_LABELS[pickup.window]}
-        </p>
-        <p className="mt-0.5 text-sm text-ink/55">
-          {pickup.address.street}, {pickup.address.city}, {pickup.address.state}
-        </p>
-      </div>
-      <span
-        className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold capitalize ${STATUS_STYLES[pickup.status]}`}
-      >
-        {pickup.status}
-      </span>
+    <div className="mt-8 grid grid-cols-3 gap-4">
+      {items.map((item) => (
+        <div key={item.label} className="rounded-2xl border border-line bg-white p-4 sm:p-5">
+          <p className="text-xs font-semibold uppercase tracking-wide text-ink/45">{item.label}</p>
+          <p className="mt-1.5 font-display text-xl font-semibold text-ink sm:text-2xl">
+            {item.value === null ? (
+              <span className="inline-block h-6 w-12 animate-pulse rounded bg-linen-soft align-middle" />
+            ) : (
+              item.value
+            )}
+          </p>
+        </div>
+      ))}
     </div>
   )
 }
@@ -61,6 +46,7 @@ export default function Home() {
   const { user } = useAuth()
   const firstName = user?.name?.split(' ')[0]
   const [pickups, setPickups] = useState(null)
+  const [stats, setStats] = useState(null)
 
   useEffect(() => {
     let cancelled = false
@@ -71,13 +57,23 @@ export default function Home() {
       .catch(() => {
         if (!cancelled) setPickups([])
       })
+    fetchMyStats()
+      .then(({ stats: fetched }) => {
+        if (!cancelled) setStats(fetched)
+      })
+      .catch(() => {
+        if (!cancelled) setStats({ totalOrders: 0, totalSpent: 0 })
+      })
     return () => {
       cancelled = true
     }
   }, [])
 
+  const recent = pickups?.slice(0, 3) ?? []
+
   return (
-    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      <SEO title="Dashboard" description="Your Looppr dashboard — pickup locations and recent orders." noindex />
       <p className="text-sm font-semibold uppercase tracking-[0.08em] text-periwinkle">
         Welcome back
       </p>
@@ -86,11 +82,26 @@ export default function Home() {
       </h1>
 
       <div className="mt-6 flex items-center gap-3 rounded-2xl bg-periwinkle-soft px-5 py-4">
-        <span className="text-lg">🎉</span>
+        <svg
+          viewBox="0 0 24 24"
+          className="h-5 w-5 shrink-0 text-periwinkle-text"
+          fill="none"
+          aria-hidden="true"
+        >
+          <path
+            d="M20 12v7a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-7M2 7h20v4a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7ZM12 22V7M12 7c-1.5 0-4-1-4-3.2S9.5 2 10.5 2 12 3.5 12 7ZM12 7c1.5 0 4-1 4-3.2S13.5 2 12.5 2 12 3.5 12 7Z"
+            stroke="currentColor"
+            strokeWidth="1.75"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </svg>
         <p className="text-sm font-medium text-periwinkle-text">
           Free delivery on your first two orders — no code needed.
         </p>
       </div>
+
+      <StatsStrip user={user} stats={stats} />
 
       <div className="mt-8 grid gap-6 lg:grid-cols-[1.3fr_1fr]">
         <div
@@ -127,36 +138,57 @@ export default function Home() {
               <dd className="text-sm text-ink">{user?.phone}</dd>
             </div>
           </dl>
-          <Button to="/settings" variant="ghost" className="mt-6 w-full">
+          <Button to="/profile" variant="ghost" className="mt-6 w-full">
             Edit profile
           </Button>
         </div>
       </div>
 
-      <div className="mt-8 rounded-3xl border border-line bg-white p-10">
-        <h2 className="font-display text-xl font-semibold text-ink">Your pickup requests</h2>
+      <div className="mt-8 rounded-3xl border border-line bg-white p-6 sm:p-10">
+        <h2 className="font-display text-xl font-semibold text-ink">Pickup locations</h2>
+        <p className="mt-1 text-sm text-ink/55">
+          {pickups?.some((p) => p.location)
+            ? 'Your scheduled pickups across the Oklahoma service area.'
+            : 'Looppr currently serves the OKC metro — Edmond, Norman & Moore.'}
+        </p>
+        <div className="mt-6">
+          {pickups === null ? (
+            <div className="h-[320px] animate-pulse rounded-3xl bg-linen-soft" />
+          ) : (
+            <Suspense fallback={<div className="h-[320px] animate-pulse rounded-3xl bg-linen-soft" />}>
+              <PickupMap pickups={pickups} />
+            </Suspense>
+          )}
+        </div>
+      </div>
+
+      <div className="mt-8 rounded-3xl border border-line bg-white p-6 sm:p-10">
+        <div className="flex items-center justify-between">
+          <h2 className="font-display text-xl font-semibold text-ink">Recent activity</h2>
+          {pickups && pickups.length > 0 && (
+            <Button to="/orders" variant="ghost" className="px-4! py-2! text-sm!">
+              View all
+            </Button>
+          )}
+        </div>
 
         {pickups === null ? (
-          <div className="mt-8 space-y-3">
+          <div className="mt-6 space-y-3">
             <div className="h-16 animate-pulse rounded-2xl bg-linen-soft" />
             <div className="h-16 animate-pulse rounded-2xl bg-linen-soft" />
           </div>
-        ) : pickups.length === 0 ? (
-          <div className="mt-8 flex flex-col items-center gap-4 py-6 text-center">
-            <EmptyOrdersIllustration />
-            <div>
-              <p className="font-medium text-ink">No pickups requested yet</p>
-              <p className="mt-1 text-sm text-ink/55">
-                Book your first pickup and it'll show up here.
-              </p>
-            </div>
-            <Button to="/book" variant="primary" className="mt-2">
+        ) : recent.length === 0 ? (
+          <div className="mt-6 flex flex-col items-center gap-3 py-6 text-center">
+            <p className="text-sm text-ink/55">
+              No pickups requested yet — book your first one to see it here.
+            </p>
+            <Button to="/book" variant="primary" className="mt-1">
               Schedule a pickup
             </Button>
           </div>
         ) : (
           <div className="mt-6 space-y-3">
-            {pickups.map((p) => (
+            {recent.map((p) => (
               <PickupCard key={p._id} pickup={p} />
             ))}
           </div>

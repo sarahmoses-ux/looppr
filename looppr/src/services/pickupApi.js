@@ -7,3 +7,12 @@ export function createPickup(payload) {
 export function fetchMyPickups() {
   return api.get('/pickups/me').then((res) => res.data)
 }
+
+export function fetchMyStats() {
+  return api.get('/pickups/me/stats').then((res) => res.data)
+}
+
+// Simulated payment confirmation — placeholder for real Stripe checkout.
+export function payMyOrder(id) {
+  return api.post(`/pickups/${id}/pay`).then((res) => res.data)
+}

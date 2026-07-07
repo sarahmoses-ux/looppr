@@ -1,0 +1,40 @@
+# Looppr — robots.txt
+# App routes below require a signed-in session (see ProtectedRoute), so
+# they're excluded here as defense-in-depth; each also carries a
+# noindex meta tag (see src/components/SEO.jsx) in case a crawler reaches
+# them via a shared link.
+
+User-agent: *
+Allow: /
+Disallow: /home
+Disallow: /orders
+Disallow: /book
+Disallow: /profile
+Disallow: /settings
+Disallow: /login/verify
+Disallow: /verify-email
+Disallow: /forgot-password
+Disallow: /admin
+
+# Explicit allowances for AI crawlers/assistants that respect robots.txt —
+# same rules as above, listed by name for clarity in crawler audits.
+User-agent: GPTBot
+User-agent: ChatGPT-User
+User-agent: Google-Extended
+User-agent: PerplexityBot
+User-agent: ClaudeBot
+User-agent: anthropic-ai
+User-agent: Applebot-Extended
+User-agent: CCBot
+Allow: /
+Disallow: /home
+Disallow: /orders
+Disallow: /book
+Disallow: /profile
+Disallow: /settings
+Disallow: /login/verify
+Disallow: /verify-email
+Disallow: /forgot-password
+Disallow: /admin
+
+Sitemap: https://getlooppr.com/sitemap.xml

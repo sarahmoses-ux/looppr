@@ -60,6 +60,7 @@ export default function LoginVerify() {
       eyebrow="Verify it's you"
       title="Enter your code"
       subtitle={`We sent a 6-digit code to ${email || 'your email'}.`}
+      noindex
     >
       <form onSubmit={handleSubmit} noValidate className="space-y-5">
         <div>

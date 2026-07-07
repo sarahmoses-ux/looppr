@@ -1,62 +1,111 @@
+import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import PublicLayout from './layouts/PublicLayout'
 import AppLayout from './layouts/AppLayout'
+import AdminLayout from './layouts/AdminLayout'
 import ProtectedRoute from './routes/ProtectedRoute'
 import Landing from './pages/Landing'
-import SignIn from './pages/SignIn'
-import LoginVerify from './pages/LoginVerify'
-import SignUp from './pages/SignUp'
-import VerifyEmail from './pages/VerifyEmail'
-import Home from './pages/Home'
-import Book from './pages/Book'
-import ComingSoon from './pages/ComingSoon'
+import { PUBLIC_PAGES } from './seo/publicPages'
+
+// Landing (the "/" route, by far the highest-traffic page) stays in the
+// main bundle so the marketing homepage has no extra chunk round-trip
+// before first paint. Everything else code-splits per route.
+const SignIn = lazy(() => import('./pages/SignIn'))
+const LoginVerify = lazy(() => import('./pages/LoginVerify'))
+const SignUp = lazy(() => import('./pages/SignUp'))
+const VerifyEmail = lazy(() => import('./pages/VerifyEmail'))
+const Home = lazy(() => import('./pages/Home'))
+const Orders = lazy(() => import('./pages/Orders'))
+const Book = lazy(() => import('./pages/Book'))
+const Profile = lazy(() => import('./pages/Profile'))
+const Settings = lazy(() => import('./pages/Settings'))
+const ComingSoon = lazy(() => import('./pages/ComingSoon'))
+const About = lazy(() => import('./pages/About'))
+const Privacy = lazy(() => import('./pages/Privacy'))
+const Terms = lazy(() => import('./pages/Terms'))
+const Contact = lazy(() => import('./pages/Contact'))
+const Laundromats = lazy(() => import('./pages/Laundromats'))
+const Drive = lazy(() => import('./pages/Drive'))
+const Faq = lazy(() => import('./pages/Faq'))
+const ForgotPassword = lazy(() => import('./pages/ForgotPassword'))
+const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'))
+const AdminLoginVerify = lazy(() => import('./pages/admin/AdminLoginVerify'))
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
+const AdminOrders = lazy(() => import('./pages/admin/AdminOrders'))
+const AdminCustomers = lazy(() => import('./pages/admin/AdminCustomers'))
+const GuestBook = lazy(() => import('./pages/guest/GuestBook'))
+const GuestRequestStatus = lazy(() => import('./pages/guest/GuestRequestStatus'))
+
+const pageMeta = Object.fromEntries(PUBLIC_PAGES.map((p) => [p.path, p]))
 
 function App() {
   return (
-    <Routes>
-      <Route element={<PublicLayout />}>
-        <Route path="/" element={<Landing />} />
-        <Route path="/about" element={<ComingSoon title="About Looppr" />} />
-        <Route path="/contact" element={<ComingSoon title="Contact us" />} />
-        <Route path="/privacy" element={<ComingSoon title="Privacy policy" />} />
-        <Route path="/terms" element={<ComingSoon title="Terms of service" />} />
+    <Suspense fallback={null}>
+      <Routes>
+        <Route element={<PublicLayout />}>
+          <Route path="/" element={<Landing />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/laundromats" element={<Laundromats />} />
+          <Route path="/drive" element={<Drive />} />
+          <Route
+            path="/cities"
+            element={<ComingSoon title={pageMeta['/cities'].title} description={pageMeta['/cities'].description} />}
+          />
+          <Route path="/faq" element={<Faq />} />
+
+          {/* Guest booking: no account required, ever — admin manages
+              guest orders directly by contact info. */}
+          <Route path="/guest/book" element={<GuestBook />} />
+          <Route path="/guest/request/:id" element={<GuestRequestStatus />} />
+        </Route>
+
         <Route
-          path="/laundromats"
-          element={<ComingSoon title="Laundromat partner sign-up" />}
+          element={
+            <ProtectedRoute>
+              <AppLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/home" element={<Home />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/book" element={<Book />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/settings" element={<Settings />} />
+        </Route>
+
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/login" element={<SignIn />} />
+        <Route path="/login/verify" element={<LoginVerify />} />
+        <Route
+          path="/verify-email"
+          element={
+            <ProtectedRoute requireVerified={false}>
+              <VerifyEmail />
+            </ProtectedRoute>
+          }
         />
-        <Route path="/drive" element={<ComingSoon title="Drive with Looppr" />} />
-        <Route path="/cities" element={<ComingSoon title="Cities & coverage" />} />
-        <Route path="/faq" element={<ComingSoon title="Help & FAQ" />} />
-      </Route>
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
-      <Route
-        element={
-          <ProtectedRoute>
-            <AppLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route path="/home" element={<Home />} />
-        <Route path="/book" element={<Book />} />
-        <Route path="/settings" element={<ComingSoon title="Edit profile" />} />
-      </Route>
-
-      <Route path="/signup" element={<SignUp />} />
-      <Route path="/login" element={<SignIn />} />
-      <Route path="/login/verify" element={<LoginVerify />} />
-      <Route
-        path="/verify-email"
-        element={
-          <ProtectedRoute requireVerified={false}>
-            <VerifyEmail />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/forgot-password"
-        element={<ComingSoon title="Password reset" />}
-      />
-    </Routes>
+        {/* Admin: separate login (no public sign-up) + role-gated dashboard.
+            Not linked from anywhere in the public site or customer nav. */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/login/verify" element={<AdminLoginVerify />} />
+        <Route
+          element={
+            <ProtectedRoute role="admin">
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/orders" element={<AdminOrders />} />
+          <Route path="/admin/customers" element={<AdminCustomers />} />
+        </Route>
+      </Routes>
+    </Suspense>
   )
 }
 

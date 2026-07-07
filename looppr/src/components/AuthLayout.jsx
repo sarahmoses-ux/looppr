@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom'
 import logoTransparent from '../assets/looppr-mark-transparent.png'
+import SEO from './SEO'
 
-export default function AuthLayout({ eyebrow, title, subtitle, children }) {
+export default function AuthLayout({ eyebrow, title, subtitle, noindex = false, children }) {
   return (
     <div className="relative grid min-h-screen lg:grid-cols-2">
+      <SEO title={title} description={subtitle} noindex={noindex} />
       <Link
         to="/"
         className="absolute left-6 top-6 z-10 flex items-center gap-2.5 lg:hidden"
@@ -37,9 +39,12 @@ export default function AuthLayout({ eyebrow, title, subtitle, children }) {
             <span className="font-display text-2xl font-bold text-white">Looppr</span>
           </Link>
 
-          <h2 className="mt-12 font-display text-6xl font-bold leading-[1.05] tracking-tight text-white xl:text-7xl">
+          {/* Repeated brand tagline, not page-unique content — kept out of
+              the heading outline so the page's own <h1 (the `title` prop)
+              stays the single top-level heading. */}
+          <p className="mt-12 font-display text-6xl font-bold leading-[1.05] tracking-tight text-white xl:text-7xl">
             Laundry, <em className="italic text-periwinkle-muted">handled.</em>
-          </h2>
+          </p>
 
           <p className="mt-7 max-w-md text-lg leading-relaxed text-white/70 xl:text-xl">
             Book a pickup, and we’ll email you the moment your laundry pro

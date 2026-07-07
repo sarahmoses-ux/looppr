@@ -98,7 +98,7 @@ export default function Footer() {
         <div className="grid gap-12 sm:grid-cols-2 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
           <div>
             <Link to="/" className="flex items-center gap-2.5">
-              <img src={logoTransparent} alt="" className="h-8 w-8" />
+              <img src={logoTransparent} alt="" loading="lazy" decoding="async" className="h-8 w-8" />
               <span className="font-display text-lg font-bold tracking-tight text-white">
                 Looppr
               </span>

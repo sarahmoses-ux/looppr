@@ -26,6 +26,12 @@ export default function HeroCarousel({ images, intervalMs = 4500 }) {
             key={img.src}
             src={img.src}
             alt={img.alt}
+            // First slide is the page's LCP element — load it eagerly at
+            // high priority. The rest are off-screen until the carousel
+            // advances, so they can lazy-load without hurting first paint.
+            loading={i === 0 ? 'eager' : 'lazy'}
+            fetchPriority={i === 0 ? 'high' : 'auto'}
+            decoding="async"
             className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ease-in-out ${
               i === index ? 'opacity-100' : 'opacity-0'
             }`}

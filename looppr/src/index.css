@@ -1,4 +1,7 @@
-@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap');
+/* Google Fonts are loaded via <link> in index.html (with preconnect), not
+   @import here — @import blocks CSS parsing on a network round-trip before
+   the browser even discovers the font request, whereas a <head> <link>
+   is discovered immediately during HTML parsing. */
 @import 'tailwindcss';
 @config '../tailwind.config.js';
 

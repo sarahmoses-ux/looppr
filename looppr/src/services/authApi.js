@@ -31,3 +31,19 @@ export function logout() {
 export function fetchMe() {
   return api.get('/auth/me').then((res) => res.data)
 }
+
+export function updateProfile(payload) {
+  return api.patch('/auth/me', payload).then((res) => res.data)
+}
+
+export function changePassword(payload) {
+  return api.post('/auth/change-password', payload).then((res) => res.data)
+}
+
+export function forgotPassword(email) {
+  return api.post('/auth/forgot-password', { email }).then((res) => res.data)
+}
+
+export function resetPassword(payload) {
+  return api.post('/auth/reset-password', payload).then((res) => res.data)
+}

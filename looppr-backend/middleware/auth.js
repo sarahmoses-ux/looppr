@@ -13,3 +13,13 @@ export function requireAuth(req, _res, next) {
     next(new ApiError(401, 'Session expired.'))
   }
 }
+
+// Must run after requireAuth (needs req.user.role from the access token).
+export function requireRole(...roles) {
+  return (req, _res, next) => {
+    if (!req.user || !roles.includes(req.user.role)) {
+      return next(new ApiError(403, 'You do not have permission to access this resource.'))
+    }
+    next()
+  }
+}

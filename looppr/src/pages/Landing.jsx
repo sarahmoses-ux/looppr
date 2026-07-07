@@ -1,7 +1,52 @@
 import Button from '../components/Button'
 import HeroCarousel from '../components/HeroCarousel'
+import FaqAccordion from '../components/FaqAccordion'
+import SEO from '../components/SEO'
 import { heroImages } from '../data/heroImages'
+import { FAQ_ITEMS } from '../data/faqItems'
+import { PUBLIC_PAGES } from '../seo/publicPages'
+import { SITE_URL, SITE_NAME, SOCIAL_PROFILES } from '../seo/siteConfig'
 import logoTransparent from '../assets/looppr-mark-transparent.png'
+
+const HOME_PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/')
+
+const ORGANIZATION_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: SITE_NAME,
+  url: SITE_URL,
+  logo: `${SITE_URL}${logoTransparent}`,
+  sameAs: SOCIAL_PROFILES,
+}
+
+const SERVICE_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  serviceType: 'Laundry pickup and delivery',
+  provider: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+  areaServed: [
+    { '@type': 'City', name: 'Oklahoma City, OK' },
+    { '@type': 'City', name: 'Edmond, OK' },
+    { '@type': 'City', name: 'Norman, OK' },
+    { '@type': 'City', name: 'Moore, OK' },
+  ],
+  offers: {
+    '@type': 'Offer',
+    priceCurrency: 'USD',
+    price: '1.59',
+    description: 'Wash & fold laundry service, priced per pound',
+  },
+}
+
+const FAQ_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQ_ITEMS.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer },
+  })),
+}
 
 const STEPS = [
   {
@@ -84,6 +129,11 @@ const PLANS = [
 export default function Landing() {
   return (
     <>
+      <SEO
+        description={HOME_PAGE_META.description}
+        jsonLd={[ORGANIZATION_JSON_LD, SERVICE_JSON_LD, FAQ_JSON_LD]}
+      />
+
       <section className="relative overflow-hidden">
         <div
           className="pointer-events-none absolute inset-0"
@@ -121,13 +171,16 @@ export default function Landing() {
               <Button to="/signup" variant="primary" className="px-8! py-3.5! text-base!">
                 Schedule your first pickup
               </Button>
-              <a
-                href="#how-it-works"
-                className="text-sm font-semibold text-ink/70 underline decoration-ink/20 underline-offset-4 transition-colors hover:text-ink"
-              >
-                See how it works
-              </a>
+              <Button to="/guest/book" variant="ghost" className="px-8! py-3.5! text-base!">
+                Book without an account
+              </Button>
             </div>
+            <a
+              href="#how-it-works"
+              className="mt-3 inline-block text-sm font-medium text-ink/50 underline decoration-ink/15 underline-offset-4 transition-colors hover:text-ink"
+            >
+              See how it works
+            </a>
             <div className="mt-10 flex flex-wrap gap-8">
               <div>
                 <span className="block font-display text-2xl font-semibold text-ink">Free</span>
@@ -272,6 +325,18 @@ export default function Landing() {
         </div>
       </section>
 
+      <section id="faq" className="mx-auto max-w-[900px] px-4 sm:px-6 lg:px-8 py-20">
+        <p className="text-sm font-semibold uppercase tracking-[0.08em] text-periwinkle">
+          FAQ
+        </p>
+        <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+          Frequently asked questions
+        </h2>
+        <div className="mt-10">
+          <FaqAccordion items={FAQ_ITEMS} />
+        </div>
+      </section>
+
       <section
         className="relative overflow-hidden"
         style={{
@@ -286,7 +351,7 @@ export default function Landing() {
           }}
         />
         <div className="relative mx-auto flex max-w-[1600px] flex-col items-center gap-6 px-4 sm:px-6 lg:px-8 py-20 text-center">
-          <img src={logoTransparent} alt="" className="h-12 w-12" />
+          <img src={logoTransparent} alt="" loading="lazy" decoding="async" className="h-12 w-12" />
           <h2 className="max-w-xl font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Your first pickup is a couple minutes away.
           </h2>

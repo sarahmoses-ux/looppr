@@ -1,0 +1,4 @@
+# Netlify SPA fallback — react-router (BrowserRouter) handles routing
+# client-side, so every path must serve index.html or deep links
+# (e.g. getlooppr.com/orders) 404 on direct load / refresh.
+/*    /index.html   200

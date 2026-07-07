@@ -1,0 +1,100 @@
+import { describe, expect, it } from 'vitest'
+import request from 'supertest'
+import { createApp } from '../app.js'
+import { createTestUser, tokenFor } from './helpers/auth.js'
+
+const app = createApp()
+
+const guestPayload = {
+  guest: { name: 'Guest Tester', email: 'guest-checkout-test@example.com', phone: '+14055559999' },
+  address: { street: '100 Test Ave', city: 'Edmond', state: 'OK', zip: '73003' },
+  preferredDate: '2027-01-15',
+  window: 'morning',
+  loadSize: 'large',
+  notes: '',
+}
+
+async function createGuestPickup(overrides = {}) {
+  const res = await request(app)
+    .post('/api/pickups/guest')
+    .send({ ...guestPayload, ...overrides })
+  return res.body
+}
+
+async function adminToken() {
+  const admin = await createTestUser({ role: 'admin', email: 'guest-checkout-admin@example.com' })
+  return tokenFor(admin)
+}
+
+describe('guest booking pricing', () => {
+  it('auto-computes price from load size, with free delivery on the first order', async () => {
+    const { pickup } = await createGuestPickup()
+    // large = 35 lbs * $1.59/lb, no delivery fee (first order for this email)
+    expect(pickup.pricing.amount).toBeCloseTo(55.65, 2)
+    expect(pickup.paymentStatus).toBe('unpaid')
+    expect(pickup.status).toBe('requested')
+  })
+
+  it('charges delivery on a third order for the same email', async () => {
+    await createGuestPickup()
+    await createGuestPickup()
+    const { pickup } = await createGuestPickup()
+    // third order: no more free delivery
+    expect(pickup.pricing.amount).toBeCloseTo(55.65 + 4.99, 2)
+  })
+})
+
+describe('guest tracking', () => {
+  it('returns the pickup for the correct token, 404s for a wrong one', async () => {
+    const { pickup, guestAccessToken } = await createGuestPickup()
+
+    const ok = await request(app).get(`/api/pickups/guest/${pickup.id}`).query({ token: guestAccessToken })
+    expect(ok.status).toBe(200)
+
+    const wrongToken = await request(app).get(`/api/pickups/guest/${pickup.id}`).query({ token: 'not-the-real-token' })
+    expect(wrongToken.status).toBe(404)
+  })
+})
+
+describe('guest payment (simulated)', () => {
+  it('goes unpaid -> awaiting_payment -> paid through the admin + guest flow', async () => {
+    const { pickup, guestAccessToken } = await createGuestPickup()
+    const token = await adminToken()
+
+    const sendReq = await request(app)
+      .post(`/api/admin/pickups/${pickup.id}/send-payment-request`)
+      .set('Authorization', `Bearer ${token}`)
+    expect(sendReq.status).toBe(200)
+    expect(sendReq.body.pickup.status).toBe('awaiting_payment')
+    expect(sendReq.body.pickup.paymentStatus).toBe('pending')
+    expect(sendReq.body.emailSent).toBe(true)
+
+    const pay = await request(app)
+      .post(`/api/pickups/guest/${pickup.id}/pay`)
+      .send({ token: guestAccessToken })
+    expect(pay.status).toBe(200)
+    expect(pay.body.pickup.paymentStatus).toBe('paid')
+    expect(pay.body.pickup.status).toBe('payment_successful')
+  })
+
+  it('rejects paying twice for the same order', async () => {
+    const { pickup, guestAccessToken } = await createGuestPickup()
+
+    await request(app).post(`/api/pickups/guest/${pickup.id}/pay`).send({ token: guestAccessToken })
+    const secondAttempt = await request(app)
+      .post(`/api/pickups/guest/${pickup.id}/pay`)
+      .send({ token: guestAccessToken })
+
+    expect(secondAttempt.status).toBe(409)
+  })
+
+  it('rejects paying with someone else\'s access token', async () => {
+    const { pickup } = await createGuestPickup()
+    const { guestAccessToken: otherToken } = await createGuestPickup({
+      guest: { name: 'Someone Else', email: 'guest-checkout-other@example.com', phone: '+14055551111' },
+    })
+
+    const res = await request(app).post(`/api/pickups/guest/${pickup.id}/pay`).send({ token: otherToken })
+    expect(res.status).toBe(404)
+  })
+})

@@ -1,0 +1,14 @@
+import { Router } from 'express'
+import { addAddress, deleteAddress, listAddresses } from '../controllers/addressController.js'
+import { requireAuth } from '../middleware/auth.js'
+import { validate } from '../middleware/validate.js'
+import { addAddressValidation } from '../validations/addressValidation.js'
+
+const router = Router()
+
+router.use(requireAuth)
+router.get('/', listAddresses)
+router.post('/', addAddressValidation, validate, addAddress)
+router.delete('/:id', deleteAddress)
+
+export default router

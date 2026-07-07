@@ -1,0 +1,16 @@
+# Netlify response headers. HSTS only takes effect once the site is
+# actually served over HTTPS (true by default on Netlify/Vercel/Cloudflare
+# Pages) — this tells browsers to *always* use HTTPS for this domain from
+# then on, even if a user types http:// or follows an old http:// link.
+/*
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), camera=(), microphone=()
+
+/sitemap.xml
+  Content-Type: application/xml; charset=utf-8
+
+/robots.txt
+  Content-Type: text/plain; charset=utf-8

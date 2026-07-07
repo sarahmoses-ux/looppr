@@ -55,6 +55,7 @@ export default function VerifyEmail() {
       eyebrow="One more step"
       title="Verify your email"
       subtitle={`We sent a 6-digit code to ${user?.email || 'your email'}.`}
+      noindex
     >
       <form onSubmit={handleSubmit} noValidate className="space-y-5">
         <div>

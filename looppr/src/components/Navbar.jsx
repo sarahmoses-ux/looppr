@@ -8,6 +8,7 @@ const LINKS = [
   { label: 'How it works', href: '#how-it-works' },
   { label: 'Pricing', href: '#pricing' },
   { label: 'Why Looppr', href: '#why-loopr' },
+  { label: 'FAQ', href: '#faq' },
 ]
 
 export default function Navbar() {
@@ -47,14 +48,13 @@ export default function Navbar() {
           >
             Drive
           </Link>
-          <Link
-            to="/cities"
-            className="text-sm font-medium text-ink/70 transition-colors hover:text-ink"
-          >
-            Cities
-          </Link>
         </div>
 
+        {/* Auth actions live here on sm+ only. Below that they'd have to
+            share the row with the logo and the hamburger, which is exactly
+            what was cramped/misaligned before — so on small screens they
+            move into the hamburger menu instead (below) rather than being
+            squeezed down to fit. */}
         <div className="flex items-center gap-3">
           {isAuthed ? (
             <>
@@ -67,20 +67,24 @@ export default function Navbar() {
               <Button
                 onClick={logout}
                 variant="ghost"
-                className="px-4! py-2.5! text-xs! sm:px-6! sm:py-3! sm:text-sm!"
+                className="hidden whitespace-nowrap px-6! py-3! text-sm! sm:inline-flex"
               >
                 Sign out
               </Button>
             </>
           ) : (
             <>
-              <Button to="/login" variant="ghost" className="hidden sm:inline-flex">
+              <Button
+                to="/login"
+                variant="ghost"
+                className="hidden whitespace-nowrap px-6! py-3! text-sm! sm:inline-flex"
+              >
                 Sign in
               </Button>
               <Button
                 to="/signup"
                 variant="primary"
-                className="px-4! py-2.5! text-xs! sm:px-6! sm:py-3! sm:text-sm!"
+                className="hidden whitespace-nowrap px-6! py-3! text-sm! sm:inline-flex"
               >
                 Get started
               </Button>
@@ -91,7 +95,7 @@ export default function Navbar() {
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
             aria-label="Toggle menu"
-            className="ml-1 flex h-10 w-10 items-center justify-center rounded-full text-ink transition-colors hover:bg-ink/5 md:hidden"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-ink transition-colors hover:bg-ink/5 md:hidden"
           >
             <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden="true">
               {open ? (
@@ -141,29 +145,36 @@ export default function Navbar() {
             >
               Drive with us
             </Link>
-            <Link
-              to="/cities"
-              onClick={() => setOpen(false)}
-              className="rounded-lg px-2 py-2.5 text-sm font-medium text-ink/75 transition-colors hover:bg-ink/5 hover:text-ink"
-            >
-              Cities
-            </Link>
+
             {isAuthed ? (
-              <Link
-                to="/home"
-                onClick={() => setOpen(false)}
-                className="mt-2 rounded-lg px-2 py-2.5 text-sm font-medium text-ink/75 transition-colors hover:bg-ink/5 hover:text-ink sm:hidden"
-              >
-                {user?.name?.split(' ')[0]}’s account
-              </Link>
+              <>
+                <Link
+                  to="/home"
+                  onClick={() => setOpen(false)}
+                  className="mt-2 rounded-lg px-2 py-2.5 text-sm font-medium text-ink/75 transition-colors hover:bg-ink/5 hover:text-ink sm:hidden"
+                >
+                  {user?.name?.split(' ')[0]}’s account
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpen(false)
+                    logout()
+                  }}
+                  className="rounded-lg px-2 py-2.5 text-left text-sm font-medium text-ink/75 transition-colors hover:bg-ink/5 hover:text-ink sm:hidden"
+                >
+                  Sign out
+                </button>
+              </>
             ) : (
-              <Link
-                to="/login"
-                onClick={() => setOpen(false)}
-                className="mt-2 rounded-lg px-2 py-2.5 text-sm font-medium text-ink/75 transition-colors hover:bg-ink/5 hover:text-ink sm:hidden"
-              >
-                Sign in
-              </Link>
+              <div className="mt-2 flex flex-col gap-2 sm:hidden">
+                <Button to="/signup" variant="primary" onClick={() => setOpen(false)} className="w-full">
+                  Get started
+                </Button>
+                <Button to="/login" variant="ghost" onClick={() => setOpen(false)} className="w-full">
+                  Sign in
+                </Button>
+              </div>
             )}
           </div>
         </div>
