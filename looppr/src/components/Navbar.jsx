@@ -60,14 +60,14 @@ export default function Navbar() {
             <>
               <Link
                 to="/home"
-                className="hidden text-sm font-medium text-ink/70 transition-colors hover:text-ink sm:inline-flex"
+                className="!hidden text-sm font-medium text-ink/70 transition-colors hover:text-ink sm:!inline-flex"
               >
                 {user?.name?.split(' ')[0]}
               </Link>
               <Button
                 onClick={logout}
                 variant="ghost"
-                className="hidden whitespace-nowrap px-6! py-3! text-sm! sm:inline-flex"
+                className="!hidden whitespace-nowrap px-6! py-3! text-sm! sm:!inline-flex"
               >
                 Sign out
               </Button>
@@ -77,14 +77,14 @@ export default function Navbar() {
               <Button
                 to="/login"
                 variant="ghost"
-                className="hidden whitespace-nowrap px-6! py-3! text-sm! sm:inline-flex"
+                className="!hidden whitespace-nowrap px-6! py-3! text-sm! sm:!inline-flex"
               >
                 Sign in
               </Button>
               <Button
                 to="/signup"
                 variant="primary"
-                className="hidden whitespace-nowrap px-6! py-3! text-sm! sm:inline-flex"
+                className="!hidden whitespace-nowrap px-6! py-3! text-sm! sm:!inline-flex"
               >
                 Get started
               </Button>
@@ -95,7 +95,7 @@ export default function Navbar() {
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
             aria-label="Toggle menu"
-            className="flex h-10 w-10 items-center justify-center rounded-full text-ink transition-colors hover:bg-ink/5 md:hidden"
+            className="!flex h-10 w-10 items-center justify-center rounded-full text-ink transition-colors hover:bg-ink/5 md:!hidden"
           >
             <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden="true">
               {open ? (
@@ -168,10 +168,20 @@ export default function Navbar() {
               </>
             ) : (
               <div className="mt-2 flex flex-col gap-2 sm:hidden">
-                <Button to="/signup" variant="primary" onClick={() => setOpen(false)} className="w-full">
+                <Button
+                  to="/signup"
+                  variant="primary"
+                  onClick={() => setOpen(false)}
+                  className="w-full py-2.5! text-sm!"
+                >
                   Get started
                 </Button>
-                <Button to="/login" variant="ghost" onClick={() => setOpen(false)} className="w-full">
+                <Button
+                  to="/login"
+                  variant="ghost"
+                  onClick={() => setOpen(false)}
+                  className="w-full py-2.5! text-sm!"
+                >
                   Sign in
                 </Button>
               </div>
