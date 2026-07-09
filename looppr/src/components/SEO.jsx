@@ -5,6 +5,7 @@ import {
   SITE_URL,
   DEFAULT_DESCRIPTION,
   DEFAULT_OG_IMAGE,
+  DEFAULT_TITLE,
 } from '../seo/siteConfig'
 
 // Renders per-page <title>, meta description, canonical link, robots
@@ -21,7 +22,7 @@ export default function SEO({
   const { pathname } = useLocation()
   const canonicalPath = pathname.length > 1 ? pathname.replace(/\/+$/, '') : '/'
   const url = `${SITE_URL}${canonicalPath}`
-  const fullTitle = title ? `${title} | ${SITE_NAME}` : `${SITE_NAME} — Laundry day, off your plate.`
+  const fullTitle = title ? `${title} | ${SITE_NAME}` : DEFAULT_TITLE
 
   return (
     <Helmet>

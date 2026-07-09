@@ -7,7 +7,7 @@ export const SITE_URL = (import.meta.env.VITE_SITE_URL || 'https://getlooppr.com
 
 export const SITE_NAME = 'Looppr'
 
-export const DEFAULT_TITLE = 'Looppr — Laundry day, off your plate.'
+export const DEFAULT_TITLE = 'Looppr — Laundry, handled.'
 
 export const DEFAULT_DESCRIPTION =
   'Looppr — book a laundry pickup in minutes. A trusted local laundry pro washes and folds your clothes, then delivers them back to your door.'
