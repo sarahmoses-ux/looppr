@@ -45,8 +45,16 @@ export function refreshCookieOptions() {
   const maxAgeMs = 30 * 24 * 60 * 60 * 1000
   return {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    // Frontend (getlooppr.com) and backend (onrender.com) are different
+    // sites, not just different ports — SameSite=Lax silently drops the
+    // cookie on cross-site fetch/XHR (it only rides along on top-level
+    // navigations), which breaks refresh entirely once deployed. None
+    // requires Secure, which is unconditional (not NODE_ENV-gated) because
+    // browsers also require it locally when SameSite=None — localhost is
+    // exempted from the HTTPS requirement itself, so this still works for
+    // local dev too.
+    secure: true,
+    sameSite: 'none',
     maxAge: maxAgeMs,
     path: '/api/auth',
   }
