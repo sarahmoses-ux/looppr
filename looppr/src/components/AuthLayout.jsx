@@ -8,9 +8,9 @@ export default function AuthLayout({ eyebrow, title, subtitle, noindex = false, 
       <SEO title={title} description={subtitle} noindex={noindex} />
       <Link
         to="/"
-        className="absolute left-6 top-6 z-10 flex items-center gap-1 lg:hidden"
+        className="absolute left-6 top-6 z-10 flex items-center gap-0 lg:hidden"
       >
-        <img src={logoTransparent} alt="" className="h-9 w-9 rounded-lg" />
+        <img src={logoTransparent} alt="" className="-mr-1 h-9 w-9" />
         <span className="font-display text-xl font-semibold tracking-tight text-ink">
           Looppr
         </span>
@@ -28,8 +28,8 @@ export default function AuthLayout({ eyebrow, title, subtitle, noindex = false, 
         />
 
         <div className="relative z-10 flex max-w-lg flex-col items-center text-center">
-          <Link to="/" className="flex items-center gap-1">
-            <img src={logoTransparent} alt="Looppr" className="h-11 w-11" />
+          <Link to="/" className="flex items-center gap-0">
+            <img src={logoTransparent} alt="Looppr" className="-mr-1.5 h-11 w-11" />
             <span className="font-display text-2xl font-semibold tracking-tight text-white">
               Looppr
             </span>
