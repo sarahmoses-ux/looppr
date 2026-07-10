@@ -5,18 +5,18 @@ import { ORDER_FLOW } from '../constants/orderStatus'
 
 describe('OrderTimeline', () => {
   it('renders every stage in the lifecycle', () => {
-    render(<OrderTimeline status="requested" />)
+    render(<OrderTimeline status="request_received" />)
     ORDER_FLOW.forEach((step) => {
       expect(screen.getByText(step.label)).toBeInTheDocument()
     })
   })
 
   it('marks the current stage distinctly from completed/upcoming ones', () => {
-    render(<OrderTimeline status="washing" />)
-    const washing = screen.getByText('Washing')
-    expect(washing.className).toContain('font-semibold')
+    render(<OrderTimeline status="laundry_in_progress" />)
+    const current = screen.getByText('Laundry In Progress')
+    expect(current.className).toContain('font-semibold')
 
-    const upcoming = screen.getByText('Completed')
+    const upcoming = screen.getByText('Ready & Delivered')
     expect(upcoming.className).not.toContain('font-semibold')
   })
 

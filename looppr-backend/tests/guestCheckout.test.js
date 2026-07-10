@@ -7,11 +7,12 @@ const app = createApp()
 
 const guestPayload = {
   guest: { name: 'Guest Tester', email: 'guest-checkout-test@example.com', phone: '+14055559999' },
-  address: { street: '100 Test Ave', city: 'Edmond', state: 'OK', zip: '73003' },
+  address: { street: '100 Test Ave', apartment: 'Apt 1', city: 'Edmond', state: 'OK', zip: '73003' },
   preferredDate: '2027-01-15',
   window: 'morning',
   loadSize: 'large',
   notes: '',
+  deliveryWindow: 'evening',
 }
 
 async function createGuestPickup(overrides = {}) {
@@ -32,7 +33,7 @@ describe('guest booking pricing', () => {
     // large = 35 lbs * $1.59/lb, no delivery fee (first order for this email)
     expect(pickup.pricing.amount).toBeCloseTo(55.65, 2)
     expect(pickup.paymentStatus).toBe('unpaid')
-    expect(pickup.status).toBe('requested')
+    expect(pickup.status).toBe('request_received')
   })
 
   it('charges delivery on a third order for the same email', async () => {
@@ -57,7 +58,7 @@ describe('guest tracking', () => {
 })
 
 describe('guest payment (simulated)', () => {
-  it('goes unpaid -> awaiting_payment -> paid through the admin + guest flow', async () => {
+  it('goes unpaid -> pending -> paid through the admin + guest flow, without moving the fulfillment status', async () => {
     const { pickup, guestAccessToken } = await createGuestPickup()
     const token = await adminToken()
 
@@ -65,7 +66,7 @@ describe('guest payment (simulated)', () => {
       .post(`/api/admin/pickups/${pickup.id}/send-payment-request`)
       .set('Authorization', `Bearer ${token}`)
     expect(sendReq.status).toBe(200)
-    expect(sendReq.body.pickup.status).toBe('awaiting_payment')
+    expect(sendReq.body.pickup.status).toBe('request_received')
     expect(sendReq.body.pickup.paymentStatus).toBe('pending')
     expect(sendReq.body.emailSent).toBe(true)
 
@@ -74,7 +75,7 @@ describe('guest payment (simulated)', () => {
       .send({ token: guestAccessToken })
     expect(pay.status).toBe(200)
     expect(pay.body.pickup.paymentStatus).toBe('paid')
-    expect(pay.body.pickup.status).toBe('payment_successful')
+    expect(pay.body.pickup.status).toBe('request_received')
   })
 
   it('rejects paying twice for the same order', async () => {

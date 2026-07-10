@@ -5,8 +5,7 @@ const COLUMNS = [
   {
     heading: 'Customers',
     links: [
-      { label: 'How it works', href: '#how-it-works' },
-      { label: 'Pricing', href: '#pricing' },
+      { label: 'Pricing', href: '/pricing' },
       { label: 'Help & FAQ', href: '/faq' },
       { label: 'Cities & coverage', href: '/cities' },
     ],
@@ -14,7 +13,7 @@ const COLUMNS = [
   {
     heading: 'Partners',
     links: [
-      { label: 'For business', href: '/laundromats' },
+      { label: 'For business', href: '/business' },
       { label: 'Laundromat partners', href: '/laundromats' },
       { label: 'Drive with us', href: '/drive' },
     ],
@@ -63,6 +62,17 @@ const SOCIALS = [
     ),
   },
   {
+    label: 'TikTok',
+    href: 'https://tiktok.com/@getlooppr',
+    path: (
+      <path
+        fill="currentColor"
+        stroke="none"
+        d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.95a8.16 8.16 0 0 0 4.77 1.52V7.01a4.85 4.85 0 0 1-1-.32z"
+      />
+    ),
+  },
+  {
     label: 'LinkedIn',
     href: 'https://linkedin.com/company/getlooppr',
     path: (
@@ -97,7 +107,7 @@ export default function Footer() {
       <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid gap-12 sm:grid-cols-2 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
           <div>
-            <Link to="/" className="flex items-center gap-2.5">
+            <Link to="/" className="flex items-center gap-1">
               <img src={logoTransparent} alt="" loading="lazy" decoding="async" className="h-8 w-8" />
               <span className="font-display text-lg font-bold tracking-tight text-white">
                 Looppr
@@ -141,16 +151,13 @@ export default function Footer() {
           ))}
         </div>
 
-        <div className="mt-14 flex flex-col gap-3 border-t border-white/10 pt-6 text-xs sm:flex-row sm:items-center sm:justify-between">
-          <p>&copy; {new Date().getFullYear()} Looppr Inc. · Edmond, Oklahoma</p>
-          <div className="flex gap-5">
-            <Link to="/privacy" className="hover:text-white/80">
-              Privacy
-            </Link>
-            <Link to="/terms" className="hover:text-white/80">
-              Terms
-            </Link>
-          </div>
+        <div className="mt-14 flex justify-center gap-5 border-t border-white/10 pt-6 text-xs">
+          <Link to="/privacy" className="hover:text-white/80">
+            Privacy
+          </Link>
+          <Link to="/terms" className="hover:text-white/80">
+            Terms
+          </Link>
         </div>
       </div>
     </footer>

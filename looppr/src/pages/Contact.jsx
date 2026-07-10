@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Input from '../components/Input'
+import Select from '../components/Select'
 import Button from '../components/Button'
 import SEO from '../components/SEO'
 import { PUBLIC_PAGES } from '../seo/publicPages'
@@ -7,8 +8,17 @@ import { submitContactMessage } from '../services/contactApi'
 
 const PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/contact')
 
+const PURPOSES = [
+  { value: 'general', label: 'General question' },
+  { value: 'order_support', label: 'Order support' },
+  { value: 'business', label: 'Business inquiry' },
+  { value: 'partnership', label: 'Partnership inquiry' },
+  { value: 'press', label: 'Press / media' },
+  { value: 'other', label: 'Other' },
+]
+
 export default function Contact() {
-  const [form, setForm] = useState({ name: '', email: '', message: '' })
+  const [form, setForm] = useState({ name: '', email: '', phone: '', purpose: '', message: '' })
   const [errors, setErrors] = useState({})
   const [formError, setFormError] = useState('')
   const [status, setStatus] = useState('idle')
@@ -23,7 +33,8 @@ export default function Contact() {
     const next = {}
     if (form.name.trim().length < 2) next.name = 'Enter your full name.'
     if (!/^\S+@\S+\.\S+$/.test(form.email)) next.email = 'Enter a valid email address.'
-    if (form.message.trim().length < 10) next.message = 'Tell us a bit more (at least 10 characters).'
+    if (!/^\+?[0-9\s()-]{7,20}$/.test(form.phone)) next.phone = 'Enter a valid phone number.'
+    if (!form.purpose) next.purpose = 'Choose a reason for contacting us.'
     return next
   }
 
@@ -38,7 +49,7 @@ export default function Contact() {
     try {
       await submitContactMessage(form)
       setSent(true)
-      setForm({ name: '', email: '', message: '' })
+      setForm({ name: '', email: '', phone: '', purpose: '', message: '' })
     } catch (err) {
       setFormError(
         err.response?.status === 429
@@ -83,19 +94,47 @@ export default function Contact() {
               onChange={handleChange}
               error={errors.name}
             />
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              label="Email"
-              value={form.email}
+            <div className="grid gap-5 sm:grid-cols-2">
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                label="Email"
+                value={form.email}
+                onChange={handleChange}
+                error={errors.email}
+                placeholder="you@example.com"
+              />
+              <Input
+                id="phone"
+                name="phone"
+                label="Phone"
+                value={form.phone}
+                onChange={handleChange}
+                error={errors.phone}
+                placeholder="(405) 555-0100"
+              />
+            </div>
+            <Select
+              id="purpose"
+              name="purpose"
+              label="How can we help you?"
+              value={form.purpose}
               onChange={handleChange}
-              error={errors.email}
-              placeholder="you@example.com"
-            />
+              error={errors.purpose}
+            >
+              <option value="" disabled>
+                Choose a reason
+              </option>
+              {PURPOSES.map((p) => (
+                <option key={p.value} value={p.value}>
+                  {p.label}
+                </option>
+              ))}
+            </Select>
             <div>
               <label htmlFor="message" className="block text-base font-medium text-ink/80">
-                Message
+                Message <span className="text-ink/40">(optional)</span>
               </label>
               <textarea
                 id="message"
@@ -103,16 +142,9 @@ export default function Contact() {
                 rows={5}
                 value={form.message}
                 onChange={handleChange}
-                placeholder="How can we help?"
-                className={`mt-2 w-full rounded-xl border bg-white px-4 py-3.5 text-base text-ink outline-none transition-colors placeholder:text-ink/35 ${
-                  errors.message ? 'border-red-400 focus:border-red-500' : 'border-line focus:border-periwinkle'
-                }`}
+                placeholder="Share any additional details…"
+                className="mt-2 w-full rounded-xl border border-line bg-white px-4 py-3.5 text-base text-ink outline-none transition-colors placeholder:text-ink/35 focus:border-periwinkle"
               />
-              {errors.message && (
-                <p role="alert" className="mt-1.5 text-sm font-medium text-red-600">
-                  {errors.message}
-                </p>
-              )}
             </div>
 
             {formError && (

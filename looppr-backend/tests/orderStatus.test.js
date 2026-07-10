@@ -11,11 +11,12 @@ async function createGuestPickup() {
     .post('/api/pickups/guest')
     .send({
       guest: { name: 'Status Test', email: `status-test-${Date.now()}@example.com`, phone: '+14055552222' },
-      address: { street: '1 Status Ave', city: 'Edmond', state: 'OK', zip: '73003' },
+      address: { street: '1 Status Ave', apartment: 'Apt 1', city: 'Edmond', state: 'OK', zip: '73003' },
       preferredDate: '2027-01-20',
       window: 'evening',
       loadSize: 'small',
       notes: '',
+      deliveryWindow: 'evening',
     })
   return res.body.pickup
 }
@@ -68,7 +69,7 @@ describe('admin order status updates', () => {
 
     const res = await request(app)
       .patch(`/api/admin/pickups/${pickup.id}/status`)
-      .send({ status: 'washing' })
+      .send({ status: 'pickup' })
     expect(res.status).toBe(401)
   })
 
@@ -77,7 +78,7 @@ describe('admin order status updates', () => {
     const res = await request(app)
       .patch('/api/admin/pickups/000000000000000000000000/status')
       .set('Authorization', `Bearer ${token}`)
-      .send({ status: 'washing' })
+      .send({ status: 'pickup' })
     expect(res.status).toBe(404)
   })
 

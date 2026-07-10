@@ -7,6 +7,11 @@ const COPY = {
     subject: "We've got your driver application",
     intro: "We've received your application to drive with Looppr.",
   },
+  business: {
+    subject: "We've got your LoopprBiz inquiry",
+    intro:
+      "We've received your business inquiry. Our business team replies within 4 business hours — you can also reach us directly at biz@getlooppr.com.",
+  },
 }
 
 export function partnerLeadEmailSubject(type) {

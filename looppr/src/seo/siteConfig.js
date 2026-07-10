@@ -20,5 +20,6 @@ export const SOCIAL_PROFILES = [
   'https://instagram.com/getlooppr',
   'https://x.com/getlooppr',
   'https://facebook.com/getlooppr',
+  'https://tiktok.com/@getlooppr',
   'https://linkedin.com/company/getlooppr',
 ]

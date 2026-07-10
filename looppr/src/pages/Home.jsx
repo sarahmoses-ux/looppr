@@ -107,7 +107,7 @@ export default function Home() {
         <div
           className="rounded-3xl p-8 text-white"
           style={{
-            backgroundImage: 'linear-gradient(155deg, #1E1B4B 0%, #332AB8 100%)',
+            backgroundImage: 'linear-gradient(155deg, #7C73E6 0%, #5A52C5 100%)',
           }}
         >
           <h2 className="font-display text-2xl font-semibold">Ready for your next pickup?</h2>

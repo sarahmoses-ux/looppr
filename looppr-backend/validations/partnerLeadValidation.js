@@ -1,7 +1,7 @@
 import { body } from 'express-validator'
 
 export const submitPartnerLeadValidation = [
-  body('type').isIn(['laundromat', 'driver']).withMessage('Invalid lead type.'),
+  body('type').isIn(['laundromat', 'driver', 'business']).withMessage('Invalid lead type.'),
   body('name').trim().isLength({ min: 2, max: 100 }).withMessage('Enter your full name.'),
   body('email').trim().isEmail().withMessage('Enter a valid email address.').normalizeEmail(),
   body('phone')
@@ -16,6 +16,6 @@ export const submitPartnerLeadValidation = [
   body('message')
     .optional({ values: 'falsy' })
     .trim()
-    .isLength({ max: 1000 })
-    .withMessage('Message must be 1000 characters or fewer.'),
+    .isLength({ max: 2000 })
+    .withMessage('Message must be 2000 characters or fewer.'),
 ]

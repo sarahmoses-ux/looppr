@@ -27,6 +27,13 @@ function getTransporter() {
   return transporter
 }
 
+// Redundant when GMAIL_USER already is the reply-to inbox (replies go to
+// `from` by default), but keeps this provider's behavior aligned with
+// resendProvider.js in case they ever point at different addresses.
+function replyTo() {
+  return process.env.REPLY_TO_EMAIL || undefined
+}
+
 export async function sendOtpEmail(toEmail, name, code) {
   const fromName = process.env.GMAIL_FROM_NAME || 'Looppr'
 
@@ -36,6 +43,7 @@ export async function sendOtpEmail(toEmail, name, code) {
   await getTransporter().sendMail({
     from: `${fromName} <${process.env.GMAIL_USER}>`,
     to: toEmail,
+    replyTo: replyTo(),
     subject: otpEmailSubject(code),
     html: otpEmailHtml(name, code),
   })
@@ -47,6 +55,7 @@ export async function sendPaymentRequestEmail(toEmail, name, amount, currency, l
   await getTransporter().sendMail({
     from: `${fromName} <${process.env.GMAIL_USER}>`,
     to: toEmail,
+    replyTo: replyTo(),
     subject: paymentRequestEmailSubject(amount, currency),
     html: paymentRequestEmailHtml(name, amount, currency, link),
   })
@@ -58,6 +67,7 @@ export async function sendPasswordResetEmail(toEmail, name, code) {
   await getTransporter().sendMail({
     from: `${fromName} <${process.env.GMAIL_USER}>`,
     to: toEmail,
+    replyTo: replyTo(),
     subject: passwordResetEmailSubject(code),
     html: passwordResetEmailHtml(name, code),
   })
@@ -69,6 +79,7 @@ export async function sendWaitlistConfirmationEmail(toEmail) {
   await getTransporter().sendMail({
     from: `${fromName} <${process.env.GMAIL_USER}>`,
     to: toEmail,
+    replyTo: replyTo(),
     subject: waitlistEmailSubject,
     html: waitlistEmailHtml(),
   })
@@ -80,6 +91,7 @@ export async function sendContactConfirmationEmail(toEmail, name) {
   await getTransporter().sendMail({
     from: `${fromName} <${process.env.GMAIL_USER}>`,
     to: toEmail,
+    replyTo: replyTo(),
     subject: contactConfirmationEmailSubject,
     html: contactConfirmationEmailHtml(name),
   })
@@ -91,6 +103,7 @@ export async function sendPartnerLeadEmail(toEmail, type, name) {
   await getTransporter().sendMail({
     from: `${fromName} <${process.env.GMAIL_USER}>`,
     to: toEmail,
+    replyTo: replyTo(),
     subject: partnerLeadEmailSubject(type),
     html: partnerLeadEmailHtml(type, name),
   })

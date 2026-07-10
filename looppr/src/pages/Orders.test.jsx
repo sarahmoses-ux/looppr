@@ -26,7 +26,7 @@ const basePickup = {
   window: 'morning',
   loadSize: 'large',
   notes: '',
-  status: 'requested',
+  status: 'request_received',
   paymentStatus: 'paid',
   createdAt: '2026-01-01T00:00:00.000Z',
   paidAt: '2026-01-02T00:00:00.000Z',

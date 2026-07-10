@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import SEO from '../../components/SEO'
 import { useToast } from '../../context/ToastContext'
 import { ALL_STATUSES } from '../../constants/orderStatus'
-import { fetchAllPickups, sendPaymentRequest, updateOrderStatus } from '../../services/adminApi'
+import { fetchAllPickups, updateOrderStatus } from '../../services/adminApi'
 
 const WINDOW_LABELS = {
   morning: 'Morning · 8am – 11am',
@@ -23,7 +23,6 @@ function formatMoney(amount, currency = 'usd') {
 
 function AdminOrderRow({ pickup, onChange }) {
   const { showToast } = useToast()
-  const [sending, setSending] = useState(false)
   const contact = pickup.clientId || pickup.guest
   const notificationsOff = pickup.source === 'account' && pickup.clientId?.emailNotifications === false
   const dateLabel = new Date(pickup.preferredDate).toLocaleDateString(undefined, {
@@ -41,26 +40,6 @@ function AdminOrderRow({ pickup, onChange }) {
       // The <select> reverts on next render since we never applied an
       // optimistic update — still worth telling the admin it didn't save.
       showToast('Could not update order status. Please try again.', 'error')
-    }
-  }
-
-  async function handleSendPaymentRequest() {
-    setSending(true)
-    try {
-      const { pickup: updated, emailSent, notificationsOptedOut } = await sendPaymentRequest(pickup._id)
-      onChange(updated)
-      showToast(
-        emailSent
-          ? 'Payment request sent.'
-          : notificationsOptedOut
-            ? 'Order moved to Awaiting Payment — email skipped (customer has notifications off).'
-            : 'Order moved to Awaiting Payment, but the email failed to send.',
-        emailSent || notificationsOptedOut ? 'success' : 'error',
-      )
-    } catch (err) {
-      showToast(err.response?.data?.message || 'Could not send payment request.', 'error')
-    } finally {
-      setSending(false)
     }
   }
 
@@ -107,17 +86,6 @@ function AdminOrderRow({ pickup, onChange }) {
             </option>
           ))}
         </select>
-
-        {pickup.paymentStatus !== 'paid' && (
-          <button
-            type="button"
-            onClick={handleSendPaymentRequest}
-            disabled={sending}
-            className="whitespace-nowrap rounded-xl bg-ink px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-ink-light disabled:opacity-50"
-          >
-            {sending ? 'Sending…' : 'Send payment request'}
-          </button>
-        )}
       </div>
     </div>
   )

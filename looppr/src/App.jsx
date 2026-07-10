@@ -5,7 +5,6 @@ import AppLayout from './layouts/AppLayout'
 import AdminLayout from './layouts/AdminLayout'
 import ProtectedRoute from './routes/ProtectedRoute'
 import Landing from './pages/Landing'
-import { PUBLIC_PAGES } from './seo/publicPages'
 
 // Landing (the "/" route, by far the highest-traffic page) stays in the
 // main bundle so the marketing homepage has no extra chunk round-trip
@@ -19,13 +18,18 @@ const Orders = lazy(() => import('./pages/Orders'))
 const Book = lazy(() => import('./pages/Book'))
 const Profile = lazy(() => import('./pages/Profile'))
 const Settings = lazy(() => import('./pages/Settings'))
-const ComingSoon = lazy(() => import('./pages/ComingSoon'))
 const About = lazy(() => import('./pages/About'))
 const Privacy = lazy(() => import('./pages/Privacy'))
 const Terms = lazy(() => import('./pages/Terms'))
 const Contact = lazy(() => import('./pages/Contact'))
 const Laundromats = lazy(() => import('./pages/Laundromats'))
+const LaundromatsForm = lazy(() => import('./pages/LaundromatsForm'))
 const Drive = lazy(() => import('./pages/Drive'))
+const DriveForm = lazy(() => import('./pages/DriveForm'))
+const Pricing = lazy(() => import('./pages/Pricing'))
+const Business = lazy(() => import('./pages/Business'))
+const BusinessForm = lazy(() => import('./pages/BusinessForm'))
+const Cities = lazy(() => import('./pages/Cities'))
 const Faq = lazy(() => import('./pages/Faq'))
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'))
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'))
@@ -35,8 +39,6 @@ const AdminOrders = lazy(() => import('./pages/admin/AdminOrders'))
 const AdminCustomers = lazy(() => import('./pages/admin/AdminCustomers'))
 const GuestBook = lazy(() => import('./pages/guest/GuestBook'))
 const GuestRequestStatus = lazy(() => import('./pages/guest/GuestRequestStatus'))
-
-const pageMeta = Object.fromEntries(PUBLIC_PAGES.map((p) => [p.path, p]))
 
 function App() {
   return (
@@ -49,11 +51,13 @@ function App() {
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/laundromats" element={<Laundromats />} />
+          <Route path="/laundromats/apply" element={<LaundromatsForm />} />
           <Route path="/drive" element={<Drive />} />
-          <Route
-            path="/cities"
-            element={<ComingSoon title={pageMeta['/cities'].title} description={pageMeta['/cities'].description} />}
-          />
+          <Route path="/drive/apply" element={<DriveForm />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/business" element={<Business />} />
+          <Route path="/business/apply" element={<BusinessForm />} />
+          <Route path="/cities" element={<Cities />} />
           <Route path="/faq" element={<Faq />} />
 
           {/* Guest booking: no account required, ever — admin manages

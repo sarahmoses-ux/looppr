@@ -15,6 +15,8 @@ function guestPublic(pickup) {
     window: pickup.window,
     loadSize: pickup.loadSize,
     notes: pickup.notes,
+    deliveryWindow: pickup.deliveryWindow,
+    deliveryAddress: pickup.deliveryAddress,
     status: pickup.status,
     pricing: pickup.pricing,
     paymentStatus: pickup.paymentStatus,
@@ -34,7 +36,7 @@ async function findGuestPickupByToken(id, token) {
 }
 
 export const createGuestPickup = asyncHandler(async (req, res) => {
-  const { guest, address, preferredDate, window, loadSize, notes } = req.body
+  const { guest, address, preferredDate, window, loadSize, notes, deliveryWindow, deliveryAddress } = req.body
 
   const guestAccessToken = crypto.randomBytes(24).toString('hex')
 
@@ -51,6 +53,8 @@ export const createGuestPickup = asyncHandler(async (req, res) => {
     window,
     loadSize,
     notes,
+    deliveryWindow,
+    deliveryAddress,
     guestAccessToken,
     pricing: computeOrderPrice(loadSize, priorOrderCount),
   })
@@ -86,11 +90,7 @@ export const payGuestOrder = asyncHandler(async (req, res) => {
 
   const updated = await PickupRequest.findOneAndUpdate(
     { _id: pickup._id, paymentStatus: { $ne: 'paid' } },
-    {
-      paymentStatus: 'paid',
-      paidAt: new Date(),
-      status: pickup.status === 'awaiting_payment' ? 'payment_successful' : pickup.status,
-    },
+    { paymentStatus: 'paid', paidAt: new Date() },
     { new: true },
   )
   if (!updated) throw new ApiError(409, 'This request has already been paid for.')

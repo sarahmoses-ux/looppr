@@ -70,62 +70,46 @@ export const listCustomers = asyncHandler(async (_req, res) => {
   res.json({ success: true, customers })
 })
 
-// Earliest-stage statuses — an order sitting here needs an admin to
+// Earliest-stage status — an order sitting here needs an admin to
 // actually do something next (review it, request payment), unlike later
 // fulfillment stages which are just "in progress." Powers the dashboard's
 // "Needs attention" list.
-const NEEDS_ATTENTION_STATUSES = ['requested', 'pending_review', 'awaiting_payment']
+const NEEDS_ATTENTION_STATUSES = ['request_received']
 
 export const getStats = asyncHandler(async (_req, res) => {
-  const [
-    totalCustomers,
-    totalOrders,
-    activeOrders,
-    completedOrders,
-    cancelledOrders,
-    revenueAgg,
-    needsAttention,
-  ] = await Promise.all([
-    User.countDocuments({ role: 'client' }),
-    PickupRequest.countDocuments(),
-    PickupRequest.countDocuments({ status: { $nin: TERMINAL_STATUSES } }),
-    PickupRequest.countDocuments({ status: 'completed' }),
-    PickupRequest.countDocuments({ status: 'cancelled' }),
-    PickupRequest.aggregate([
-      { $match: { paymentStatus: 'paid' } },
-      { $group: { _id: null, total: { $sum: '$pricing.amount' } } },
-    ]),
-    PickupRequest.find({ status: { $in: NEEDS_ATTENTION_STATUSES } })
-      .sort({ createdAt: -1 })
-      .limit(5)
-      .populate('clientId', 'name email')
-      .select('status preferredDate window clientId guest source'),
-  ])
+  const [totalCustomers, totalOrders, activeOrders, completedOrders, cancelledOrders, needsAttention] =
+    await Promise.all([
+      User.countDocuments({ role: 'client' }),
+      PickupRequest.countDocuments(),
+      PickupRequest.countDocuments({ status: { $nin: TERMINAL_STATUSES } }),
+      PickupRequest.countDocuments({ status: 'ready_delivered' }),
+      PickupRequest.countDocuments({ status: 'cancelled' }),
+      PickupRequest.find({ status: { $in: NEEDS_ATTENTION_STATUSES } })
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .populate('clientId', 'name email')
+        .select('status preferredDate window clientId guest source'),
+    ])
 
   res.json({
     success: true,
-    stats: {
-      totalCustomers,
-      totalOrders,
-      activeOrders,
-      completedOrders,
-      cancelledOrders,
-      revenue: revenueAgg[0]?.total || 0,
-    },
+    stats: { totalCustomers, totalOrders, activeOrders, completedOrders, cancelledOrders },
     needsAttention,
   })
 })
 
-// Moves an order into 'awaiting_payment' and emails the customer/guest a
-// link to pay — the price itself was already computed automatically at
-// booking time (see utils/pricing.js), so this is purely "go pay now",
-// not "here's your price".
+// Emails the customer/guest a link to pay — the price itself was already
+// computed automatically at booking time (see utils/pricing.js), so this
+// is purely "go pay now", not "here's your price". Only paymentStatus
+// moves here; `status` stays at 'request_received' until an admin
+// actually advances the order (payment is tracked separately from the
+// 4-stage fulfillment timeline).
 //
 // Guests have no account/preferences to opt out with, so they always get
 // this email (it's the only way they'd ever know their order needs
 // payment). Logged-in customers can turn it off via Settings ->
-// emailNotifications — respected here, but the order still moves to
-// awaiting_payment either way; only the email is skipped.
+// emailNotifications — respected here, but paymentStatus still moves to
+// pending either way; only the email is skipped.
 export const sendPaymentRequest = asyncHandler(async (req, res) => {
   const pickup = await PickupRequest.findById(req.params.id)
     .select('+guestAccessToken')
@@ -144,7 +128,6 @@ export const sendPaymentRequest = asyncHandler(async (req, res) => {
 
   pickup.paymentStatus = 'pending'
   pickup.paymentLink = link
-  pickup.status = 'awaiting_payment'
   await pickup.save()
 
   const optedOut = pickup.source === 'account' && pickup.clientId?.emailNotifications === false

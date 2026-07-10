@@ -8,10 +8,12 @@ export default function AuthLayout({ eyebrow, title, subtitle, noindex = false, 
       <SEO title={title} description={subtitle} noindex={noindex} />
       <Link
         to="/"
-        className="absolute left-6 top-6 z-10 flex items-center gap-2.5 lg:hidden"
+        className="absolute left-6 top-6 z-10 flex items-center gap-1 lg:hidden"
       >
-        <img src={logoTransparent} alt="" className="h-7 w-7" />
-        <span className="font-display text-lg font-bold text-ink">Looppr</span>
+        <img src={logoTransparent} alt="" className="h-9 w-9 rounded-lg" />
+        <span className="font-display text-xl font-semibold tracking-tight text-ink">
+          Looppr
+        </span>
       </Link>
 
       {/* Branding panel — content is a single stack (logo, heading, subtitle)
@@ -24,19 +26,13 @@ export default function AuthLayout({ eyebrow, title, subtitle, noindex = false, 
               'radial-gradient(circle at 15% 15%, rgba(124,115,230,0.35), transparent 45%), radial-gradient(circle at 85% 75%, rgba(124,115,230,0.2), transparent 40%)',
           }}
         />
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.06]"
-          style={{
-            backgroundImage:
-              'linear-gradient(rgba(248,247,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(248,247,255,0.6) 1px, transparent 1px)',
-            backgroundSize: '32px 32px',
-          }}
-        />
 
         <div className="relative z-10 flex max-w-lg flex-col items-center text-center">
-          <Link to="/" className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-1">
             <img src={logoTransparent} alt="Looppr" className="h-11 w-11" />
-            <span className="font-display text-2xl font-bold text-white">Looppr</span>
+            <span className="font-display text-2xl font-semibold tracking-tight text-white">
+              Looppr
+            </span>
           </Link>
 
           {/* Repeated brand tagline, not page-unique content — kept out of

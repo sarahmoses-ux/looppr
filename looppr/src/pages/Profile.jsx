@@ -1,9 +1,79 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
 import Input from '../components/Input'
 import Button from '../components/Button'
 import SEO from '../components/SEO'
+import { deleteAddress, fetchAddresses } from '../services/addressApi'
+
+function AddressesSection() {
+  const { showToast } = useToast()
+  const [addresses, setAddresses] = useState(null)
+  const [deletingId, setDeletingId] = useState('')
+
+  useEffect(() => {
+    let cancelled = false
+    fetchAddresses()
+      .then(({ addresses: list }) => {
+        if (!cancelled) setAddresses(list)
+      })
+      .catch(() => {
+        if (!cancelled) setAddresses([])
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  async function handleDelete(id) {
+    setDeletingId(id)
+    try {
+      const { addresses: updated } = await deleteAddress(id)
+      setAddresses(updated)
+    } catch {
+      showToast('Could not remove that address. Please try again.', 'error')
+    } finally {
+      setDeletingId('')
+    }
+  }
+
+  return (
+    <div className="mt-6 rounded-3xl border border-line bg-white p-6 sm:p-8">
+      <h2 className="text-sm font-semibold uppercase tracking-wide text-ink/45">Saved addresses</h2>
+      <p className="mt-1 text-sm text-ink/55">Addresses you've saved from booking a pickup.</p>
+
+      <div className="mt-4 space-y-2">
+        {addresses === null ? (
+          <div className="h-14 animate-pulse rounded-xl bg-linen-soft" />
+        ) : addresses.length === 0 ? (
+          <p className="text-sm text-ink/45">No saved addresses yet.</p>
+        ) : (
+          addresses.map((address) => (
+            <div
+              key={address._id}
+              className="flex items-center justify-between gap-4 rounded-xl border border-line px-4 py-3"
+            >
+              <div>
+                <p className="text-sm font-semibold text-ink">{address.label}</p>
+                <p className="text-sm text-ink/55">
+                  {address.street}, {address.city}, {address.state} {address.zip}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => handleDelete(address._id)}
+                disabled={deletingId === address._id}
+                className="shrink-0 text-sm font-semibold text-red-600 hover:underline disabled:opacity-50"
+              >
+                {deletingId === address._id ? 'Removing…' : 'Remove'}
+              </button>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  )
+}
 
 export default function Profile() {
   const { user, updateProfile } = useAuth()
@@ -95,6 +165,8 @@ export default function Profile() {
           </Button>
         </form>
       </div>
+
+      <AddressesSection />
     </div>
   )
 }

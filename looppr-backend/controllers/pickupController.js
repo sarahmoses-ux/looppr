@@ -6,7 +6,7 @@ import { asyncHandler } from '../utils/asyncHandler.js'
 import { computeOrderPrice } from '../utils/pricing.js'
 
 export const createPickup = asyncHandler(async (req, res) => {
-  const { address, preferredDate, window, loadSize, notes } = req.body
+  const { address, preferredDate, window, loadSize, notes, deliveryWindow, deliveryAddress } = req.body
 
   const priorOrderCount = await PickupRequest.countDocuments({
     clientId: req.user.sub,
@@ -20,6 +20,8 @@ export const createPickup = asyncHandler(async (req, res) => {
     window,
     loadSize,
     notes,
+    deliveryWindow,
+    deliveryAddress,
     pricing: computeOrderPrice(loadSize, priorOrderCount),
   })
 
@@ -73,11 +75,7 @@ export const payMyOrder = asyncHandler(async (req, res) => {
 
   const updated = await PickupRequest.findOneAndUpdate(
     { _id: pickup._id, paymentStatus: { $ne: 'paid' } },
-    {
-      paymentStatus: 'paid',
-      paidAt: new Date(),
-      status: pickup.status === 'awaiting_payment' ? 'payment_successful' : pickup.status,
-    },
+    { paymentStatus: 'paid', paidAt: new Date() },
     { new: true },
   )
   if (!updated) throw new ApiError(409, 'This order has already been paid for.')

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import logoOnDark from '../assets/looppr-mark-on-dark.png'
+import logoTransparent from '../assets/looppr-mark-transparent.png'
 import Button from '../components/Button'
 
 function OverviewIcon(props) {
@@ -101,8 +101,8 @@ export default function AppLayout() {
     <div className="flex min-h-screen bg-linen">
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex lg:w-64 lg:shrink-0 lg:flex-col lg:border-r lg:border-line lg:bg-white lg:px-4 lg:py-6">
-        <Link to="/home" className="flex items-center gap-2.5 px-2">
-          <img src={logoOnDark} alt="Looppr" className="h-8 w-8 rounded-lg" />
+        <Link to="/home" className="flex items-center gap-0 px-2">
+          <img src={logoTransparent} alt="Looppr" className="-mr-1 h-9 w-9" />
           <span className="font-display text-lg font-semibold tracking-tight text-ink">
             Looppr
           </span>
@@ -122,8 +122,8 @@ export default function AppLayout() {
         {/* Mobile / tablet top bar */}
         <header className="border-b border-line bg-white/90 backdrop-blur lg:hidden">
           <div className="flex items-center justify-between px-4 py-3.5 sm:px-6">
-            <Link to="/home" className="flex items-center gap-2.5">
-              <img src={logoOnDark} alt="Looppr" className="h-8 w-8 rounded-lg" />
+            <Link to="/home" className="flex items-center gap-0">
+              <img src={logoTransparent} alt="Looppr" className="-mr-1 h-9 w-9" />
               <span className="font-display text-lg font-semibold tracking-tight text-ink">
                 Looppr
               </span>

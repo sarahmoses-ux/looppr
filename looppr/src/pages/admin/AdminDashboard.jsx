@@ -4,23 +4,16 @@ import SEO from '../../components/SEO'
 import { STATUS_LABELS } from '../../constants/orderStatus'
 import { fetchStats } from '../../services/adminApi'
 
-function formatMoney(amount) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount || 0)
-}
-
 const STAT_CARDS = [
   { key: 'totalCustomers', label: 'Total customers' },
   { key: 'totalOrders', label: 'Total orders' },
   { key: 'activeOrders', label: 'Active orders' },
   { key: 'completedOrders', label: 'Completed orders' },
   { key: 'cancelledOrders', label: 'Cancelled orders' },
-  { key: 'revenue', label: 'Revenue', money: true },
 ]
 
 const STATUS_STYLES = {
-  requested: 'bg-periwinkle-soft text-periwinkle-text',
-  pending_review: 'bg-periwinkle-soft text-periwinkle-text',
-  awaiting_payment: 'bg-ink/5 text-ink/60',
+  request_received: 'bg-periwinkle-soft text-periwinkle-text',
 }
 
 function NeedsAttention({ orders }) {
@@ -116,14 +109,12 @@ export default function AdminDashboard() {
       </h1>
 
       <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3">
-        {STAT_CARDS.map(({ key, label, money }) => (
+        {STAT_CARDS.map(({ key, label }) => (
           <div key={key} className="rounded-2xl border border-line bg-white p-5">
             <p className="text-xs font-semibold uppercase tracking-wide text-ink/45">{label}</p>
             <p className="mt-2 font-display text-2xl font-semibold text-ink sm:text-3xl">
               {stats === null ? (
                 <span className="inline-block h-7 w-16 animate-pulse rounded bg-linen-soft align-middle" />
-              ) : money ? (
-                formatMoney(stats[key])
               ) : (
                 (stats[key] ?? 0)
               )}

@@ -1,5 +1,5 @@
-// Single source of truth for crawlable public routes. Used both by App.jsx
-// (to feed title/description into <SEO>/<ComingSoon>) and by
+// Single source of truth for crawlable public routes. Used both by each
+// page's own <SEO title description> lookup and by
 // scripts/generate-sitemap.mjs (to emit sitemap.xml). Keep this list, the
 // routes in App.jsx, and robots.txt's Disallow rules in sync — nothing else
 // derives them automatically.
@@ -62,6 +62,20 @@ export const PUBLIC_PAGES = [
     path: '/drive',
     title: 'Drive with Looppr',
     description: 'Earn on your schedule delivering laundry orders for Looppr in the Oklahoma metro.',
+    changefreq: 'monthly',
+    priority: 0.6,
+  },
+  {
+    path: '/pricing',
+    title: 'Pricing',
+    description: 'Looppr pricing — pay by the pound, or subscribe to Looppr+ for free delivery on every order.',
+    changefreq: 'monthly',
+    priority: 0.8,
+  },
+  {
+    path: '/business',
+    title: 'Looppr for business',
+    description: 'LoopprBiz — linen turnaround for hotels, gyms, Airbnb hosts & med spas, with an 8-hour SLA and monthly invoicing.',
     changefreq: 'monthly',
     priority: 0.6,
   },

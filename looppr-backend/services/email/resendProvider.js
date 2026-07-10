@@ -13,6 +13,14 @@ function getClient() {
   return client
 }
 
+// `from` has to stay on the verified Resend domain (getlooppr.com) — Resend
+// won't send on behalf of a gmail.com address we don't control. REPLY_TO_EMAIL
+// is how a real inbox (the business Gmail account) still gets replies instead
+// of them vanishing into the noreply@ sender.
+function replyTo() {
+  return process.env.REPLY_TO_EMAIL || undefined
+}
+
 export async function sendOtpEmail(toEmail, name, code) {
   const from = process.env.OTP_FROM_EMAIL || 'Looppr <onboarding@resend.dev>'
 
@@ -24,6 +32,7 @@ export async function sendOtpEmail(toEmail, name, code) {
   const { error } = await getClient().emails.send({
     from,
     to: toEmail,
+    replyTo: replyTo(),
     subject: otpEmailSubject(code),
     html: otpEmailHtml(name, code),
   })
@@ -39,6 +48,7 @@ export async function sendPaymentRequestEmail(toEmail, name, amount, currency, l
   const { error } = await getClient().emails.send({
     from,
     to: toEmail,
+    replyTo: replyTo(),
     subject: paymentRequestEmailSubject(amount, currency),
     html: paymentRequestEmailHtml(name, amount, currency, link),
   })
@@ -54,6 +64,7 @@ export async function sendPasswordResetEmail(toEmail, name, code) {
   const { error } = await getClient().emails.send({
     from,
     to: toEmail,
+    replyTo: replyTo(),
     subject: passwordResetEmailSubject(code),
     html: passwordResetEmailHtml(name, code),
   })
@@ -69,6 +80,7 @@ export async function sendWaitlistConfirmationEmail(toEmail) {
   const { error } = await getClient().emails.send({
     from,
     to: toEmail,
+    replyTo: replyTo(),
     subject: waitlistEmailSubject,
     html: waitlistEmailHtml(),
   })
@@ -84,6 +96,7 @@ export async function sendContactConfirmationEmail(toEmail, name) {
   const { error } = await getClient().emails.send({
     from,
     to: toEmail,
+    replyTo: replyTo(),
     subject: contactConfirmationEmailSubject,
     html: contactConfirmationEmailHtml(name),
   })
@@ -99,6 +112,7 @@ export async function sendPartnerLeadEmail(toEmail, type, name) {
   const { error } = await getClient().emails.send({
     from,
     to: toEmail,
+    replyTo: replyTo(),
     subject: partnerLeadEmailSubject(type),
     html: partnerLeadEmailHtml(type, name),
   })

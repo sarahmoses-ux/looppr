@@ -14,7 +14,7 @@ export const FAQ_ITEMS = [
   {
     question: 'Where does Looppr operate?',
     answer:
-      'Looppr launches July 23, 2026 across the OKC metro — Oklahoma City, Edmond, Norman, and Moore.',
+      'Looppr launches July 12, 2026 across the OKC metro — Oklahoma City, Edmond, Norman, and Moore.',
   },
   {
     question: 'How long does a typical order take?',

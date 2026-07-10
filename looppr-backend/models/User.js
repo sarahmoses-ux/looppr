@@ -26,6 +26,7 @@ const userSchema = new mongoose.Schema(
       {
         label: { type: String, trim: true, maxlength: 50, default: 'Address' },
         street: { type: String, required: true, trim: true, maxlength: 200 },
+        apartment: { type: String, trim: true, maxlength: 50, default: '' },
         city: { type: String, required: true, trim: true, maxlength: 100 },
         state: { type: String, required: true, trim: true, maxlength: 2, uppercase: true, default: 'OK' },
         zip: { type: String, required: true, trim: true, maxlength: 10 },

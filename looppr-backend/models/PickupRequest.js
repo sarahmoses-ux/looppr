@@ -18,6 +18,7 @@ const pickupRequestSchema = new mongoose.Schema(
 
     address: {
       street: { type: String, required: true, trim: true, maxlength: 200 },
+      apartment: { type: String, required: true, trim: true, maxlength: 50 },
       city: { type: String, required: true, trim: true, maxlength: 100 },
       state: { type: String, required: true, trim: true, maxlength: 2, uppercase: true },
       zip: { type: String, required: true, trim: true, maxlength: 10 },
@@ -35,12 +36,39 @@ const pickupRequestSchema = new mongoose.Schema(
     },
     notes: { type: String, trim: true, maxlength: 500, default: '' },
 
+    // Delivery preferences, collected alongside pickup at booking time.
+    deliveryWindow: {
+      type: String,
+      enum: ['morning', 'afternoon', 'evening'],
+      required: true,
+    },
+    // Only present when the customer chose a delivery address different
+    // from the pickup address — absent (not just empty) means "same as
+    // pickup", which the frontend/admin should treat as the fallback.
+    // Wrapped in its own Schema with default: undefined on the parent field
+    // below — without both of those, Mongoose auto-vivifies this into
+    // `{ apartment: '' }` on every save just because `apartment` has a
+    // default, defeating the "absent means same as pickup" check.
+    deliveryAddress: {
+      type: new mongoose.Schema(
+        {
+          street: { type: String, trim: true, maxlength: 200 },
+          apartment: { type: String, trim: true, maxlength: 50 },
+          city: { type: String, trim: true, maxlength: 100 },
+          state: { type: String, trim: true, maxlength: 2, uppercase: true },
+          zip: { type: String, trim: true, maxlength: 10 },
+        },
+        { _id: false },
+      ),
+      default: undefined,
+    },
+
     // Full order lifecycle — see constants/orderStatus.js. Admin drives
     // this end to end via PATCH /admin/pickups/:id/status.
     status: {
       type: String,
       enum: ALL_STATUSES,
-      default: 'requested',
+      default: 'request_received',
     },
     location: {
       lat: { type: Number },

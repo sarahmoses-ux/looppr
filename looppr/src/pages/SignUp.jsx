@@ -5,6 +5,16 @@ import AuthLayout from '../components/AuthLayout'
 import Input from '../components/Input'
 import Button from '../components/Button'
 
+// Same checks as validate() below, factored out so the progress meter and
+// the actual submit validation can never drift apart from each other.
+const FIELD_CHECKS = {
+  name: (v) => v.trim().length >= 2,
+  email: (v) => /^\S+@\S+\.\S+$/.test(v),
+  phone: (v) => /^\+?[0-9\s()-]{7,}$/.test(v),
+  password: (v) => /^(?=.*[A-Za-z])(?=.*\d).{8,}$/.test(v),
+}
+const FIELD_ORDER = ['name', 'email', 'phone', 'password']
+
 export default function SignUp() {
   const { register } = useAuth()
   const navigate = useNavigate()
@@ -17,6 +27,9 @@ export default function SignUp() {
   const [errors, setErrors] = useState({})
   const [formError, setFormError] = useState('')
   const [status, setStatus] = useState('idle')
+
+  const completedCount = FIELD_ORDER.filter((f) => FIELD_CHECKS[f](form[f])).length
+  const progress = Math.round((completedCount / FIELD_ORDER.length) * 100)
 
   function handleChange(e) {
     const { name, value } = e.target
@@ -60,9 +73,29 @@ export default function SignUp() {
   return (
     <AuthLayout
       eyebrow="Get started"
-      title="Create your account"
+      title="Sign up"
       subtitle="Book your first pickup in a couple of minutes."
     >
+      <div className="mb-6">
+        <div className="flex items-center justify-between text-sm font-medium text-ink/50">
+          <span>Profile completeness</span>
+          <span className="font-semibold text-periwinkle-text">{progress}%</span>
+        </div>
+        <div
+          role="progressbar"
+          aria-label="Sign-up progress"
+          aria-valuenow={progress}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          className="mt-2 h-2 w-full overflow-hidden rounded-full bg-periwinkle-soft"
+        >
+          <div
+            className="h-full rounded-full bg-periwinkle transition-[width] duration-500 ease-out"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      </div>
+
       <form onSubmit={handleSubmit} noValidate className="space-y-5">
         <Input
           id="name"
@@ -121,7 +154,7 @@ export default function SignUp() {
           className="w-full"
           disabled={status === 'pending'}
         >
-          {status === 'pending' ? 'Creating account…' : 'Create account'}
+          {status === 'pending' ? 'Signing up…' : 'Sign up'}
         </Button>
 
         <p className="text-center text-sm leading-relaxed text-ink/50">

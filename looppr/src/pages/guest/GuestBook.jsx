@@ -35,20 +35,27 @@ export default function GuestBook() {
     email: '',
     phone: '',
     street: '',
+    apartment: '',
     city: '',
     zip: '',
     preferredDate: '',
     window: '',
     loadSize: '',
     notes: '',
+    deliveryWindow: '',
+    deliverySameAsPickup: true,
+    deliveryStreet: '',
+    deliveryApartment: '',
+    deliveryCity: '',
+    deliveryZip: '',
   })
   const [errors, setErrors] = useState({})
   const [formError, setFormError] = useState('')
   const [status, setStatus] = useState('idle')
 
   function handleChange(e) {
-    const { name, value } = e.target
-    setForm((f) => ({ ...f, [name]: value }))
+    const { name, value, type, checked } = e.target
+    setForm((f) => ({ ...f, [name]: type === 'checkbox' ? checked : value }))
   }
 
   function validate() {
@@ -57,11 +64,19 @@ export default function GuestBook() {
     if (!/^\S+@\S+\.\S+$/.test(form.email)) next.email = 'Enter a valid email address.'
     if (!/^\+?[0-9\s()-]{7,20}$/.test(form.phone)) next.phone = 'Enter a valid phone number.'
     if (form.street.trim().length < 3) next.street = 'Enter your street address.'
+    if (!form.apartment.trim()) next.apartment = 'Enter your apartment/unit number.'
     if (form.city.trim().length < 2) next.city = 'Enter your city.'
     if (!/^\d{5}(-\d{4})?$/.test(form.zip)) next.zip = 'Enter a valid ZIP code.'
     if (!form.preferredDate) next.preferredDate = 'Choose a date.'
     if (!form.window) next.window = 'Choose a pickup window.'
     if (!form.loadSize) next.loadSize = 'Choose a load size.'
+    if (!form.deliveryWindow) next.deliveryWindow = 'Choose a delivery window.'
+    if (!form.deliverySameAsPickup) {
+      if (form.deliveryStreet.trim().length < 3) next.deliveryStreet = 'Enter the delivery street address.'
+      if (!form.deliveryApartment.trim()) next.deliveryApartment = 'Enter the delivery apartment/unit number.'
+      if (form.deliveryCity.trim().length < 2) next.deliveryCity = 'Enter the delivery city.'
+      if (!/^\d{5}(-\d{4})?$/.test(form.deliveryZip)) next.deliveryZip = 'Enter a valid delivery ZIP code.'
+    }
     return next
   }
 
@@ -76,11 +91,21 @@ export default function GuestBook() {
     try {
       const { pickup, guestAccessToken } = await createGuestPickup({
         guest: { name: form.name, email: form.email, phone: form.phone },
-        address: { street: form.street, city: form.city, state: 'OK', zip: form.zip },
+        address: { street: form.street, apartment: form.apartment, city: form.city, state: 'OK', zip: form.zip },
         preferredDate: form.preferredDate,
         window: form.window,
         loadSize: form.loadSize,
         notes: form.notes,
+        deliveryWindow: form.deliveryWindow,
+        deliveryAddress: form.deliverySameAsPickup
+          ? undefined
+          : {
+              street: form.deliveryStreet,
+              apartment: form.deliveryApartment,
+              city: form.deliveryCity,
+              state: 'OK',
+              zip: form.deliveryZip,
+            },
       })
       navigate(`/guest/request/${pickup.id}?token=${guestAccessToken}`)
     } catch (err) {
@@ -143,15 +168,26 @@ export default function GuestBook() {
           placeholder="(405) 555-0100"
         />
 
-        <Input
-          id="street"
-          name="street"
-          label="Street address"
-          value={form.street}
-          onChange={handleChange}
-          error={errors.street}
-          placeholder="123 Main St"
-        />
+        <div className="grid grid-cols-[2fr_1fr] gap-4">
+          <Input
+            id="street"
+            name="street"
+            label="Street address"
+            value={form.street}
+            onChange={handleChange}
+            error={errors.street}
+            placeholder="123 Main St"
+          />
+          <Input
+            id="apartment"
+            name="apartment"
+            label="Apt / Unit"
+            value={form.apartment}
+            onChange={handleChange}
+            error={errors.apartment}
+            placeholder="Apt 4B"
+          />
+        </div>
         <div className="grid grid-cols-2 gap-4">
           <Input
             id="city"
@@ -233,6 +269,92 @@ export default function GuestBook() {
             placeholder="Gate code, special instructions, delicate items…"
             className="mt-2 w-full rounded-xl border border-line bg-white px-4 py-3.5 text-base text-ink outline-none transition-colors placeholder:text-ink/35 focus:border-periwinkle"
           />
+        </div>
+
+        <div className="rounded-2xl border border-line bg-linen-soft p-5">
+          <h2 className="font-display text-base font-semibold text-ink">Delivery preferences</h2>
+
+          <div className="mt-4">
+            <Select
+              id="deliveryWindow"
+              name="deliveryWindow"
+              label="Delivery window"
+              value={form.deliveryWindow}
+              onChange={handleChange}
+              error={errors.deliveryWindow}
+            >
+              <option value="" disabled>
+                Choose a window
+              </option>
+              {WINDOWS.map((w) => (
+                <option key={w.value} value={w.value}>
+                  {w.label}
+                </option>
+              ))}
+            </Select>
+          </div>
+
+          <label className="mt-4 flex items-center gap-2.5 text-sm text-ink/70">
+            <input
+              type="checkbox"
+              name="deliverySameAsPickup"
+              checked={!form.deliverySameAsPickup}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, deliverySameAsPickup: !e.target.checked }))
+              }
+              className="h-4 w-4 rounded border-line accent-periwinkle focus:ring-periwinkle"
+            />
+            Deliver to a different address
+          </label>
+
+          {!form.deliverySameAsPickup && (
+            <div className="mt-4 space-y-4">
+              <div className="grid grid-cols-[2fr_1fr] gap-4">
+                <Input
+                  id="deliveryStreet"
+                  name="deliveryStreet"
+                  label="Delivery street address"
+                  value={form.deliveryStreet}
+                  onChange={handleChange}
+                  error={errors.deliveryStreet}
+                  placeholder="123 Main St"
+                />
+                <Input
+                  id="deliveryApartment"
+                  name="deliveryApartment"
+                  label="Apt / Unit"
+                  value={form.deliveryApartment}
+                  onChange={handleChange}
+                  error={errors.deliveryApartment}
+                  placeholder="Apt 4B"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <Input
+                  id="deliveryCity"
+                  name="deliveryCity"
+                  label="Delivery city"
+                  value={form.deliveryCity}
+                  onChange={handleChange}
+                  error={errors.deliveryCity}
+                  placeholder="Edmond"
+                />
+                <Input
+                  id="deliveryZip"
+                  name="deliveryZip"
+                  label="Delivery ZIP code"
+                  value={form.deliveryZip}
+                  onChange={handleChange}
+                  error={errors.deliveryZip}
+                  placeholder="73003"
+                />
+              </div>
+            </div>
+          )}
+
+          <p className="mt-4 rounded-lg bg-periwinkle-soft px-4 py-3 text-xs font-medium text-periwinkle-text">
+            Your estimated delivery date will be confirmed once your order has been received.
+          </p>
         </div>
 
         {formError && (

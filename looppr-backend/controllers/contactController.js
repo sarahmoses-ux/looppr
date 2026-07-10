@@ -3,9 +3,9 @@ import { sendContactConfirmationEmail } from '../services/emailService.js'
 import { asyncHandler } from '../utils/asyncHandler.js'
 
 export const submitContactMessage = asyncHandler(async (req, res) => {
-  const { name, email, message } = req.body
+  const { name, email, phone, purpose, message } = req.body
 
-  await ContactMessage.create({ name, email, message })
+  await ContactMessage.create({ name, email, phone, purpose, message })
 
   try {
     await sendContactConfirmationEmail(email, name)

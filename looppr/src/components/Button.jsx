@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 
 const VARIANTS = {
   primary:
-    'bg-ink text-white hover:bg-ink-light shadow-[0_6px_20px_-4px_rgba(30,27,75,0.35)]',
+    'bg-periwinkle text-white hover:bg-periwinkle-text shadow-[0_6px_20px_-4px_rgba(124,115,230,0.35)]',
   accent: 'bg-periwinkle text-white hover:bg-periwinkle/90',
   inverse: 'bg-white text-ink hover:bg-periwinkle-soft',
   ghost: 'bg-transparent text-periwinkle-text border border-line hover:border-periwinkle-muted hover:text-ink',

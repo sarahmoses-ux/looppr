@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import logoOnDark from '../assets/looppr-mark-on-dark.png'
+import logo from '../assets/looppr-mark-transparent.png'
 import Button from '../components/Button'
 
 const NAV_ITEMS = [
@@ -17,8 +17,10 @@ export default function AdminLayout() {
       <header className="border-b border-line bg-white/90 backdrop-blur">
         <div className="mx-auto flex max-w-[1600px] items-center justify-between px-4 sm:px-6 lg:px-8 py-3.5">
           <div className="flex items-center gap-2.5">
-            <img src={logoOnDark} alt="Looppr" className="h-8 w-8 rounded-lg" />
-            <span className="font-display text-lg font-semibold tracking-tight text-ink">Looppr</span>
+            <span className="flex items-center gap-0">
+              <img src={logo} alt="Looppr" className="-mr-1 h-9 w-9" />
+              <span className="font-display text-lg font-semibold tracking-tight text-ink">Looppr</span>
+            </span>
             <span className="rounded-full bg-ink px-2.5 py-0.5 text-xs font-semibold text-white">
               Admin
             </span>

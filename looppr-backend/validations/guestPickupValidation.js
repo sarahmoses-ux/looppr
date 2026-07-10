@@ -1,4 +1,5 @@
 import { body } from 'express-validator'
+import { deliveryAddressValidator } from './pickupValidation.js'
 
 const OK_STATES = ['OK']
 
@@ -10,6 +11,10 @@ export const createGuestPickupValidation = [
     .matches(/^\+?[0-9\s()-]{7,20}$/)
     .withMessage('Enter a valid phone number.'),
   body('address.street').trim().isLength({ min: 3, max: 200 }).withMessage('Enter a valid street address.'),
+  body('address.apartment')
+    .trim()
+    .isLength({ min: 1, max: 50 })
+    .withMessage('Enter your apartment/unit number.'),
   body('address.city').trim().isLength({ min: 2, max: 100 }).withMessage('Enter a valid city.'),
   body('address.state')
     .trim()
@@ -33,5 +38,7 @@ export const createGuestPickupValidation = [
   body('window').isIn(['morning', 'afternoon', 'evening']).withMessage('Choose a pickup window.'),
   body('loadSize').isIn(['small', 'medium', 'large']).withMessage('Choose a load size.'),
   body('notes').optional({ values: 'falsy' }).trim().isLength({ max: 500 }).withMessage('Notes must be 500 characters or fewer.'),
+  body('deliveryWindow').isIn(['morning', 'afternoon', 'evening']).withMessage('Choose a delivery window.'),
+  deliveryAddressValidator('deliveryAddress'),
 ]
 

@@ -44,12 +44,19 @@ export default function Book() {
   const [priorOrderCount, setPriorOrderCount] = useState(null)
   const [form, setForm] = useState({
     street: rebook?.street || '',
+    apartment: rebook?.apartment || '',
     city: rebook?.city || '',
     zip: rebook?.zip || '',
     preferredDate: '',
     window: '',
     loadSize: rebook?.loadSize || '',
     notes: rebook?.notes || '',
+    deliveryWindow: '',
+    deliverySameAsPickup: true,
+    deliveryStreet: '',
+    deliveryApartment: '',
+    deliveryCity: '',
+    deliveryZip: '',
   })
   const [errors, setErrors] = useState({})
   const [formError, setFormError] = useState('')
@@ -73,18 +80,24 @@ export default function Book() {
 
   function handleSelectAddress(address) {
     setSelectedAddressId(address._id)
-    setForm((f) => ({ ...f, street: address.street, city: address.city, zip: address.zip }))
+    setForm((f) => ({
+      ...f,
+      street: address.street,
+      apartment: address.apartment || '',
+      city: address.city,
+      zip: address.zip,
+    }))
     setErrors((e) => ({ ...e, street: undefined, city: undefined, zip: undefined }))
   }
 
   function handleUseNewAddress() {
     setSelectedAddressId('')
-    setForm((f) => ({ ...f, street: '', city: '', zip: '' }))
+    setForm((f) => ({ ...f, street: '', apartment: '', city: '', zip: '' }))
   }
 
   function handleChange(e) {
-    const { name, value } = e.target
-    setForm((f) => ({ ...f, [name]: value }))
+    const { name, value, type, checked } = e.target
+    setForm((f) => ({ ...f, [name]: type === 'checkbox' ? checked : value }))
     // Editing the address fields by hand means they're no longer using the
     // saved address as-is, even if they started from one.
     if (selectedAddressId && ['street', 'city', 'zip'].includes(name)) {
@@ -94,17 +107,38 @@ export default function Book() {
 
   function handleCardChange(e) {
     const { name, value } = e.target
+    if (name === 'expiry') {
+      const prev = card.expiry
+      let digits = value.replace(/\D/g, '')
+      // Backspacing over the auto-inserted "/" should remove the month
+      // digit before it too, so deleting doesn't get stuck at "MM/".
+      if (value.length === prev.length - 1 && prev[value.length] === '/') {
+        digits = digits.slice(0, -1)
+      }
+      digits = digits.slice(0, 4)
+      const formatted = digits.length < 2 ? digits : `${digits.slice(0, 2)}/${digits.slice(2)}`
+      setCard((c) => ({ ...c, expiry: formatted }))
+      return
+    }
     setCard((c) => ({ ...c, [name]: value }))
   }
 
   function validate() {
     const next = {}
     if (form.street.trim().length < 3) next.street = 'Enter your street address.'
+    if (!form.apartment.trim()) next.apartment = 'Enter your apartment/unit number.'
     if (form.city.trim().length < 2) next.city = 'Enter your city.'
     if (!/^\d{5}(-\d{4})?$/.test(form.zip)) next.zip = 'Enter a valid ZIP code.'
     if (!form.preferredDate) next.preferredDate = 'Choose a date.'
     if (!form.window) next.window = 'Choose a pickup window.'
     if (!form.loadSize) next.loadSize = 'Choose a load size.'
+    if (!form.deliveryWindow) next.deliveryWindow = 'Choose a delivery window.'
+    if (!form.deliverySameAsPickup) {
+      if (form.deliveryStreet.trim().length < 3) next.deliveryStreet = 'Enter the delivery street address.'
+      if (!form.deliveryApartment.trim()) next.deliveryApartment = 'Enter the delivery apartment/unit number.'
+      if (form.deliveryCity.trim().length < 2) next.deliveryCity = 'Enter the delivery city.'
+      if (!/^\d{5}(-\d{4})?$/.test(form.deliveryZip)) next.deliveryZip = 'Enter a valid delivery ZIP code.'
+    }
     return next
   }
 
@@ -131,7 +165,7 @@ export default function Book() {
       (a) => a.street === form.street && a.zip === form.zip,
     )
     if (saveNewAddress && !selectedAddressId && !alreadySaved) {
-      saveAddress({ street: form.street, city: form.city, zip: form.zip }).catch(() => {})
+      saveAddress({ street: form.street, apartment: form.apartment, city: form.city, zip: form.zip }).catch(() => {})
     }
 
     setStep('checkout')
@@ -153,11 +187,21 @@ export default function Book() {
     setStatus('pending')
     try {
       const { pickup } = await createPickup({
-        address: { street: form.street, city: form.city, state: 'OK', zip: form.zip },
+        address: { street: form.street, apartment: form.apartment, city: form.city, state: 'OK', zip: form.zip },
         preferredDate: form.preferredDate,
         window: form.window,
         loadSize: form.loadSize,
         notes: form.notes,
+        deliveryWindow: form.deliveryWindow,
+        deliveryAddress: form.deliverySameAsPickup
+          ? undefined
+          : {
+              street: form.deliveryStreet,
+              apartment: form.deliveryApartment,
+              city: form.deliveryCity,
+              state: 'OK',
+              zip: form.deliveryZip,
+            },
       })
       setConfirmed(pickup)
     } catch (err) {
@@ -196,7 +240,7 @@ export default function Book() {
         <p className="mt-3 text-sm leading-relaxed text-ink/65">
           We've saved your pickup request for <strong>{dateLabel}</strong>,{' '}
           {windowLabel?.toLowerCase()}. Looppr launches in your area on July
-          23, 2026 — we'll email you to confirm your exact window as we get
+          12, 2026 — we'll email you to confirm your exact window as we get
           closer.
         </p>
         <Button to="/home" variant="primary" className="mt-8">
@@ -252,9 +296,10 @@ export default function Book() {
           </div>
           <dl className="mt-4 space-y-2 text-sm">
             <div className="flex justify-between">
-              <dt className="text-ink/50">Address</dt>
+              <dt className="text-ink/50">Pickup address</dt>
               <dd className="text-right text-ink">
-                {form.street}, {form.city}, OK {form.zip}
+                {form.street}
+                {form.apartment && `, ${form.apartment}`}, {form.city}, OK {form.zip}
               </dd>
             </div>
             <div className="flex justify-between">
@@ -272,6 +317,46 @@ export default function Book() {
               <dd className="text-ink">{selectedLoad?.label}</dd>
             </div>
           </dl>
+        </div>
+
+        <div className="mt-6 rounded-3xl border border-line bg-white p-6 sm:p-8">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-ink/45">
+              Delivery preferences
+            </h2>
+            <button
+              type="button"
+              onClick={() => setStep('details')}
+              className="text-sm font-semibold text-periwinkle-text hover:underline"
+            >
+              Edit
+            </button>
+          </div>
+          <dl className="mt-4 space-y-2 text-sm">
+            <div className="flex justify-between">
+              <dt className="text-ink/50">Delivery window</dt>
+              <dd className="text-ink">
+                {WINDOWS.find((w) => w.value === form.deliveryWindow)?.label}
+              </dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-ink/50">Delivery address</dt>
+              <dd className="text-right text-ink">
+                {form.deliverySameAsPickup ? (
+                  'Same as pickup address'
+                ) : (
+                  <>
+                    {form.deliveryStreet}
+                    {form.deliveryApartment && `, ${form.deliveryApartment}`}, {form.deliveryCity} OK{' '}
+                    {form.deliveryZip}
+                  </>
+                )}
+              </dd>
+            </div>
+          </dl>
+          <p className="mt-4 rounded-lg bg-periwinkle-soft px-4 py-3 text-xs font-medium text-periwinkle-text">
+            Your estimated delivery date will be confirmed once your order has been received.
+          </p>
         </div>
 
         <div className="mt-6 rounded-3xl border border-line bg-white p-6 sm:p-8">
@@ -340,6 +425,8 @@ export default function Book() {
               onChange={handleCardChange}
               error={cardErrors.expiry}
               placeholder="MM/YY"
+              inputMode="numeric"
+              maxLength={5}
               autoComplete="cc-exp"
             />
             <Input
@@ -401,7 +488,7 @@ export default function Book() {
       </h1>
       <p className="mt-2 text-sm text-ink/60">
         Looppr only serves Oklahoma at launch — we'll confirm your exact
-        window closer to July 23, 2026.
+        window closer to July 12, 2026.
       </p>
 
       <form onSubmit={handleContinue} noValidate className="mt-8 space-y-5">
@@ -437,15 +524,26 @@ export default function Book() {
           </div>
         )}
 
-        <Input
-          id="street"
-          name="street"
-          label="Street address"
-          value={form.street}
-          onChange={handleChange}
-          error={errors.street}
-          placeholder="123 Main St"
-        />
+        <div className="grid grid-cols-[2fr_1fr] gap-4">
+          <Input
+            id="street"
+            name="street"
+            label="Street address"
+            value={form.street}
+            onChange={handleChange}
+            error={errors.street}
+            placeholder="123 Main St"
+          />
+          <Input
+            id="apartment"
+            name="apartment"
+            label="Apt / Unit"
+            value={form.apartment}
+            onChange={handleChange}
+            error={errors.apartment}
+            placeholder="Apt 4B"
+          />
+        </div>
         <div className="grid grid-cols-2 gap-4">
           <Input
             id="city"
@@ -473,7 +571,7 @@ export default function Book() {
               type="checkbox"
               checked={saveNewAddress}
               onChange={(e) => setSaveNewAddress(e.target.checked)}
-              className="h-4 w-4 rounded border-line text-periwinkle focus:ring-periwinkle"
+              className="h-4 w-4 rounded border-line accent-periwinkle focus:ring-periwinkle"
             />
             Save this address for next time
           </label>
@@ -539,6 +637,92 @@ export default function Book() {
             placeholder="Gate code, special instructions, delicate items…"
             className="mt-2 w-full rounded-xl border border-line bg-white px-4 py-3.5 text-base text-ink outline-none transition-colors placeholder:text-ink/35 focus:border-periwinkle"
           />
+        </div>
+
+        <div className="rounded-2xl border border-line bg-linen-soft p-5">
+          <h2 className="font-display text-base font-semibold text-ink">Delivery preferences</h2>
+
+          <div className="mt-4">
+            <Select
+              id="deliveryWindow"
+              name="deliveryWindow"
+              label="Delivery window"
+              value={form.deliveryWindow}
+              onChange={handleChange}
+              error={errors.deliveryWindow}
+            >
+              <option value="" disabled>
+                Choose a window
+              </option>
+              {WINDOWS.map((w) => (
+                <option key={w.value} value={w.value}>
+                  {w.label}
+                </option>
+              ))}
+            </Select>
+          </div>
+
+          <label className="mt-4 flex items-center gap-2.5 text-sm text-ink/70">
+            <input
+              type="checkbox"
+              name="deliverySameAsPickup"
+              checked={!form.deliverySameAsPickup}
+              onChange={(e) =>
+                setForm((f) => ({ ...f, deliverySameAsPickup: !e.target.checked }))
+              }
+              className="h-4 w-4 rounded border-line accent-periwinkle focus:ring-periwinkle"
+            />
+            Deliver to a different address
+          </label>
+
+          {!form.deliverySameAsPickup && (
+            <div className="mt-4 space-y-4">
+              <div className="grid grid-cols-[2fr_1fr] gap-4">
+                <Input
+                  id="deliveryStreet"
+                  name="deliveryStreet"
+                  label="Delivery street address"
+                  value={form.deliveryStreet}
+                  onChange={handleChange}
+                  error={errors.deliveryStreet}
+                  placeholder="123 Main St"
+                />
+                <Input
+                  id="deliveryApartment"
+                  name="deliveryApartment"
+                  label="Apt / Unit"
+                  value={form.deliveryApartment}
+                  onChange={handleChange}
+                  error={errors.deliveryApartment}
+                  placeholder="Apt 4B"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <Input
+                  id="deliveryCity"
+                  name="deliveryCity"
+                  label="Delivery city"
+                  value={form.deliveryCity}
+                  onChange={handleChange}
+                  error={errors.deliveryCity}
+                  placeholder="Edmond"
+                />
+                <Input
+                  id="deliveryZip"
+                  name="deliveryZip"
+                  label="Delivery ZIP code"
+                  value={form.deliveryZip}
+                  onChange={handleChange}
+                  error={errors.deliveryZip}
+                  placeholder="73003"
+                />
+              </div>
+            </div>
+          )}
+
+          <p className="mt-4 rounded-lg bg-periwinkle-soft px-4 py-3 text-xs font-medium text-periwinkle-text">
+            Your estimated delivery date will be confirmed once your order has been received.
+          </p>
         </div>
 
         <Button type="submit" variant="primary" className="w-full">

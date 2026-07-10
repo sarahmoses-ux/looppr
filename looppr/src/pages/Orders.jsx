@@ -36,7 +36,7 @@ const LOAD_SIZE_LABELS = {
 
 function statusBadgeClass(status) {
   if (status === 'cancelled') return 'bg-red-50 text-red-600'
-  if (status === 'completed') return 'bg-success-soft text-success-dark'
+  if (status === 'ready_delivered') return 'bg-success-soft text-success-dark'
   return 'bg-periwinkle-soft text-periwinkle-text'
 }
 

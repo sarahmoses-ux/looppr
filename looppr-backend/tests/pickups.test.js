@@ -12,11 +12,12 @@ async function clientToken() {
 
 function pickupPayload(overrides = {}) {
   return {
-    address: { street: '1 Pickup Test Ln', city: 'Edmond', state: 'OK', zip: '73003' },
+    address: { street: '1 Pickup Test Ln', apartment: 'Apt 1', city: 'Edmond', state: 'OK', zip: '73003' },
     preferredDate: '2027-06-01',
     window: 'morning',
     loadSize: 'medium',
     notes: '',
+    deliveryWindow: 'evening',
     ...overrides,
   }
 }

@@ -8,11 +8,11 @@ const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN
 // Centered on the OKC metro — the Oklahoma launch service area.
 const SERVICE_AREA_VIEW = { longitude: -97.5164, latitude: 35.4676, zoom: 9 }
 
-// Falls back to bg-periwinkle for any of the many in-progress statuses
-// (see src/constants/orderStatus.js) — only the two terminal states get
-// their own color here.
+// Falls back to bg-periwinkle for the two in-progress stages (see
+// src/constants/orderStatus.js) — only the two terminal states get their
+// own color here.
 const STATUS_DOT = {
-  completed: 'bg-success',
+  ready_delivered: 'bg-success',
   cancelled: 'bg-red-500',
 }
 

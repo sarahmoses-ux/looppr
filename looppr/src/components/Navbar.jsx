@@ -1,14 +1,15 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import logoOnDark from '../assets/looppr-mark-on-dark.png'
+import logoTransparent from '../assets/looppr-mark-transparent.png'
 import Button from './Button'
 
 const LINKS = [
-  { label: 'How it works', href: '#how-it-works' },
-  { label: 'Pricing', href: '#pricing' },
-  { label: 'Why Looppr', href: '#why-loopr' },
-  { label: 'FAQ', href: '#faq' },
+  { label: 'Pricing', to: '/pricing' },
+  { label: 'For business', to: '/business' },
+  { label: 'Partners', to: '/laundromats' },
+  { label: 'Drive', to: '/drive' },
+  { label: 'Cities', to: '/cities' },
 ]
 
 export default function Navbar() {
@@ -19,35 +20,23 @@ export default function Navbar() {
   return (
     <header className="border-b border-line bg-linen/90 backdrop-blur">
       <nav className="mx-auto flex max-w-[1600px] items-center justify-between px-4 sm:px-6 lg:px-8 py-4">
-        <Link to="/" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
-          <img src={logoOnDark} alt="Looppr" className="h-9 w-9 rounded-lg" />
+        <Link to="/" className="flex items-center gap-0" onClick={() => setOpen(false)}>
+          <img src={logoTransparent} alt="Looppr" className="-mr-1 h-9 w-9" />
           <span className="font-display text-xl font-semibold tracking-tight text-ink">
             Looppr
           </span>
         </Link>
 
-        <div className="hidden items-center gap-8 md:flex">
+        <div className="hidden items-center gap-6 md:flex">
           {LINKS.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
+            <Link
+              key={link.to}
+              to={link.to}
               className="text-sm font-medium text-ink/70 transition-colors hover:text-ink"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
-          <Link
-            to="/laundromats"
-            className="text-sm font-medium text-ink/70 transition-colors hover:text-ink"
-          >
-            For laundromats
-          </Link>
-          <Link
-            to="/drive"
-            className="text-sm font-medium text-ink/70 transition-colors hover:text-ink"
-          >
-            Drive
-          </Link>
         </div>
 
         {/* Auth actions live here on sm+ only. Below that they'd have to
@@ -122,29 +111,15 @@ export default function Navbar() {
         <div className="border-t border-ink/8 bg-linen px-4 sm:px-6 lg:px-8 py-4 md:hidden">
           <div className="flex flex-col gap-1">
             {LINKS.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
+              <Link
+                key={link.to}
+                to={link.to}
                 onClick={() => setOpen(false)}
                 className="rounded-lg px-2 py-2.5 text-sm font-medium text-ink/75 transition-colors hover:bg-ink/5 hover:text-ink"
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
-            <Link
-              to="/laundromats"
-              onClick={() => setOpen(false)}
-              className="rounded-lg px-2 py-2.5 text-sm font-medium text-ink/75 transition-colors hover:bg-ink/5 hover:text-ink"
-            >
-              For laundromats
-            </Link>
-            <Link
-              to="/drive"
-              onClick={() => setOpen(false)}
-              className="rounded-lg px-2 py-2.5 text-sm font-medium text-ink/75 transition-colors hover:bg-ink/5 hover:text-ink"
-            >
-              Drive with us
-            </Link>
 
             {isAuthed ? (
               <>
