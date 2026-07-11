@@ -6,7 +6,6 @@ import {
   forgotPassword as forgotPasswordRequest,
   loginClient,
   logout as logoutRequest,
-  refreshSession,
   registerClient,
   resendLoginOtp,
   resetPassword as resetPasswordRequest,
@@ -19,7 +18,7 @@ const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
-  const [status, setStatus] = useState('loading') // loading | authenticated | guest
+  const [status, setStatus] = useState('guest') // authenticated | guest
 
   useEffect(() => {
     setAuthFailureHandler(() => {
@@ -29,20 +28,9 @@ export function AuthProvider({ children }) {
   }, [])
 
   useEffect(() => {
-    let cancelled = false
-    refreshSession()
-      .then(({ accessToken, user: sessionUser }) => {
-        if (cancelled) return
-        setAccessToken(accessToken)
-        setUser(sessionUser)
-        setStatus('authenticated')
-      })
-      .catch(() => {
-        if (!cancelled) setStatus('guest')
-      })
-    return () => {
-      cancelled = true
-    }
+    setAccessToken(null)
+    setUser(null)
+    setStatus('guest')
   }, [])
 
   async function register(payload) {

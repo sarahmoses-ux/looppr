@@ -40,11 +40,11 @@ export default function Laundromats() {
         />
         <div className="relative mx-auto grid max-w-[1140px] gap-12 md:grid-cols-2 md:items-center">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.08em] text-success">
+            <p className="text-sm font-semibold uppercase tracking-[0.08em] text-periwinkle">
               For laundromats
             </p>
             <h1 className="mt-4 font-display text-4xl font-semibold leading-[1.06] tracking-tight text-ink sm:text-5xl">
-              Turn idle machines into <span className="text-success">steady income.</span>
+              Turn idle machines into <span className="text-periwinkle">steady income.</span>
             </h1>
             <p className="mt-5 max-w-md text-lg leading-relaxed text-periwinkle-text">
               We send wash-and-fold orders from local customers during your slow hours. You do
@@ -54,7 +54,7 @@ export default function Laundromats() {
               <Button
                 to="/laundromats/apply"
                 variant="accent"
-                className="bg-success! hover:bg-success/90!"
+                className="bg-periwinkle! hover:bg-periwinkle-text!"
               >
                 Apply to become a partner
               </Button>
@@ -64,7 +64,7 @@ export default function Laundromats() {
             </div>
           </div>
 
-          <div id="earnings" className="rounded-3xl bg-success-dark p-7">
+          <div id="earnings" className="rounded-3xl bg-periwinkle p-7">
             <p className="text-xs font-semibold uppercase tracking-[0.06em] text-white/55">
               Example earnings · 20 orders / week
             </p>
@@ -80,7 +80,7 @@ export default function Laundromats() {
               ))}
               <div className="flex items-baseline justify-between pt-4">
                 <span className="text-sm font-semibold text-white">Your weekly payout</span>
-                <span className="font-display text-2xl font-semibold text-success-soft">
+                <span className="font-display text-2xl font-semibold text-periwinkle-soft">
                   ~$342
                 </span>
               </div>
@@ -92,7 +92,7 @@ export default function Laundromats() {
       <section className="bg-white px-4 py-20 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-[1140px]">
           <div className="max-w-xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.08em] text-success">
+            <p className="text-sm font-semibold uppercase tracking-[0.08em] text-periwinkle">
               How partnering works
             </p>
             <h2 className="mt-3 font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
@@ -102,7 +102,7 @@ export default function Laundromats() {
           <div className="mt-10 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
             {STEPS.map((step) => (
               <div key={step.n} className="rounded-2xl border border-line bg-linen-soft p-6">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-success font-display text-sm font-semibold text-white">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-periwinkle font-display text-sm font-semibold text-white">
                   {step.n}
                 </div>
                 <h3 className="mt-4 text-sm font-semibold text-ink">{step.title}</h3>
@@ -122,7 +122,7 @@ export default function Laundromats() {
             <div className="mt-6 flex flex-col gap-3.5">
               {BENEFITS.map((b) => (
                 <p key={b} className="flex items-start gap-3 text-base text-periwinkle-text">
-                  <svg viewBox="0 0 20 20" className="mt-0.5 h-5 w-5 shrink-0 text-success" fill="none" aria-hidden="true">
+                  <svg viewBox="0 0 20 20" className="mt-0.5 h-5 w-5 shrink-0 text-periwinkle" fill="none" aria-hidden="true">
                     <path
                       d="M4 10.5l3.5 3.5L16 6"
                       stroke="currentColor"
@@ -142,7 +142,7 @@ export default function Laundromats() {
               completely — and the orders just show up. I don't do anything differently."
             </p>
             <div className="mt-5 flex items-center gap-3">
-              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-success-soft text-sm font-semibold text-success-dark">
+              <span className="flex h-11 w-11 items-center justify-center rounded-full bg-periwinkle-soft text-sm font-semibold text-periwinkle-text">
                 RM
               </span>
               <div>
@@ -154,12 +154,12 @@ export default function Laundromats() {
         </div>
       </section>
 
-      <section className="bg-success-dark px-4 py-20 text-center sm:px-6 lg:px-8">
+      <section className="bg-periwinkle px-4 py-20 text-center sm:px-6 lg:px-8">
         <div className="mx-auto max-w-xl">
           <h2 className="font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Fill your slow hours.
           </h2>
-          <p className="mt-4 text-lg leading-relaxed text-success-soft">
+          <p className="mt-4 text-lg leading-relaxed text-periwinkle-soft">
             Apply today and you could be taking your first Looppr orders within ten days. No
             cost, no commitment.
           </p>

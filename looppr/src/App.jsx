@@ -1,5 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
+import ScrollToTop from './components/ScrollToTop'
 import PublicLayout from './layouts/PublicLayout'
 import AppLayout from './layouts/AppLayout'
 import AdminLayout from './layouts/AdminLayout'
@@ -43,6 +44,7 @@ const GuestRequestStatus = lazy(() => import('./pages/guest/GuestRequestStatus')
 function App() {
   return (
     <Suspense fallback={null}>
+      <ScrollToTop />
       <Routes>
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Landing />} />

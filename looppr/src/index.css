@@ -17,6 +17,42 @@ body {
   @apply outline-2 outline-offset-2 outline-periwinkle;
 }
 
+@keyframes mobile-marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.mobile-marquee {
+  overflow: hidden;
+  max-width: 100%;
+}
+
+.mobile-marquee__track {
+  display: inline-flex;
+  min-width: max-content;
+  white-space: nowrap;
+  animation: mobile-marquee 16s linear infinite;
+}
+
+@media (min-width: 640px) {
+  .mobile-marquee {
+    overflow: visible;
+    max-width: none;
+  }
+
+  .mobile-marquee__track {
+    display: inline;
+    min-width: 0;
+    white-space: normal;
+    animation: none;
+  }
+}
+
 @keyframes float-badge {
   0%,
   100% {
