@@ -135,7 +135,7 @@ export default function Navbar() {
       </div>
     )}
 
-    {isAuthed && location.pathname === '/home' && (
+    {isAuthed && (location.pathname === '/home' || location.pathname === '/') && (
       <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-line/80 bg-linen/95 px-2 py-2 shadow-[0_-8px_24px_-12px_rgba(30,27,75,0.2)] backdrop-blur md:hidden">
         <div className="mx-auto flex max-w-md items-center justify-around gap-1">
           {LINKS.map((link) => {
