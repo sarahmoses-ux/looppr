@@ -74,6 +74,33 @@ const pickupRequestSchema = new mongoose.Schema(
       lat: { type: Number },
       lng: { type: Number },
     },
+    // GeoJSON mirror of location.lat/lng, kept in sync by the pre-save hook
+    // below — location itself stays as-is since it's read elsewhere as
+    // plain lat/lng. This is what the assignment engine's $near queries use
+    // (2dsphere indexes require GeoJSON, not a plain {lat,lng} pair).
+    // default: undefined so Mongoose doesn't auto-vivify a coordinate-less
+    // Point on save — same guard as deliveryAddress above.
+    geoLocation: {
+      type: new mongoose.Schema(
+        {
+          type: { type: String, enum: ['Point'], default: 'Point' },
+          coordinates: { type: [Number], required: true }, // [lng, lat]
+        },
+        { _id: false },
+      ),
+      default: undefined,
+    },
+
+    // Assignment — set by the future decision engine, left null until then.
+    riderId: { type: mongoose.Schema.Types.ObjectId, ref: 'Rider', index: true, default: null },
+    riderAssignedAt: { type: Date },
+    laundryPartnerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'LaundryPartner',
+      index: true,
+      default: null,
+    },
+    partnerAssignedAt: { type: Date },
 
     // Computed automatically at creation from loadSize (see utils/pricing.js)
     // — matches the price shown on the website. No admin pricing step.
@@ -101,5 +128,18 @@ const pickupRequestSchema = new mongoose.Schema(
   },
   { timestamps: true },
 )
+
+// Keeps geoLocation in sync with location.lat/lng whenever both are set,
+// so callers that already write location (createPickup, etc.) don't need
+// to change. Leaves geoLocation unset if either coordinate is missing,
+// matching the deliveryAddress "absent means not present" convention.
+pickupRequestSchema.pre('save', function syncGeoLocation(next) {
+  if (this.isModified('location') && this.location?.lat != null && this.location?.lng != null) {
+    this.geoLocation = { type: 'Point', coordinates: [this.location.lng, this.location.lat] }
+  }
+  next()
+})
+
+pickupRequestSchema.index({ geoLocation: '2dsphere' })
 
 export const PickupRequest = mongoose.model('PickupRequest', pickupRequestSchema)
