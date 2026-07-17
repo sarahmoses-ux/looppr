@@ -82,13 +82,19 @@ export default function Business() {
               the staffing headache. We show up daily on your schedule and invoice you monthly.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button to="/business/apply" variant="inverse">
-                Talk to our business team
+              <Button to="/business/signup" variant="inverse">
+                Create business account
               </Button>
-              <Button href="#segments" variant="ghost-light">
-                See who we serve
+              <Button to="/business/login" variant="ghost-light">
+                Business login
               </Button>
             </div>
+            <p className="mt-4 text-sm text-periwinkle-muted">
+              Prefer to talk first?{' '}
+              <a href="/business/apply" className="font-semibold text-white underline-offset-2 hover:underline">
+                Talk to our business team
+              </a>
+            </p>
           </div>
 
           <div className="rounded-3xl border border-white/15 bg-white/[0.06] p-7 backdrop-blur">
@@ -193,9 +199,14 @@ export default function Business() {
             Tell us your volume and schedule. We'll match a partner laundromat and have you
             running this week — no contract.
           </p>
-          <Button to="/business/apply" variant="primary" className="mt-8 px-9! py-4!">
-            Talk to our business team
-          </Button>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <Button to="/business/signup" variant="primary" className="px-9! py-4!">
+              Create business account
+            </Button>
+            <Button to="/business/login" variant="ghost-light" className="px-9! py-4!">
+              Business login
+            </Button>
+          </div>
         </div>
       </section>
     </div>

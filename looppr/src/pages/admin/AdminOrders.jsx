@@ -17,6 +17,16 @@ const PAYMENT_STYLES = {
   failed: 'bg-red-50 text-red-600',
 }
 
+// Partner Portal lifecycle labels — mirrors the partner-side stages so admins
+// see exactly what a laundromat has done with an order.
+const PARTNER_STAGE_LABELS = {
+  accepted: 'Accepted',
+  pickup_completed: 'Pickup completed',
+  laundry_in_progress: 'Laundry in progress',
+  ready_for_delivery: 'Ready for delivery',
+  delivered: 'Delivered',
+}
+
 function formatMoney(amount, currency = 'usd') {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency.toUpperCase() }).format(amount)
 }
@@ -72,6 +82,27 @@ function AdminOrderRow({ pickup, onChange }) {
             {pickup.paymentStatus}
           </span>
         </p>
+
+        {/* Partner Portal attribution — reflects any accept/advance action a
+            laundromat took on this order. */}
+        {pickup.partnerUserId ? (
+          <p className="mt-1.5 flex flex-wrap items-center gap-2 text-xs">
+            <span className="rounded-full bg-sky-50 px-2 py-0.5 font-semibold text-sky-700">
+              Partner: {pickup.partnerUserId.businessName}
+            </span>
+            {pickup.partnerStage && (
+              <span className="rounded-full bg-ink/5 px-2 py-0.5 font-semibold text-ink/60">
+                {PARTNER_STAGE_LABELS[pickup.partnerStage] || pickup.partnerStage}
+              </span>
+            )}
+          </p>
+        ) : (
+          pickup.partnerRejectedBy?.length > 0 && (
+            <p className="mt-1.5 text-xs font-medium text-ink/45">
+              Unclaimed · {pickup.partnerRejectedBy.length} partner rejection{pickup.partnerRejectedBy.length === 1 ? '' : 's'}
+            </p>
+          )
+        )}
       </div>
 
       <div className="flex shrink-0 flex-col items-stretch gap-2 sm:flex-row sm:items-center">

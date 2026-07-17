@@ -1,5 +1,9 @@
 import { ApiError } from '../utils/ApiError.js'
-import { verifyAccessToken } from '../utils/tokens.js'
+import {
+  verifyAccessToken,
+  verifyBusinessAccessToken,
+  verifyPartnerAccessToken,
+} from '../utils/tokens.js'
 
 export function requireAuth(req, _res, next) {
   const header = req.headers.authorization || ''
@@ -21,5 +25,38 @@ export function requireRole(...roles) {
       return next(new ApiError(403, 'You do not have permission to access this resource.'))
     }
     next()
+  }
+}
+
+// Business Portal guard — verifies a *business* access token (signed with the
+// dedicated business secret, see utils/tokens.js). A customer/admin token
+// fails this verification outright, so it can never reach a business route.
+// Sets req.business (not req.user) to keep the two auth worlds cleanly apart.
+export function requireBusinessAuth(req, _res, next) {
+  const header = req.headers.authorization || ''
+  const token = header.startsWith('Bearer ') ? header.slice(7) : null
+  if (!token) return next(new ApiError(401, 'Not authenticated.'))
+
+  try {
+    req.business = verifyBusinessAccessToken(token)
+    next()
+  } catch {
+    next(new ApiError(401, 'Session expired.'))
+  }
+}
+
+// Partner Portal guard — verifies a *partner* access token (dedicated
+// secret). Customer/admin/business tokens fail this outright. Sets
+// req.partner to keep the auth worlds cleanly apart.
+export function requirePartnerAuth(req, _res, next) {
+  const header = req.headers.authorization || ''
+  const token = header.startsWith('Bearer ') ? header.slice(7) : null
+  if (!token) return next(new ApiError(401, 'Not authenticated.'))
+
+  try {
+    req.partner = verifyPartnerAccessToken(token)
+    next()
+  } catch {
+    next(new ApiError(401, 'Session expired.'))
   }
 }

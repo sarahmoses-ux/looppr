@@ -47,7 +47,10 @@ export const createPickupValidation = [
       return true
     }),
   body('window').isIn(['morning', 'afternoon', 'evening']).withMessage('Choose a pickup window.'),
-  body('loadSize').isIn(['small', 'medium', 'large']).withMessage('Choose a load size.'),
+  // Load is size-based, not free-weight: 'small' (~10 lbs) is the smallest
+  // accepted value, which enforces the 10 lb per-pickup minimum — nothing
+  // lighter can be submitted. See utils/pricing.js LOAD_SIZE_LBS.
+  body('loadSize').isIn(['small', 'medium', 'large']).withMessage('Choose a load size (10 lb minimum).'),
   body('notes').optional({ values: 'falsy' }).trim().isLength({ max: 500 }).withMessage('Notes must be 500 characters or fewer.'),
   body('deliveryWindow').isIn(['morning', 'afternoon', 'evening']).withMessage('Choose a delivery window.'),
   deliveryAddressValidator('deliveryAddress'),

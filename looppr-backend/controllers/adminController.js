@@ -14,6 +14,10 @@ export const listAllPickups = asyncHandler(async (req, res) => {
   let pickups = await PickupRequest.find(match)
     .sort({ createdAt: -1 })
     .populate('clientId', 'name email phone emailNotifications')
+    // Surface the Partner Portal claim so admins see which laundromat took
+    // the order and how far along it is (partnerStage), reflecting any
+    // accept/advance/reject action a partner took.
+    .populate('partnerUserId', 'businessName ownerName')
 
   // Filtered in application code rather than a $lookup aggregation — simpler
   // to read/maintain, and fine at MVP order volumes. Revisit with a Mongo

@@ -8,8 +8,20 @@ const pickupRequestSchema = new mongoose.Schema(
     clientId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', index: true },
 
     // 'guest' requests carry contact details directly (no account);
-    // 'account' requests rely on clientId + the User document instead.
-    source: { type: String, enum: ['account', 'guest'], default: 'account' },
+    // 'account' requests rely on clientId + the User document instead;
+    // 'business' requests come from the Business Portal and rely on
+    // businessId + the BusinessUser document.
+    source: { type: String, enum: ['account', 'guest', 'business'], default: 'account' },
+
+    // Set on Business Portal requests (source: 'business'). Kept alongside
+    // clientId rather than reusing it so business orders never collide with a
+    // customer's order history and each side queries only its own scope.
+    businessId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'BusinessUser',
+      index: true,
+      default: null,
+    },
     guest: {
       name: { type: String, trim: true, maxlength: 100 },
       email: { type: String, trim: true, lowercase: true, maxlength: 200 },
@@ -101,6 +113,31 @@ const pickupRequestSchema = new mongoose.Schema(
       default: null,
     },
     partnerAssignedAt: { type: Date },
+
+    // Partner Portal claim/lifecycle — separate from laundryPartnerId (which
+    // refs the ops-foundation LaundryPartner collection). partnerUserId is the
+    // self-serve PartnerUser who claimed the order through the portal.
+    // partnerStage tracks the granular partner-facing lifecycle, decoupled
+    // from the 4-stage customer `status` above (the controller keeps `status`
+    // roughly in sync so the customer's tracking still reflects progress).
+    partnerUserId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'PartnerUser',
+      index: true,
+      default: null,
+    },
+    partnerStage: {
+      type: String,
+      enum: ['accepted', 'pickup_completed', 'laundry_in_progress', 'ready_for_delivery', 'delivered'],
+      default: undefined,
+    },
+    partnerAcceptedAt: { type: Date },
+    // PartnerUser ids that rejected this order, so it drops out of their
+    // incoming list without affecting other partners.
+    partnerRejectedBy: {
+      type: [mongoose.Schema.Types.ObjectId],
+      default: [],
+    },
 
     // Computed automatically at creation from loadSize (see utils/pricing.js)
     // — matches the price shown on the website. No admin pricing step.

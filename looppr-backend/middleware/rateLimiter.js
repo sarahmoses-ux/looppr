@@ -166,6 +166,59 @@ export const guestCheckoutCompleteLimiter = rateLimit({
   },
 })
 
+// ---- Business Portal ----------------------------------------------------
+// Unauthenticated, keyed on IP+email like the customer equivalents.
+export const businessRegisterLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => `${req.ip}:${req.body?.email || ''}`,
+  handler: (_req, res) => {
+    res.status(429).json({
+      success: false,
+      message: 'Too many attempts. Please try again later.',
+    })
+  },
+})
+
+export const businessVerifyLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => `${req.ip}:${req.body?.email || ''}`,
+  handler: (_req, res) => {
+    res.status(429).json({
+      success: false,
+      message: 'Too many attempts. Please try again later.',
+    })
+  },
+})
+
+// ---- Partner Portal -----------------------------------------------------
+export const partnerRegisterLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => `${req.ip}:${req.body?.email || ''}`,
+  handler: (_req, res) => {
+    res.status(429).json({ success: false, message: 'Too many attempts. Please try again later.' })
+  },
+})
+
+export const partnerVerifyLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => `${req.ip}:${req.body?.email || ''}`,
+  handler: (_req, res) => {
+    res.status(429).json({ success: false, message: 'Too many attempts. Please try again later.' })
+  },
+})
+
 // Login-OTP endpoints run before the user has a session, so key on IP alone.
 export const loginOtpVerifyLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,

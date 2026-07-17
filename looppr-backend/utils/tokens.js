@@ -41,6 +41,120 @@ export function verifyLoginChallenge(token) {
   return payload
 }
 
+// ---------------------------------------------------------------------------
+// Business Portal tokens — signed with DEDICATED secrets so a business token
+// can never be verified (and therefore accepted) by the customer/admin auth
+// middleware, and vice versa. This is what actually enforces "business users
+// can only log into the Business Portal": token isolation, not just role
+// checks. Secrets fall back to the main ones only if unset, so local dev
+// works out of the box, but production must set distinct values.
+// ---------------------------------------------------------------------------
+function businessAccessSecret() {
+  return process.env.JWT_BUSINESS_ACCESS_SECRET || process.env.JWT_ACCESS_SECRET
+}
+
+function businessRefreshSecret() {
+  return process.env.JWT_BUSINESS_REFRESH_SECRET || process.env.JWT_REFRESH_SECRET
+}
+
+export function signBusinessAccessToken(business) {
+  return jwt.sign(
+    { sub: business._id.toString(), role: business.role, tokenVersion: business.tokenVersion },
+    businessAccessSecret(),
+    { expiresIn: process.env.JWT_ACCESS_EXPIRES || '15m' },
+  )
+}
+
+export function signBusinessRefreshToken(business, persistent = true) {
+  return jwt.sign(
+    // `persistent` (the login "Remember me" choice) rides in the token so a
+    // refresh can re-issue the cookie with the same lifetime — otherwise a
+    // mid-session refresh would silently upgrade a "session only" login to a
+    // persistent one.
+    { sub: business._id.toString(), role: business.role, tokenVersion: business.tokenVersion, persistent },
+    businessRefreshSecret(),
+    { expiresIn: process.env.JWT_REFRESH_EXPIRES || '30d' },
+  )
+}
+
+export function verifyBusinessAccessToken(token) {
+  return jwt.verify(token, businessAccessSecret())
+}
+
+export function verifyBusinessRefreshToken(token) {
+  return jwt.verify(token, businessRefreshSecret())
+}
+
+// Distinct cookie name AND path from the customer/admin refresh cookie
+// (`refreshToken` on `/api/auth`) so both can coexist in one browser without
+// overwriting each other — a user could be signed into the customer app and
+// the Business Portal in the same session with no interference.
+//   persistent=false ("Remember me" unchecked) → session cookie, cleared when
+//   the browser closes; persistent=true → 30-day cookie.
+export function businessRefreshCookieOptions(persistent = true) {
+  const maxAgeMs = 30 * 24 * 60 * 60 * 1000
+  return {
+    httpOnly: true,
+    // See refreshCookieOptions below for why SameSite=None + Secure is
+    // required (cross-site frontend/backend on deploy, localhost-exempt).
+    secure: true,
+    sameSite: 'none',
+    ...(persistent ? { maxAge: maxAgeMs } : {}),
+    path: '/api/business-auth',
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Partner Portal tokens — dedicated secrets, same isolation rationale as the
+// business tokens above: a partner token can't be verified by the customer/
+// admin/business middleware, and vice versa. Falls back to the main secrets
+// if unset so local dev runs out of the box.
+// ---------------------------------------------------------------------------
+function partnerAccessSecret() {
+  return process.env.JWT_PARTNER_ACCESS_SECRET || process.env.JWT_ACCESS_SECRET
+}
+
+function partnerRefreshSecret() {
+  return process.env.JWT_PARTNER_REFRESH_SECRET || process.env.JWT_REFRESH_SECRET
+}
+
+export function signPartnerAccessToken(partner) {
+  return jwt.sign(
+    { sub: partner._id.toString(), role: partner.role, tokenVersion: partner.tokenVersion },
+    partnerAccessSecret(),
+    { expiresIn: process.env.JWT_ACCESS_EXPIRES || '15m' },
+  )
+}
+
+export function signPartnerRefreshToken(partner, persistent = true) {
+  return jwt.sign(
+    { sub: partner._id.toString(), role: partner.role, tokenVersion: partner.tokenVersion, persistent },
+    partnerRefreshSecret(),
+    { expiresIn: process.env.JWT_REFRESH_EXPIRES || '30d' },
+  )
+}
+
+export function verifyPartnerAccessToken(token) {
+  return jwt.verify(token, partnerAccessSecret())
+}
+
+export function verifyPartnerRefreshToken(token) {
+  return jwt.verify(token, partnerRefreshSecret())
+}
+
+// Own cookie name + path (`/api/partner-auth`) so partner, business and
+// customer sessions never overwrite each other in one browser.
+export function partnerRefreshCookieOptions(persistent = true) {
+  const maxAgeMs = 30 * 24 * 60 * 60 * 1000
+  return {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+    ...(persistent ? { maxAge: maxAgeMs } : {}),
+    path: '/api/partner-auth',
+  }
+}
+
 export function refreshCookieOptions() {
   const maxAgeMs = 30 * 24 * 60 * 60 * 1000
   return {

@@ -157,7 +157,7 @@ export default function Landing() {
               <div className="w-px bg-line" />
               <div>
                 <span className="block font-display text-2xl font-semibold text-ink">4 cities</span>
-                <span className="text-xs text-ink/50">At launch, July 2026</span>
+                <span className="text-xs text-ink/50">At launch, August 2026</span>
               </div>
             </div>
           </div>
