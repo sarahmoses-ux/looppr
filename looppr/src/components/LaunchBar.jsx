@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { joinWaitlist } from '../services/waitlistApi'
 
-const LAUNCH_DATE = new Date('2026-07-12T00:00:00-05:00')
+const LAUNCH_DATE = new Date('2026-08-01T00:00:00-05:00')
 
 function formatCountdown(diff) {
   if (diff <= 0) return 'Live now!'
@@ -57,18 +57,18 @@ export default function LaunchBar() {
         <div className="mobile-marquee__track items-center">
           <span className="flex items-center gap-2 whitespace-nowrap text-xs font-semibold text-white sm:hidden sm:text-sm">
             <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-white" aria-hidden="true" />
-            Looppr launches July 12, 2026 in OKC, Edmond, Norman &amp; Moore
+            Looppr launches August 1, 2026 in OKC, Edmond, Norman &amp; Moore
           </span>
           <span
             className="ml-6 flex items-center gap-2 whitespace-nowrap text-xs font-semibold text-white sm:hidden sm:text-sm"
             aria-hidden="true"
           >
             <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-white" aria-hidden="true" />
-            Looppr launches July 12, 2026 in OKC, Edmond, Norman &amp; Moore
+            Looppr launches August 1, 2026 in OKC, Edmond, Norman &amp; Moore
           </span>
           <span className="hidden items-center gap-2 whitespace-nowrap text-xs font-semibold text-white sm:flex sm:text-sm">
             <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-white" aria-hidden="true" />
-            Looppr launches July 12, 2026 in OKC, Edmond, Norman &amp; Moore
+            Looppr launches August 1, 2026 in OKC, Edmond, Norman &amp; Moore
           </span>
         </div>
       </div>

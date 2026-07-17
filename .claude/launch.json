@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "looppr-frontend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "looppr", "run", "dev"],
+      "port": 5173
+    },
+    {
+      "name": "looppr-backend",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "looppr-backend", "run", "dev"],
+      "port": 5000
+    }
+  ]
+}

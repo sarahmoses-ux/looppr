@@ -6,7 +6,7 @@ import { joinWaitlist } from '../services/waitlistApi'
 
 const PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/cities')
 
-const OK_LAUNCH_ETA = 'July 12, 2026'
+const OK_LAUNCH_ETA = 'August 1, 2026'
 const EXPANSION_ETA = 'Feb 2027'
 
 const STATES = [

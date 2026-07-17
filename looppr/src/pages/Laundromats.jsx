@@ -52,16 +52,22 @@ export default function Laundromats() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button
-                to="/laundromats/apply"
+                to="/partners/signup"
                 variant="accent"
                 className="bg-periwinkle! hover:bg-periwinkle-text!"
               >
-                Apply to become a partner
+                Become a Partner
               </Button>
-              <Button href="#earnings" variant="ghost">
-                See the numbers
+              <Button to="/partners/login" variant="ghost">
+                Partner Login
               </Button>
             </div>
+            <p className="mt-4 text-sm text-ink/55">
+              Prefer to talk first?{' '}
+              <a href="/laundromats/apply" className="font-semibold text-periwinkle-text hover:underline">
+                Apply and we'll reach out
+              </a>
+            </p>
           </div>
 
           <div id="earnings" className="rounded-3xl bg-periwinkle p-7">
@@ -163,9 +169,14 @@ export default function Laundromats() {
             Apply today and you could be taking your first Looppr orders within ten days. No
             cost, no commitment.
           </p>
-          <Button to="/laundromats/apply" variant="inverse" className="mt-8 px-9! py-4!">
-            Apply to become a partner
-          </Button>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <Button to="/partners/signup" variant="inverse" className="px-9! py-4!">
+              Become a Partner
+            </Button>
+            <Button to="/partners/login" variant="ghost-light" className="px-9! py-4!">
+              Partner Login
+            </Button>
+          </div>
         </div>
       </section>
     </div>

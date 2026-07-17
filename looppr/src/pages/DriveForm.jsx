@@ -217,7 +217,7 @@ export default function DriveForm() {
                       <option value="" disabled>
                         Select city…
                       </option>
-                      <optgroup label="Oklahoma — Launching July 12, 2026">
+                      <optgroup label="Oklahoma — Launching August 1, 2026">
                         <option>Oklahoma City, OK</option>
                         <option>Edmond, OK</option>
                         <option>Norman, OK</option>

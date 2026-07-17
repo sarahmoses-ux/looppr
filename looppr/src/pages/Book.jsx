@@ -239,9 +239,9 @@ export default function Book() {
         <h1 className="mt-4 font-display text-2xl font-semibold text-ink">You're on the list!</h1>
         <p className="mt-3 text-sm leading-relaxed text-ink/65">
           We've saved your pickup request for <strong>{dateLabel}</strong>,{' '}
-          {windowLabel?.toLowerCase()}. Looppr launches in your area on July
-          12, 2026 — we'll email you to confirm your exact window as we get
-          closer.
+          {windowLabel?.toLowerCase()}. Looppr launches in your area on
+          August 1, 2026 — we'll email you to confirm your exact window as we
+          get closer.
         </p>
         <Button to="/home" variant="primary" className="mt-8">
           Back to home
@@ -488,7 +488,7 @@ export default function Book() {
       </h1>
       <p className="mt-2 text-sm text-ink/60">
         Looppr only serves Oklahoma at launch — we'll confirm your exact
-        window closer to July 12, 2026.
+        window closer to August 1, 2026.
       </p>
 
       <form onSubmit={handleContinue} noValidate className="mt-8 space-y-5">
@@ -623,6 +623,9 @@ export default function Book() {
             </option>
           ))}
         </Select>
+        <p className="-mt-3 text-xs font-medium text-ink/50">
+          Minimum order is 10 lbs (Small) — the least we take per pickup.
+        </p>
 
         <div>
           <label htmlFor="notes" className="block text-base font-medium text-ink/80">
