@@ -3,7 +3,9 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import Cities from './Cities'
 
-const joinWaitlist = vi.fn()
+// vi.mock factories are hoisted above imports, so the mock fn must be too
+// (a plain top-level `const` here hits a temporal-dead-zone ReferenceError).
+const { joinWaitlist } = vi.hoisted(() => ({ joinWaitlist: vi.fn() }))
 
 vi.mock('../services/waitlistApi', () => ({
   joinWaitlist,

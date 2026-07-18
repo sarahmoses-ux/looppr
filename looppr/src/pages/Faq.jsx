@@ -2,6 +2,7 @@ import SEO from '../components/SEO'
 import FaqAccordion from '../components/FaqAccordion'
 import { FAQ_ITEMS } from '../data/faqItems'
 import { PUBLIC_PAGES } from '../seo/publicPages'
+import { breadcrumbJsonLd } from '../seo/structuredData'
 
 const FAQ_JSON_LD = {
   '@context': 'https://schema.org',
@@ -13,12 +14,19 @@ const FAQ_JSON_LD = {
   })),
 }
 
+const BREADCRUMB_JSON_LD = breadcrumbJsonLd([{ name: 'Help & FAQ', path: '/faq' }])
+
 const PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/faq')
 
 export default function Faq() {
   return (
     <div className="mx-auto max-w-[900px] px-4 py-16 sm:px-6 lg:px-8">
-      <SEO title={PAGE_META.title} description={PAGE_META.description} jsonLd={FAQ_JSON_LD} />
+      <SEO
+        title={PAGE_META.title}
+        description={PAGE_META.description}
+        keywords={PAGE_META.keywords}
+        jsonLd={[FAQ_JSON_LD, BREADCRUMB_JSON_LD]}
+      />
       <p className="text-sm font-semibold uppercase tracking-[0.08em] text-periwinkle">
         Help
       </p>

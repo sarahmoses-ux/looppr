@@ -12,10 +12,10 @@ const HIGHLIGHTS = [
 // Split-screen auth layout for the Business Portal. Mirrors the customer
 // AuthLayout: the branding panel is a single stack centered both vertically
 // and horizontally, and the form column's title/subtitle are centered too.
-export default function BusinessAuthShell({ title, subtitle, children, footer }) {
+export default function BusinessAuthShell({ title, subtitle, children, footer, description, keywords, noindex = true }) {
   return (
     <div className="relative grid min-h-screen lg:grid-cols-2">
-      <SEO title={`${title} · Looppr for Business`} noindex />
+      <SEO title={`${title} · Looppr for Business`} description={description} keywords={keywords} noindex={noindex} />
 
       <Link to="/business" className="absolute left-6 top-6 z-10 flex items-center gap-0 lg:hidden">
         <img src={logo} alt="" className="-mr-1 h-9 w-9" />

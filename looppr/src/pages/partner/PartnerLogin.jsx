@@ -4,6 +4,9 @@ import { usePartnerAuth } from '../../context/PartnerAuthContext'
 import PartnerAuthShell from '../../components/partner/PartnerAuthShell'
 import Input from '../../components/Input'
 import Button from '../../components/Button'
+import { PUBLIC_PAGES } from '../../seo/publicPages'
+
+const PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/partners/login')
 
 export default function PartnerLogin() {
   const { login } = usePartnerAuth()
@@ -60,6 +63,9 @@ export default function PartnerLogin() {
     <PartnerAuthShell
       title="Sign in to your partner account"
       subtitle="Manage incoming orders, jobs and earnings."
+      description={PAGE_META.description}
+      keywords={PAGE_META.keywords}
+      noindex={false}
       footer={
         <>
           Don't have a Partner Account?{' '}

@@ -4,7 +4,10 @@ import Input from '../../components/Input'
 import Select from '../../components/Select'
 import Button from '../../components/Button'
 import SEO from '../../components/SEO'
+import { PUBLIC_PAGES } from '../../seo/publicPages'
 import { createGuestPickup } from '../../services/guestPickupApi'
+
+const PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/guest/book')
 
 const WINDOWS = [
   { value: 'morning', label: 'Morning · 8am – 11am' },
@@ -122,10 +125,7 @@ export default function GuestBook() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6 lg:px-8">
-      <SEO
-        title="Request a pickup as a guest"
-        description="Request a Looppr laundry pickup without creating an account."
-      />
+      <SEO title={PAGE_META.title} description={PAGE_META.description} keywords={PAGE_META.keywords} />
       <p className="text-sm font-semibold uppercase tracking-[0.08em] text-periwinkle">
         No account needed
       </p>

@@ -4,38 +4,19 @@ import HeroCarousel from '../components/HeroCarousel'
 import SEO from '../components/SEO'
 import { heroImages } from '../data/heroImages'
 import { PUBLIC_PAGES } from '../seo/publicPages'
-import { SITE_URL, SITE_NAME, SOCIAL_PROFILES } from '../seo/siteConfig'
-import logoTransparent from '../assets/looppr-mark-transparent.png'
+import { LOCAL_BUSINESS_JSON_LD, serviceJsonLd } from '../seo/structuredData'
 
 const HOME_PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/')
 
-const ORGANIZATION_JSON_LD = {
-  '@context': 'https://schema.org',
-  '@type': 'Organization',
-  name: SITE_NAME,
-  url: SITE_URL,
-  logo: `${SITE_URL}${logoTransparent}`,
-  sameAs: SOCIAL_PROFILES,
-}
-
-const SERVICE_JSON_LD = {
-  '@context': 'https://schema.org',
-  '@type': 'Service',
+// Organization/WebSite JSON-LD render sitewide (see PublicLayout.jsx) —
+// Landing adds the schema specific to it: the service offering itself, plus
+// LocalBusiness (most relevant on the homepage and Cities, where "laundry
+// near me" search intent is highest).
+const SERVICE_JSON_LD = serviceJsonLd({
   serviceType: 'Laundry pickup and delivery',
-  provider: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
-  areaServed: [
-    { '@type': 'City', name: 'Oklahoma City, OK' },
-    { '@type': 'City', name: 'Edmond, OK' },
-    { '@type': 'City', name: 'Norman, OK' },
-    { '@type': 'City', name: 'Moore, OK' },
-  ],
-  offers: {
-    '@type': 'Offer',
-    priceCurrency: 'USD',
-    price: '1.59',
-    description: 'Wash & fold laundry service, priced per pound',
-  },
-}
+  price: '1.59',
+  description: 'Wash & fold laundry service, priced per pound',
+})
 
 const PLANS = [
   {
@@ -105,7 +86,8 @@ export default function Landing() {
     <>
       <SEO
         description={HOME_PAGE_META.description}
-        jsonLd={[ORGANIZATION_JSON_LD, SERVICE_JSON_LD]}
+        keywords={HOME_PAGE_META.keywords}
+        jsonLd={[SERVICE_JSON_LD, LOCAL_BUSINESS_JSON_LD]}
       />
 
       <section className="relative overflow-hidden">

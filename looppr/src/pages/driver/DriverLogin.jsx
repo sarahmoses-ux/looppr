@@ -4,6 +4,9 @@ import { useDriverAuth } from '../../context/DriverAuthContext'
 import DriverAuthShell from '../../components/driver/DriverAuthShell'
 import Input from '../../components/Input'
 import Button from '../../components/Button'
+import { PUBLIC_PAGES } from '../../seo/publicPages'
+
+const PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/drive/login')
 
 export default function DriverLogin() {
   const { login } = useDriverAuth()
@@ -60,6 +63,9 @@ export default function DriverLogin() {
     <DriverAuthShell
       title="Sign in to your driver account"
       subtitle="Manage deliveries, routes and earnings."
+      description={PAGE_META.description}
+      keywords={PAGE_META.keywords}
+      noindex={false}
       footer={
         <>
           Don't have a Driver Account?{' '}

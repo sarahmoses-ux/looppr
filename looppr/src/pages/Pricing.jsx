@@ -1,8 +1,10 @@
 import Button from '../components/Button'
 import SEO from '../components/SEO'
 import { PUBLIC_PAGES } from '../seo/publicPages'
+import { breadcrumbJsonLd } from '../seo/structuredData'
 
 const PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/pricing')
+const BREADCRUMB_JSON_LD = breadcrumbJsonLd([{ name: 'Pricing', path: '/pricing' }])
 
 const PLANS = [
   {
@@ -106,7 +108,12 @@ function CheckIcon({ className }) {
 export default function Pricing() {
   return (
     <div>
-      <SEO title={PAGE_META.title} description={PAGE_META.description} />
+      <SEO
+        title={PAGE_META.title}
+        description={PAGE_META.description}
+        keywords={PAGE_META.keywords}
+        jsonLd={BREADCRUMB_JSON_LD}
+      />
 
       <section className="relative overflow-hidden px-4 py-16 text-center sm:px-6 sm:py-20 lg:px-8">
         <div

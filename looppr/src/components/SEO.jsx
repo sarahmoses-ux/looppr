@@ -15,6 +15,7 @@ import {
 export default function SEO({
   title,
   description = DEFAULT_DESCRIPTION,
+  keywords,
   noindex = false,
   image = DEFAULT_OG_IMAGE,
   jsonLd,
@@ -28,6 +29,10 @@ export default function SEO({
     <Helmet>
       <title>{fullTitle}</title>
       <meta name="description" content={description} />
+      {/* Meta keywords carries ~zero weight with modern search engines, but
+          included per spec — kept optional/omitted where a page has none
+          rather than ever repeating the same list everywhere. */}
+      {keywords && <meta name="keywords" content={Array.isArray(keywords) ? keywords.join(', ') : keywords} />}
       <link rel="canonical" href={url} />
       <meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow'} />
 

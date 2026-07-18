@@ -6,6 +6,9 @@ import { VEHICLE_OPTIONS } from '../../components/driver/driverUi'
 import Input from '../../components/Input'
 import Select from '../../components/Select'
 import Button from '../../components/Button'
+import { PUBLIC_PAGES } from '../../seo/publicPages'
+
+const PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/drive/signup')
 
 const EMPTY = {
   name: '', email: '', phone: '', password: '', confirmPassword: '',
@@ -104,6 +107,9 @@ export default function DriverSignup() {
   return (
     <DriverAuthShell
       title="Create your driver account"
+      description={PAGE_META.description}
+      keywords={PAGE_META.keywords}
+      noindex={false}
       footer={
         <>
           Already a Driver?{' '}

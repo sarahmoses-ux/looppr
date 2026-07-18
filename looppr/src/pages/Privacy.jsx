@@ -1,7 +1,9 @@
 import SEO from '../components/SEO'
 import { PUBLIC_PAGES } from '../seo/publicPages'
+import { breadcrumbJsonLd } from '../seo/structuredData'
 
 const PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/privacy')
+const BREADCRUMB_JSON_LD = breadcrumbJsonLd([{ name: 'Privacy policy', path: '/privacy' }])
 
 const SECTIONS = [
   {
@@ -44,7 +46,7 @@ const SECTIONS = [
 export default function Privacy() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
-      <SEO title={PAGE_META.title} description={PAGE_META.description} />
+      <SEO title={PAGE_META.title} description={PAGE_META.description} jsonLd={BREADCRUMB_JSON_LD} />
       <p className="text-sm font-semibold uppercase tracking-[0.08em] text-periwinkle">Legal</p>
       <h1 className="mt-2 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
         Privacy policy

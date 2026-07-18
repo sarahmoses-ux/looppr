@@ -4,6 +4,9 @@ import { useBusinessAuth } from '../../context/BusinessAuthContext'
 import BusinessAuthShell from '../../components/business/BusinessAuthShell'
 import Input from '../../components/Input'
 import Button from '../../components/Button'
+import { PUBLIC_PAGES } from '../../seo/publicPages'
+
+const PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/business/login')
 
 export default function BusinessLogin() {
   const { login } = useBusinessAuth()
@@ -60,6 +63,9 @@ export default function BusinessLogin() {
     <BusinessAuthShell
       title="Sign in to your business account"
       subtitle="Manage pickups, orders and invoices in one place."
+      description={PAGE_META.description}
+      keywords={PAGE_META.keywords}
+      noindex={false}
       footer={
         <>
           Don't have an account?{' '}

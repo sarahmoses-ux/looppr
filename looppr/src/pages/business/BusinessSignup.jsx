@@ -6,6 +6,9 @@ import { BUSINESS_TYPE_OPTIONS } from '../../components/business/businessUi'
 import Input from '../../components/Input'
 import Select from '../../components/Select'
 import Button from '../../components/Button'
+import { PUBLIC_PAGES } from '../../seo/publicPages'
+
+const PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/business/signup')
 
 const EMPTY = {
   businessName: '',
@@ -72,6 +75,9 @@ export default function BusinessSignup() {
   return (
     <BusinessAuthShell
       title="Create your business account"
+      description={PAGE_META.description}
+      keywords={PAGE_META.keywords}
+      noindex={false}
       footer={
         <>
           Already have an account?{' '}

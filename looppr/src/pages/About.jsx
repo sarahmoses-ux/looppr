@@ -1,8 +1,10 @@
 import Button from '../components/Button'
 import SEO from '../components/SEO'
 import { PUBLIC_PAGES } from '../seo/publicPages'
+import { breadcrumbJsonLd } from '../seo/structuredData'
 
 const PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/about')
+const BREADCRUMB_JSON_LD = breadcrumbJsonLd([{ name: 'About', path: '/about' }])
 
 const ORIGIN_STATS = [
   { value: '3', label: 'Test orders that started it all' },
@@ -75,7 +77,12 @@ const IMPACT_STATS = [
 export default function About() {
   return (
     <div>
-      <SEO title={PAGE_META.title} description={PAGE_META.description} />
+      <SEO
+        title={PAGE_META.title}
+        description={PAGE_META.description}
+        keywords={PAGE_META.keywords}
+        jsonLd={BREADCRUMB_JSON_LD}
+      />
 
       <section className="relative overflow-hidden bg-ink px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
         <div

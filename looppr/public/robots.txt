@@ -1,8 +1,11 @@
 # Looppr — robots.txt
-# App routes below require a signed-in session (see ProtectedRoute), so
+# App routes below require a signed-in session (see ProtectedRoute /
+# BusinessProtectedRoute / PartnerProtectedRoute / DriverProtectedRoute), so
 # they're excluded here as defense-in-depth; each also carries a
 # noindex meta tag (see src/components/SEO.jsx) in case a crawler reaches
-# them via a shared link.
+# them via a shared link. Portal login/signup pages (/business, /partners,
+# /drive) are deliberately NOT disallowed — those are public conversion
+# pages, indexed like the customer /login and /signup.
 
 User-agent: *
 Allow: /
@@ -15,6 +18,15 @@ Disallow: /login/verify
 Disallow: /verify-email
 Disallow: /forgot-password
 Disallow: /admin
+Disallow: /business/dashboard
+Disallow: /business/verify-email
+Disallow: /business/forgot-password
+Disallow: /partners/dashboard
+Disallow: /partners/verify-email
+Disallow: /partners/forgot-password
+Disallow: /drive/dashboard
+Disallow: /drive/verify-email
+Disallow: /drive/forgot-password
 
 # Explicit allowances for AI crawlers/assistants that respect robots.txt —
 # same rules as above, listed by name for clarity in crawler audits.
@@ -36,5 +48,14 @@ Disallow: /login/verify
 Disallow: /verify-email
 Disallow: /forgot-password
 Disallow: /admin
+Disallow: /business/dashboard
+Disallow: /business/verify-email
+Disallow: /business/forgot-password
+Disallow: /partners/dashboard
+Disallow: /partners/verify-email
+Disallow: /partners/forgot-password
+Disallow: /drive/dashboard
+Disallow: /drive/verify-email
+Disallow: /drive/forgot-password
 
 Sitemap: https://getlooppr.com/sitemap.xml

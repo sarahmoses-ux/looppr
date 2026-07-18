@@ -4,9 +4,11 @@ import Select from '../components/Select'
 import Button from '../components/Button'
 import SEO from '../components/SEO'
 import { PUBLIC_PAGES } from '../seo/publicPages'
+import { breadcrumbJsonLd } from '../seo/structuredData'
 import { submitContactMessage } from '../services/contactApi'
 
 const PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/contact')
+const BREADCRUMB_JSON_LD = breadcrumbJsonLd([{ name: 'Contact', path: '/contact' }])
 
 const PURPOSES = [
   { value: 'general', label: 'General question' },
@@ -63,7 +65,7 @@ export default function Contact() {
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 lg:px-8">
-      <SEO title={PAGE_META.title} description={PAGE_META.description} />
+      <SEO title={PAGE_META.title} description={PAGE_META.description} jsonLd={BREADCRUMB_JSON_LD} />
       <p className="text-sm font-semibold uppercase tracking-[0.08em] text-periwinkle">Contact</p>
       <h1 className="mt-2 font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
         Get in touch

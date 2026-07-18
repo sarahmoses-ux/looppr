@@ -1,6 +1,13 @@
 import Button from '../components/Button'
 import SEO from '../components/SEO'
 import { PUBLIC_PAGES } from '../seo/publicPages'
+import { breadcrumbJsonLd, serviceJsonLd } from '../seo/structuredData'
+
+const BREADCRUMB_JSON_LD = breadcrumbJsonLd([{ name: 'For business', path: '/business' }])
+const SERVICE_JSON_LD = serviceJsonLd({
+  serviceType: 'Hotel laundry services',
+  description: 'Commercial laundry pickup, wash & fold, and linen turnaround for hotels, gyms, Airbnb hosts and med spas.',
+})
 
 const PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/business')
 
@@ -60,7 +67,12 @@ const STEPS = [
 export default function Business() {
   return (
     <div>
-      <SEO title={PAGE_META.title} description={PAGE_META.description} />
+      <SEO
+        title={PAGE_META.title}
+        description={PAGE_META.description}
+        keywords={PAGE_META.keywords}
+        jsonLd={[BREADCRUMB_JSON_LD, SERVICE_JSON_LD]}
+      />
 
       <section className="relative overflow-hidden bg-ink px-4 py-20 sm:px-6 sm:py-24 lg:px-8">
         <div

@@ -1,6 +1,9 @@
 import Button from '../components/Button'
 import SEO from '../components/SEO'
 import { PUBLIC_PAGES } from '../seo/publicPages'
+import { breadcrumbJsonLd } from '../seo/structuredData'
+
+const BREADCRUMB_JSON_LD = breadcrumbJsonLd([{ name: 'Drive with Looppr', path: '/drive' }])
 
 const PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/drive')
 
@@ -35,7 +38,12 @@ const REQUIREMENTS = [
 export default function Drive() {
   return (
     <div>
-      <SEO title={PAGE_META.title} description={PAGE_META.description} />
+      <SEO
+        title={PAGE_META.title}
+        description={PAGE_META.description}
+        keywords={PAGE_META.keywords}
+        jsonLd={BREADCRUMB_JSON_LD}
+      />
 
       <section className="relative overflow-hidden px-4 py-16 text-center sm:px-6 sm:py-20 lg:px-8">
         <div

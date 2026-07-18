@@ -11,10 +11,10 @@ const HIGHLIGHTS = [
 
 // Split-screen auth layout for the Driver Portal — mirrors the customer/
 // business/partner shells: centered branding panel + centered form headings.
-export default function DriverAuthShell({ title, subtitle, children, footer }) {
+export default function DriverAuthShell({ title, subtitle, children, footer, description, keywords, noindex = true }) {
   return (
     <div className="relative grid min-h-screen lg:grid-cols-2">
-      <SEO title={`${title} · Drive with Looppr`} noindex />
+      <SEO title={`${title} · Drive with Looppr`} description={description} keywords={keywords} noindex={noindex} />
 
       <Link to="/drive" className="absolute left-6 top-6 z-10 flex items-center gap-0 lg:hidden">
         <img src={logo} alt="" className="-mr-1 h-9 w-9" />

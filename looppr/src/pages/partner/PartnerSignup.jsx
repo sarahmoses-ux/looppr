@@ -5,6 +5,9 @@ import PartnerAuthShell from '../../components/partner/PartnerAuthShell'
 import { SERVICE_OPTIONS } from '../../components/partner/partnerUi'
 import Input from '../../components/Input'
 import Button from '../../components/Button'
+import { PUBLIC_PAGES } from '../../seo/publicPages'
+
+const PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/partners/signup')
 
 const MAX_FILE_BYTES = 500 * 1024 // 500KB per image — kept small (stored as data URLs, MVP)
 const MAX_IMAGES = 4
@@ -163,6 +166,9 @@ export default function PartnerSignup() {
   return (
     <PartnerAuthShell
       title="Create your partner account"
+      description={PAGE_META.description}
+      keywords={PAGE_META.keywords}
+      noindex={false}
       footer={
         <>
           Already a Partner?{' '}
