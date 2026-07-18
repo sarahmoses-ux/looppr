@@ -2,10 +2,10 @@ import { Link } from 'react-router-dom'
 import logoTransparent from '../assets/looppr-mark-transparent.png'
 import SEO from './SEO'
 
-export default function AuthLayout({ eyebrow, title, subtitle, noindex = false, children }) {
+export default function AuthLayout({ eyebrow, title, subtitle, noindex = false, jsonLd, children }) {
   return (
     <div className="relative grid min-h-screen lg:grid-cols-2">
-      <SEO title={title} description={subtitle} noindex={noindex} />
+      <SEO title={title} description={subtitle} noindex={noindex} jsonLd={jsonLd} />
       <Link
         to="/"
         className="absolute left-6 top-6 z-10 flex items-center gap-0 lg:hidden"

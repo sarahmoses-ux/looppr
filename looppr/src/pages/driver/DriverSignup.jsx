@@ -7,8 +7,10 @@ import Input from '../../components/Input'
 import Select from '../../components/Select'
 import Button from '../../components/Button'
 import { PUBLIC_PAGES } from '../../seo/publicPages'
+import { breadcrumbJsonLd } from '../../seo/structuredData'
 
 const PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/drive/signup')
+const BREADCRUMB_JSON_LD = breadcrumbJsonLd([{ name: 'Drive with Looppr', path: '/drive' }, { name: 'Become a driver', path: '/drive/signup' }])
 
 const EMPTY = {
   name: '', email: '', phone: '', password: '', confirmPassword: '',
@@ -110,6 +112,7 @@ export default function DriverSignup() {
       description={PAGE_META.description}
       keywords={PAGE_META.keywords}
       noindex={false}
+      jsonLd={BREADCRUMB_JSON_LD}
       footer={
         <>
           Already a Driver?{' '}

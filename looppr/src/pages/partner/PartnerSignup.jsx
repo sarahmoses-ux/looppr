@@ -6,8 +6,10 @@ import { SERVICE_OPTIONS } from '../../components/partner/partnerUi'
 import Input from '../../components/Input'
 import Button from '../../components/Button'
 import { PUBLIC_PAGES } from '../../seo/publicPages'
+import { breadcrumbJsonLd } from '../../seo/structuredData'
 
 const PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/partners/signup')
+const BREADCRUMB_JSON_LD = breadcrumbJsonLd([{ name: 'Laundromat partners', path: '/laundromats' }, { name: 'Become a partner', path: '/partners/signup' }])
 
 const MAX_FILE_BYTES = 500 * 1024 // 500KB per image — kept small (stored as data URLs, MVP)
 const MAX_IMAGES = 4
@@ -169,6 +171,7 @@ export default function PartnerSignup() {
       description={PAGE_META.description}
       keywords={PAGE_META.keywords}
       noindex={false}
+      jsonLd={BREADCRUMB_JSON_LD}
       footer={
         <>
           Already a Partner?{' '}

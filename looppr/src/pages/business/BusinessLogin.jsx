@@ -5,8 +5,10 @@ import BusinessAuthShell from '../../components/business/BusinessAuthShell'
 import Input from '../../components/Input'
 import Button from '../../components/Button'
 import { PUBLIC_PAGES } from '../../seo/publicPages'
+import { breadcrumbJsonLd } from '../../seo/structuredData'
 
 const PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/business/login')
+const BREADCRUMB_JSON_LD = breadcrumbJsonLd([{ name: 'For business', path: '/business' }, { name: 'Business login', path: '/business/login' }])
 
 export default function BusinessLogin() {
   const { login } = useBusinessAuth()
@@ -66,6 +68,7 @@ export default function BusinessLogin() {
       description={PAGE_META.description}
       keywords={PAGE_META.keywords}
       noindex={false}
+      jsonLd={BREADCRUMB_JSON_LD}
       footer={
         <>
           Don't have an account?{' '}

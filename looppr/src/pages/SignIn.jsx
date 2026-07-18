@@ -4,6 +4,9 @@ import { useAuth } from '../context/AuthContext'
 import AuthLayout from '../components/AuthLayout'
 import Input from '../components/Input'
 import Button from '../components/Button'
+import { breadcrumbJsonLd } from '../seo/structuredData'
+
+const BREADCRUMB_JSON_LD = breadcrumbJsonLd([{ name: 'Sign in', path: '/login' }])
 
 export default function SignIn() {
   const { login } = useAuth()
@@ -56,6 +59,7 @@ export default function SignIn() {
       eyebrow="Welcome back"
       title="Sign in to your account"
       subtitle="Track your orders and book your next pickup."
+      jsonLd={BREADCRUMB_JSON_LD}
     >
       <form onSubmit={handleSubmit} noValidate className="space-y-5">
         <Input

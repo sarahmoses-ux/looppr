@@ -5,8 +5,10 @@ import PartnerAuthShell from '../../components/partner/PartnerAuthShell'
 import Input from '../../components/Input'
 import Button from '../../components/Button'
 import { PUBLIC_PAGES } from '../../seo/publicPages'
+import { breadcrumbJsonLd } from '../../seo/structuredData'
 
 const PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/partners/login')
+const BREADCRUMB_JSON_LD = breadcrumbJsonLd([{ name: 'Laundromat partners', path: '/laundromats' }, { name: 'Partner login', path: '/partners/login' }])
 
 export default function PartnerLogin() {
   const { login } = usePartnerAuth()
@@ -66,6 +68,7 @@ export default function PartnerLogin() {
       description={PAGE_META.description}
       keywords={PAGE_META.keywords}
       noindex={false}
+      jsonLd={BREADCRUMB_JSON_LD}
       footer={
         <>
           Don't have a Partner Account?{' '}

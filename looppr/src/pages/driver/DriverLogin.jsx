@@ -5,8 +5,10 @@ import DriverAuthShell from '../../components/driver/DriverAuthShell'
 import Input from '../../components/Input'
 import Button from '../../components/Button'
 import { PUBLIC_PAGES } from '../../seo/publicPages'
+import { breadcrumbJsonLd } from '../../seo/structuredData'
 
 const PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/drive/login')
+const BREADCRUMB_JSON_LD = breadcrumbJsonLd([{ name: 'Drive with Looppr', path: '/drive' }, { name: 'Driver login', path: '/drive/login' }])
 
 export default function DriverLogin() {
   const { login } = useDriverAuth()
@@ -66,6 +68,7 @@ export default function DriverLogin() {
       description={PAGE_META.description}
       keywords={PAGE_META.keywords}
       noindex={false}
+      jsonLd={BREADCRUMB_JSON_LD}
       footer={
         <>
           Don't have a Driver Account?{' '}

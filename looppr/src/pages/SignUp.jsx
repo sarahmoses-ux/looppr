@@ -4,6 +4,9 @@ import { useAuth } from '../context/AuthContext'
 import AuthLayout from '../components/AuthLayout'
 import Input from '../components/Input'
 import Button from '../components/Button'
+import { breadcrumbJsonLd } from '../seo/structuredData'
+
+const BREADCRUMB_JSON_LD = breadcrumbJsonLd([{ name: 'Sign up', path: '/signup' }])
 
 // Same checks as validate() below, factored out so the progress meter and
 // the actual submit validation can never drift apart from each other.
@@ -75,6 +78,7 @@ export default function SignUp() {
       eyebrow="Get started"
       title="Sign up"
       subtitle="Book your first pickup in a couple of minutes."
+      jsonLd={BREADCRUMB_JSON_LD}
     >
       <div className="mb-6">
         <div className="flex items-center justify-between text-sm font-medium text-ink/50">

@@ -66,6 +66,19 @@ const PLANS = [
   },
 ]
 
+// In-content links to the site's other major pages — the global Navbar
+// links to these too, but a repeated boilerplate nav link carries far less
+// topical-relevance signal than a contextual, descriptively-labeled link
+// from the homepage's own content. Keeps the homepage passing authority to
+// every major section of the site, not just the ones already linked above.
+const EXPLORE_LINKS = [
+  { to: '/about', title: 'About Looppr', body: 'How a Tulsa laundromat and a borrowed van became a laundry marketplace.' },
+  { to: '/laundromats', title: 'Partner your laundromat', body: 'Join the Looppr laundry marketplace and fill your slow hours with new orders.' },
+  { to: '/drive', title: 'Drive with Looppr', body: 'Earn on your schedule delivering laundry pickup & delivery orders near you.' },
+  { to: '/cities', title: 'Cities & coverage', body: 'See where Looppr laundry service is available, and join the waitlist for your city.' },
+  { to: '/faq', title: 'Help & FAQ', body: 'What is Looppr, how does pickup work, and other common questions, answered.' },
+]
+
 const VALUE_PROPS = [
   {
     title: 'Real laundry pros, not a warehouse',
@@ -248,6 +261,28 @@ export default function Landing() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="explore-looppr-heading" className="border-t border-line bg-white">
+        <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8 py-20">
+          <h2 id="explore-looppr-heading" className="font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+            Explore Looppr
+          </h2>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {EXPLORE_LINKS.map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                className="group rounded-2xl border border-line bg-linen-soft p-6 transition-colors hover:border-periwinkle"
+              >
+                <h3 className="font-display text-base font-semibold text-ink group-hover:text-periwinkle-text">
+                  {item.title}
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-ink/60">{item.body}</p>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
