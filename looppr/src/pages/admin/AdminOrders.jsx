@@ -27,6 +27,16 @@ const PARTNER_STAGE_LABELS = {
   delivered: 'Delivered',
 }
 
+// Driver Portal lifecycle labels — mirrors the driver-side stages so admins
+// see exactly what a driver has done with a delivery.
+const DRIVER_STAGE_LABELS = {
+  assigned: 'Driver assigned',
+  pickup_completed: 'Pickup completed',
+  at_laundromat: 'At laundromat',
+  out_for_delivery: 'Out for delivery',
+  delivered: 'Delivered',
+}
+
 function formatMoney(amount, currency = 'usd') {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency.toUpperCase() }).format(amount)
 }
@@ -102,6 +112,38 @@ function AdminOrderRow({ pickup, onChange }) {
               Unclaimed · {pickup.partnerRejectedBy.length} partner rejection{pickup.partnerRejectedBy.length === 1 ? '' : 's'}
             </p>
           )
+        )}
+
+        {/* Driver Portal attribution — reflects any accept/advance/weight
+            action a driver took on this delivery. */}
+        {pickup.driverUserId ? (
+          <p className="mt-1.5 flex flex-wrap items-center gap-2 text-xs">
+            <span className="rounded-full bg-violet-50 px-2 py-0.5 font-semibold text-violet-700">
+              Driver: {pickup.driverUserId.name}
+            </span>
+            {pickup.driverStage && (
+              <span className="rounded-full bg-ink/5 px-2 py-0.5 font-semibold text-ink/60">
+                {DRIVER_STAGE_LABELS[pickup.driverStage] || pickup.driverStage}
+              </span>
+            )}
+          </p>
+        ) : (
+          pickup.driverRejectedBy?.length > 0 && (
+            <p className="mt-1.5 text-xs font-medium text-ink/45">
+              Unclaimed · {pickup.driverRejectedBy.length} driver rejection{pickup.driverRejectedBy.length === 1 ? '' : 's'}
+            </p>
+          )
+        )}
+
+        {/* Driver-confirmed weight overrides the customer/business's
+            original loadSize estimate — flag it so admins know a correction
+            was made and can see what it was. */}
+        {pickup.actualWeightLbs != null && (
+          <p className="mt-1.5 text-xs">
+            <span className="rounded-full bg-amber-50 px-2 py-0.5 font-semibold text-amber-700">
+              Weight corrected: {pickup.actualWeightLbs} lbs (was {pickup.loadSize})
+            </span>
+          </p>
         )}
       </div>
 

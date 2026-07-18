@@ -18,6 +18,9 @@ export const listAllPickups = asyncHandler(async (req, res) => {
     // the order and how far along it is (partnerStage), reflecting any
     // accept/advance/reject action a partner took.
     .populate('partnerUserId', 'businessName ownerName')
+    // Same for the Driver Portal — which driver claimed the delivery, its
+    // stage, and any actualWeightLbs correction they made at pickup.
+    .populate('driverUserId', 'name')
 
   // Filtered in application code rather than a $lookup aggregation — simpler
   // to read/maintain, and fine at MVP order volumes. Revisit with a Mongo

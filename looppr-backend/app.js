@@ -10,6 +10,8 @@ import businessAuthRoutes from './routes/businessAuthRoutes.js'
 import businessRoutes from './routes/businessRoutes.js'
 import partnerAuthRoutes from './routes/partnerAuthRoutes.js'
 import partnerRoutes from './routes/partnerRoutes.js'
+import driverAuthRoutes from './routes/driverAuthRoutes.js'
+import driverRoutes from './routes/driverRoutes.js'
 import contactRoutes from './routes/contactRoutes.js'
 import guestPickupRoutes from './routes/guestPickupRoutes.js'
 import partnerLeadRoutes from './routes/partnerLeadRoutes.js'
@@ -50,6 +52,10 @@ export function createApp() {
   // /api/partner-auth), isolated from customer/admin/business sessions.
   app.use('/api/partner-auth', partnerAuthRoutes)
   app.use('/api/partner', partnerRoutes)
+  // Driver Portal — separate auth surface (refresh cookie scoped to
+  // /api/driver-auth), isolated from customer/admin/business/partner sessions.
+  app.use('/api/driver-auth', driverAuthRoutes)
+  app.use('/api/driver', driverRoutes)
   app.use('/api/waitlist', waitlistRoutes)
   app.use('/api/contact', contactRoutes)
   app.use('/api/partner-leads', partnerLeadRoutes)

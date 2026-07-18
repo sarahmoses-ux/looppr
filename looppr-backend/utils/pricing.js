@@ -14,6 +14,10 @@ const LOAD_SIZE_LBS = { small: 10, medium: 20, large: 35 }
 // for accounts, email lookup for guests).
 export function computeOrderPrice(loadSize, priorOrderCount = 0) {
   const lbs = LOAD_SIZE_LBS[loadSize] ?? LOAD_SIZE_LBS.medium
+  return priceForWeight(lbs, priorOrderCount)
+}
+
+function priceForWeight(lbs, priorOrderCount = 0) {
   const subtotal = Math.round(lbs * PRICE_PER_LB * 100) / 100
   const freeDelivery = priorOrderCount < FREE_DELIVERY_ORDER_LIMIT
   const deliveryFee = freeDelivery ? 0 : DELIVERY_FEE
@@ -21,4 +25,16 @@ export function computeOrderPrice(loadSize, priorOrderCount = 0) {
   // subtotal/deliveryFee are kept alongside amount so paid orders can show
   // an itemized receipt later (see Orders.jsx) instead of just a total.
   return { amount, currency: 'usd', subtotal, deliveryFee }
+}
+
+// Recomputes subtotal/amount from a driver-confirmed actual weight (in lbs)
+// instead of the loadSize bucket's fixed estimate — used when a driver
+// corrects a customer/business's pounds mistake at pickup. Keeps the
+// existing deliveryFee as-is (it reflects the customer's own order-history
+// promo eligibility, computed at booking time) rather than re-deriving it,
+// since a driver correcting weight has no bearing on that promo.
+export function recomputeSubtotalForWeight(lbs, existingDeliveryFee = 0) {
+  const subtotal = Math.round(lbs * PRICE_PER_LB * 100) / 100
+  const amount = Math.round((subtotal + existingDeliveryFee) * 100) / 100
+  return { amount, subtotal }
 }

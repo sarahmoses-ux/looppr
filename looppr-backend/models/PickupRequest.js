@@ -46,6 +46,13 @@ const pickupRequestSchema = new mongoose.Schema(
       enum: ['small', 'medium', 'large'],
       required: true,
     },
+    // Driver-confirmed actual weight, set at pickup to correct a customer/
+    // business mistake in the `loadSize` estimate above. When present, this
+    // is authoritative over loadSize for display and pricing — loadSize
+    // itself is left untouched as a record of what was originally booked.
+    actualWeightLbs: { type: Number, min: 0.1, max: 500 },
+    weightConfirmedAt: { type: Date },
+    weightConfirmedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'DriverUser' },
     notes: { type: String, trim: true, maxlength: 500, default: '' },
 
     // Delivery preferences, collected alongside pickup at booking time.
@@ -135,6 +142,31 @@ const pickupRequestSchema = new mongoose.Schema(
     // PartnerUser ids that rejected this order, so it drops out of their
     // incoming list without affecting other partners.
     partnerRejectedBy: {
+      type: [mongoose.Schema.Types.ObjectId],
+      default: [],
+    },
+
+    // Driver Portal claim/lifecycle — separate from riderId (which refs the
+    // ops-foundation Rider collection). driverUserId is the self-serve
+    // DriverUser who claimed the delivery through the portal, decoupled from
+    // the partner claim above: a driver and a partner can independently claim
+    // the same order (driver handles pickup/delivery, partner handles the
+    // wash) without either blocking the other.
+    driverUserId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'DriverUser',
+      index: true,
+      default: null,
+    },
+    driverStage: {
+      type: String,
+      enum: ['assigned', 'pickup_completed', 'at_laundromat', 'out_for_delivery', 'delivered'],
+      default: undefined,
+    },
+    driverAcceptedAt: { type: Date },
+    // DriverUser ids that rejected this delivery, so it drops out of their
+    // incoming list without affecting other drivers.
+    driverRejectedBy: {
       type: [mongoose.Schema.Types.ObjectId],
       default: [],
     },

@@ -155,6 +155,56 @@ export function partnerRefreshCookieOptions(persistent = true) {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Driver Portal tokens — dedicated secrets, same isolation rationale as the
+// business/partner tokens above. Falls back to the main secrets if unset so
+// local dev runs out of the box.
+// ---------------------------------------------------------------------------
+function driverAccessSecret() {
+  return process.env.JWT_DRIVER_ACCESS_SECRET || process.env.JWT_ACCESS_SECRET
+}
+
+function driverRefreshSecret() {
+  return process.env.JWT_DRIVER_REFRESH_SECRET || process.env.JWT_REFRESH_SECRET
+}
+
+export function signDriverAccessToken(driver) {
+  return jwt.sign(
+    { sub: driver._id.toString(), role: driver.role, tokenVersion: driver.tokenVersion },
+    driverAccessSecret(),
+    { expiresIn: process.env.JWT_ACCESS_EXPIRES || '15m' },
+  )
+}
+
+export function signDriverRefreshToken(driver, persistent = true) {
+  return jwt.sign(
+    { sub: driver._id.toString(), role: driver.role, tokenVersion: driver.tokenVersion, persistent },
+    driverRefreshSecret(),
+    { expiresIn: process.env.JWT_REFRESH_EXPIRES || '30d' },
+  )
+}
+
+export function verifyDriverAccessToken(token) {
+  return jwt.verify(token, driverAccessSecret())
+}
+
+export function verifyDriverRefreshToken(token) {
+  return jwt.verify(token, driverRefreshSecret())
+}
+
+// Own cookie name + path (`/api/driver-auth`) so driver, partner, business
+// and customer sessions never overwrite each other in one browser.
+export function driverRefreshCookieOptions(persistent = true) {
+  const maxAgeMs = 30 * 24 * 60 * 60 * 1000
+  return {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+    ...(persistent ? { maxAge: maxAgeMs } : {}),
+    path: '/api/driver-auth',
+  }
+}
+
 export function refreshCookieOptions() {
   const maxAgeMs = 30 * 24 * 60 * 60 * 1000
   return {

@@ -39,7 +39,12 @@ export const createPickup = asyncHandler(async (req, res) => {
 })
 
 export const listMyPickups = asyncHandler(async (req, res) => {
-  const pickups = await PickupRequest.find({ clientId: req.user.sub }).sort({ createdAt: -1 })
+  const pickups = await PickupRequest.find({ clientId: req.user.sub })
+    .sort({ createdAt: -1 })
+    // Public-safe fields only — no email/address/license/plate — so the
+    // customer can see and identify who's handling their order without
+    // exposing the driver's private contact/account details.
+    .populate('driverUserId', 'name profilePhoto vehicleType vehicleName averageRating')
   res.json({ success: true, pickups })
 })
 

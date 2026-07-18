@@ -1,10 +1,13 @@
 import {
   businessRefreshCookieOptions,
+  driverRefreshCookieOptions,
   partnerRefreshCookieOptions,
   refreshCookieOptions,
   signAccessToken,
   signBusinessAccessToken,
   signBusinessRefreshToken,
+  signDriverAccessToken,
+  signDriverRefreshToken,
   signPartnerAccessToken,
   signPartnerRefreshToken,
   signRefreshToken,
@@ -34,6 +37,38 @@ export function issuePartnerSession(res, partner, persistent = true) {
   const refreshToken = signPartnerRefreshToken(partner, persistent)
   res.cookie('partnerRefreshToken', refreshToken, partnerRefreshCookieOptions(persistent))
   return accessToken
+}
+
+export function issueDriverSession(res, driver, persistent = true) {
+  const accessToken = signDriverAccessToken(driver)
+  const refreshToken = signDriverRefreshToken(driver, persistent)
+  res.cookie('driverRefreshToken', refreshToken, driverRefreshCookieOptions(persistent))
+  return accessToken
+}
+
+export function publicDriver(driver) {
+  return {
+    id: driver._id.toString(),
+    name: driver.name,
+    email: driver.email,
+    phone: driver.phone,
+    address: driver.address,
+    city: driver.city,
+    state: driver.state,
+    vehicleType: driver.vehicleType,
+    vehicleName: driver.vehicleName,
+    licenseNumber: driver.licenseNumber,
+    vehiclePlate: driver.vehiclePlate,
+    profilePhoto: driver.profilePhoto,
+    isVerified: driver.isVerified,
+    accountStatus: driver.accountStatus,
+    availability: driver.availability,
+    location: driver.location || null,
+    locationUpdatedAt: driver.locationUpdatedAt || null,
+    averageRating: driver.averageRating,
+    role: driver.role,
+    createdAt: driver.createdAt,
+  }
 }
 
 export function publicPartner(partner) {

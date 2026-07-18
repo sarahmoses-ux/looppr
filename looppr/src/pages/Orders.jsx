@@ -28,6 +28,42 @@ const WINDOW_LABELS = {
   evening: 'Evening · 4pm – 7pm',
 }
 
+const VEHICLE_LABELS = {
+  bike: 'Bike',
+  car: 'Car',
+  van: 'Van',
+}
+
+// Shown once a driver has claimed this pickup — see
+// looppr-backend/controllers/pickupController.js's populate('driverUserId', ...)
+// for the public-safe field set (no email/address/license/plate).
+function DriverInfo({ driver }) {
+  if (!driver) return null
+  const vehicleLabel = [VEHICLE_LABELS[driver.vehicleType], driver.vehicleName].filter(Boolean).join(' · ')
+
+  return (
+    <div className="mt-4 border-t border-line pt-4">
+      <p className="text-xs font-semibold uppercase tracking-wide text-ink/40">Your driver</p>
+      <div className="mt-2 flex items-center gap-3">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-full bg-periwinkle-soft text-sm font-semibold text-periwinkle-text">
+          {driver.profilePhoto ? (
+            <img src={driver.profilePhoto} alt="" className="h-full w-full object-cover" />
+          ) : (
+            (driver.name || 'D').charAt(0).toUpperCase()
+          )}
+        </span>
+        <div>
+          <p className="text-sm font-semibold text-ink">{driver.name}</p>
+          <p className="text-xs text-ink/50">
+            {vehicleLabel}
+            {driver.averageRating != null && ` · ${driver.averageRating.toFixed(1)}★`}
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 const LOAD_SIZE_LABELS = {
   small: 'Small load · 1–2 bags',
   medium: 'Medium load · 3–4 bags',
@@ -193,6 +229,8 @@ export function PickupCard({ pickup, detailed = false, onChange }) {
           <OrderTimeline status={pickup.status} />
         </div>
       )}
+
+      {detailed && <DriverInfo driver={pickup.driverUserId} />}
     </div>
   )
 }

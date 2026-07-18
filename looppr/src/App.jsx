@@ -9,6 +9,8 @@ import { BusinessAuthProvider } from './context/BusinessAuthContext'
 import BusinessProtectedRoute from './routes/BusinessProtectedRoute'
 import { PartnerAuthProvider } from './context/PartnerAuthContext'
 import PartnerProtectedRoute from './routes/PartnerProtectedRoute'
+import { DriverAuthProvider } from './context/DriverAuthContext'
+import DriverProtectedRoute from './routes/DriverProtectedRoute'
 import Landing from './pages/Landing'
 
 // Landing (the "/" route, by far the highest-traffic page) stays in the
@@ -75,6 +77,21 @@ const PartnerReviews = lazy(() => import('./pages/partner/dashboard/CustomerRevi
 const PartnerNotifications = lazy(() => import('./pages/partner/dashboard/PartnerNotifications'))
 const PartnerProfile = lazy(() => import('./pages/partner/dashboard/BusinessProfile'))
 const PartnerSettings = lazy(() => import('./pages/partner/dashboard/PartnerSettings'))
+
+// Driver Portal — its own auth context, isolated from customer/business/
+// partner. Base path /drive matches the existing "Drive" marketing page.
+const DriverLayout = lazy(() => import('./layouts/DriverLayout'))
+const DriverLogin = lazy(() => import('./pages/driver/DriverLogin'))
+const DriverSignup = lazy(() => import('./pages/driver/DriverSignup'))
+const DriverVerifyEmail = lazy(() => import('./pages/driver/DriverVerifyEmail'))
+const DriverForgotPassword = lazy(() => import('./pages/driver/DriverForgotPassword'))
+const DriverOverview = lazy(() => import('./pages/driver/dashboard/DriverOverview'))
+const DriverIncoming = lazy(() => import('./pages/driver/dashboard/IncomingDeliveries'))
+const DriverMyDeliveries = lazy(() => import('./pages/driver/dashboard/MyDeliveries'))
+const DriverEarnings = lazy(() => import('./pages/driver/dashboard/DriverEarnings'))
+const DriverNotifications = lazy(() => import('./pages/driver/dashboard/DriverNotifications'))
+const DriverProfile = lazy(() => import('./pages/driver/dashboard/DriverProfile'))
+const DriverSettings = lazy(() => import('./pages/driver/dashboard/DriverSettings'))
 
 function App() {
   return (
@@ -208,6 +225,37 @@ function App() {
             <Route path="/partners/dashboard/notifications" element={<PartnerNotifications />} />
             <Route path="/partners/dashboard/profile" element={<PartnerProfile />} />
             <Route path="/partners/dashboard/settings" element={<PartnerSettings />} />
+          </Route>
+        </Route>
+
+        {/* Driver Portal — separate auth context, isolated from all others.
+            The marketing page /drive stays in PublicLayout above. */}
+        <Route
+          element={
+            <DriverAuthProvider>
+              <Outlet />
+            </DriverAuthProvider>
+          }
+        >
+          <Route path="/drive/login" element={<DriverLogin />} />
+          <Route path="/drive/signup" element={<DriverSignup />} />
+          <Route path="/drive/verify-email" element={<DriverVerifyEmail />} />
+          <Route path="/drive/forgot-password" element={<DriverForgotPassword />} />
+
+          <Route
+            element={
+              <DriverProtectedRoute>
+                <DriverLayout />
+              </DriverProtectedRoute>
+            }
+          >
+            <Route path="/drive/dashboard" element={<DriverOverview />} />
+            <Route path="/drive/dashboard/incoming" element={<DriverIncoming />} />
+            <Route path="/drive/dashboard/deliveries" element={<DriverMyDeliveries />} />
+            <Route path="/drive/dashboard/earnings" element={<DriverEarnings />} />
+            <Route path="/drive/dashboard/notifications" element={<DriverNotifications />} />
+            <Route path="/drive/dashboard/profile" element={<DriverProfile />} />
+            <Route path="/drive/dashboard/settings" element={<DriverSettings />} />
           </Route>
         </Route>
       </Routes>

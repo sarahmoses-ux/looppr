@@ -2,6 +2,7 @@ import { ApiError } from '../utils/ApiError.js'
 import {
   verifyAccessToken,
   verifyBusinessAccessToken,
+  verifyDriverAccessToken,
   verifyPartnerAccessToken,
 } from '../utils/tokens.js'
 
@@ -55,6 +56,22 @@ export function requirePartnerAuth(req, _res, next) {
 
   try {
     req.partner = verifyPartnerAccessToken(token)
+    next()
+  } catch {
+    next(new ApiError(401, 'Session expired.'))
+  }
+}
+
+// Driver Portal guard — verifies a *driver* access token (dedicated secret).
+// Customer/admin/business/partner tokens fail this outright. Sets
+// req.driver to keep the auth worlds cleanly apart.
+export function requireDriverAuth(req, _res, next) {
+  const header = req.headers.authorization || ''
+  const token = header.startsWith('Bearer ') ? header.slice(7) : null
+  if (!token) return next(new ApiError(401, 'Not authenticated.'))
+
+  try {
+    req.driver = verifyDriverAccessToken(token)
     next()
   } catch {
     next(new ApiError(401, 'Session expired.'))

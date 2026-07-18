@@ -219,6 +219,41 @@ export const partnerVerifyLimiter = rateLimit({
   },
 })
 
+// ---- Driver Portal --------------------------------------------------------
+export const driverRegisterLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => `${req.ip}:${req.body?.email || ''}`,
+  handler: (_req, res) => {
+    res.status(429).json({ success: false, message: 'Too many attempts. Please try again later.' })
+  },
+})
+
+export const driverVerifyLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 15,
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => `${req.ip}:${req.body?.email || ''}`,
+  handler: (_req, res) => {
+    res.status(429).json({ success: false, message: 'Too many attempts. Please try again later.' })
+  },
+})
+
+// Location updates can fire frequently while a driver is online — generous
+// but still bounded so a runaway client can't hammer the DB.
+export const driverLocationLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (_req, res) => {
+    res.status(429).json({ success: false, message: 'Too many location updates. Please slow down.' })
+  },
+})
+
 // Login-OTP endpoints run before the user has a session, so key on IP alone.
 export const loginOtpVerifyLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,

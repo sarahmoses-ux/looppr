@@ -58,9 +58,20 @@ export default function Drive() {
             Pick up laundry, drop it at a partner laundromat, deliver it back clean. Short
             routes, flexible hours, and a guaranteed $18/hr minimum your first two weeks.
           </p>
-          <Button to="/drive/apply" variant="primary" className="mt-8 px-8! py-4!">
-            Apply to drive
-          </Button>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <Button to="/drive/signup" variant="primary" className="px-8! py-4!">
+              Become a Driver
+            </Button>
+            <Button to="/drive/login" variant="ghost" className="px-8! py-4!">
+              Driver Login
+            </Button>
+          </div>
+          <p className="mt-4 text-sm text-periwinkle-text">
+            Prefer to talk first?{' '}
+            <a href="/drive/apply" className="font-semibold text-ink underline-offset-2 hover:underline">
+              Apply to drive
+            </a>
+          </p>
         </div>
         <div className="relative mx-auto mt-12 flex max-w-2xl flex-wrap justify-center gap-3">
           {STATS.map((s) => (
@@ -142,13 +153,18 @@ export default function Drive() {
             Apply in minutes. Once your background check clears, you can take your first route
             right away.
           </p>
-          <Button
-            to="/drive/apply"
-            variant="accent"
-            className="mt-8 bg-[#EF9F27]! px-9! py-4! text-[#412402]! hover:bg-[#f0a838]!"
-          >
-            Apply to drive
-          </Button>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <Button
+              to="/drive/signup"
+              variant="accent"
+              className="bg-[#EF9F27]! px-9! py-4! text-[#412402]! hover:bg-[#f0a838]!"
+            >
+              Become a Driver
+            </Button>
+            <Button to="/drive/login" variant="ghost-light" className="px-9! py-4!">
+              Driver Login
+            </Button>
+          </div>
         </div>
       </section>
     </div>

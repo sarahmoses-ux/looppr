@@ -1,6 +1,9 @@
+import bcrypt from 'bcryptjs'
 import { describe, expect, it } from 'vitest'
 import request from 'supertest'
 import { createApp } from '../app.js'
+import { DriverUser } from '../models/DriverUser.js'
+import { PickupRequest } from '../models/PickupRequest.js'
 import { createTestUser, tokenFor } from './helpers/auth.js'
 
 const app = createApp()
@@ -77,6 +80,46 @@ describe('listMyPickups', () => {
     expect(res.status).toBe(200)
     expect(res.body.pickups).toHaveLength(1)
     expect(res.body.pickups[0].clientId).toBe(a.user._id.toString())
+  })
+
+  it('shows the assigned driver\'s public profile once claimed, without leaking private fields', async () => {
+    const { token } = await clientToken()
+    const created = await request(app).post('/api/pickups').set('Authorization', `Bearer ${token}`).send(pickupPayload())
+
+    const passwordHash = await bcrypt.hash('password123', 12)
+    const driver = await DriverUser.create({
+      name: 'Jamie Chen',
+      email: 'jamie-pub@driver.test',
+      phone: '+19185550199', // private — must not appear in the customer-facing response
+      passwordHash,
+      address: '200 Riverside Dr', // private
+      city: 'Tulsa',
+      licenseNumber: 'OK-DL-99999', // private
+      vehiclePlate: 'LPR-0001', // private
+      vehicleType: 'car',
+      vehicleName: 'Toyota Corolla',
+      profilePhoto: 'data:image/png;base64,abc123',
+      averageRating: 4.8,
+      isVerified: true,
+    })
+    await PickupRequest.updateOne({ _id: created.body.pickup._id }, { driverUserId: driver._id, driverStage: 'assigned' })
+
+    const res = await request(app).get('/api/pickups/me').set('Authorization', `Bearer ${token}`)
+    expect(res.status).toBe(200)
+    const pickup = res.body.pickups.find((p) => p._id === created.body.pickup._id)
+    expect(pickup.driverUserId).toMatchObject({
+      name: 'Jamie Chen',
+      profilePhoto: 'data:image/png;base64,abc123',
+      vehicleType: 'car',
+      vehicleName: 'Toyota Corolla',
+      averageRating: 4.8,
+    })
+    // Public-safe populate — private driver fields must never reach the customer.
+    expect(pickup.driverUserId.email).toBeUndefined()
+    expect(pickup.driverUserId.phone).toBeUndefined()
+    expect(pickup.driverUserId.address).toBeUndefined()
+    expect(pickup.driverUserId.licenseNumber).toBeUndefined()
+    expect(pickup.driverUserId.vehiclePlate).toBeUndefined()
   })
 })
 
