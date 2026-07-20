@@ -100,6 +100,11 @@ function AdminOrderRow({ pickup, onChange }) {
             <span className="rounded-full bg-sky-50 px-2 py-0.5 font-semibold text-sky-700">
               Partner: {pickup.partnerUserId.businessName}
             </span>
+            {pickup.partnerUserId.isDefaultLaundromat && (
+              <span className="rounded-full bg-amber-50 px-2 py-0.5 font-semibold text-amber-700">
+                In-House
+              </span>
+            )}
             {pickup.partnerStage && (
               <span className="rounded-full bg-ink/5 px-2 py-0.5 font-semibold text-ink/60">
                 {PARTNER_STAGE_LABELS[pickup.partnerStage] || pickup.partnerStage}

@@ -2,6 +2,7 @@ import mongoose from 'mongoose'
 import { ActivityLog } from '../models/ActivityLog.js'
 import { PickupRequest } from '../models/PickupRequest.js'
 import { geocodeAddress } from '../services/geocodeService.js'
+import { logAssignmentOutcome, resolveAssignment } from '../services/assignmentService.js'
 import { asyncHandler } from '../utils/asyncHandler.js'
 import { computeOrderPrice } from '../utils/pricing.js'
 
@@ -16,6 +17,8 @@ export const createBusinessPickup = asyncHandler(async (req, res) => {
     status: { $ne: 'cancelled' },
   })
 
+  const assignment = await resolveAssignment({ address, loadSize, source: 'business' })
+
   const pickup = await PickupRequest.create({
     businessId: req.business.sub,
     source: 'business',
@@ -27,6 +30,7 @@ export const createBusinessPickup = asyncHandler(async (req, res) => {
     deliveryWindow,
     deliveryAddress,
     pricing: computeOrderPrice(loadSize, priorOrderCount),
+    ...(assignment || {}),
   })
 
   try {
@@ -38,6 +42,8 @@ export const createBusinessPickup = asyncHandler(async (req, res) => {
   } catch (err) {
     console.error('Failed to geocode business pickup address', err)
   }
+
+  await logAssignmentOutcome(pickup, assignment)
 
   try {
     await ActivityLog.create({

@@ -8,6 +8,7 @@
     "start": "node server.js",
     "seed:admin": "node scripts/seedAdmin.js",
     "seed:ops": "node scripts/seedOps.js",
+    "seed:default-laundromat": "node scripts/seedDefaultLaundromat.js",
     "test": "vitest run"
   },
   "dependencies": {

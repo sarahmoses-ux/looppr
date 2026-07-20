@@ -17,7 +17,7 @@ export const listAllPickups = asyncHandler(async (req, res) => {
     // Surface the Partner Portal claim so admins see which laundromat took
     // the order and how far along it is (partnerStage), reflecting any
     // accept/advance/reject action a partner took.
-    .populate('partnerUserId', 'businessName ownerName')
+    .populate('partnerUserId', 'businessName ownerName isDefaultLaundromat')
     // Same for the Driver Portal — which driver claimed the delivery, its
     // stage, and any actualWeightLbs correction they made at pickup.
     .populate('driverUserId', 'name')

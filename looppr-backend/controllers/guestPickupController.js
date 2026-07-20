@@ -1,6 +1,7 @@
 import crypto from 'crypto'
 import { PickupRequest } from '../models/PickupRequest.js'
 import { geocodeAddress } from '../services/geocodeService.js'
+import { logAssignmentOutcome, resolveAssignment } from '../services/assignmentService.js'
 import { ApiError } from '../utils/ApiError.js'
 import { asyncHandler } from '../utils/asyncHandler.js'
 import { computeOrderPrice } from '../utils/pricing.js'
@@ -45,6 +46,8 @@ export const createGuestPickup = asyncHandler(async (req, res) => {
     status: { $ne: 'cancelled' },
   })
 
+  const assignment = await resolveAssignment({ address, loadSize, source: 'guest' })
+
   const pickup = await PickupRequest.create({
     source: 'guest',
     guest,
@@ -57,6 +60,7 @@ export const createGuestPickup = asyncHandler(async (req, res) => {
     deliveryAddress,
     guestAccessToken,
     pricing: computeOrderPrice(loadSize, priorOrderCount),
+    ...(assignment || {}),
   })
 
   try {
@@ -68,6 +72,8 @@ export const createGuestPickup = asyncHandler(async (req, res) => {
   } catch (err) {
     console.error('Failed to geocode guest pickup address', err)
   }
+
+  await logAssignmentOutcome(pickup, assignment)
 
   res.status(201).json({ success: true, pickup: guestPublic(pickup), guestAccessToken })
 })

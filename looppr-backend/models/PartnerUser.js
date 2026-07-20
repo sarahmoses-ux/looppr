@@ -85,6 +85,16 @@ const partnerUserSchema = new mongoose.Schema(
 
     role: { type: String, enum: ['partner'], default: 'partner' },
 
+    // Flags the single system-owned PartnerUser account that
+    // services/assignmentService.js falls back to when no dedicated partner
+    // match applies yet. Not DB-unique (a unique index on a boolean needs a
+    // partialFilterExpression) — the sole writer is
+    // scripts/seedDefaultLaundromat.js, consistent with this codebase's
+    // existing "trust the sole writer" convention (see the
+    // LaundryPartner.activeOrderCount / Rider.activeDeliveryCount
+    // "kept in sync by the assignment engine" comments).
+    isDefaultLaundromat: { type: Boolean, default: false, index: true },
+
     // Stateless session revocation — bumped on password change/reset, checked
     // on refresh. Same approach as User/BusinessUser (chosen over storing a
     // live refresh token in the DB).

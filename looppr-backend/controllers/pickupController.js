@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 import { PickupRequest } from '../models/PickupRequest.js'
 import { geocodeAddress } from '../services/geocodeService.js'
+import { logAssignmentOutcome, resolveAssignment } from '../services/assignmentService.js'
 import { ApiError } from '../utils/ApiError.js'
 import { asyncHandler } from '../utils/asyncHandler.js'
 import { computeOrderPrice } from '../utils/pricing.js'
@@ -13,6 +14,8 @@ export const createPickup = asyncHandler(async (req, res) => {
     status: { $ne: 'cancelled' },
   })
 
+  const assignment = await resolveAssignment({ address, loadSize, source: 'account' })
+
   const pickup = await PickupRequest.create({
     clientId: req.user.sub,
     address,
@@ -23,6 +26,7 @@ export const createPickup = asyncHandler(async (req, res) => {
     deliveryWindow,
     deliveryAddress,
     pricing: computeOrderPrice(loadSize, priorOrderCount),
+    ...(assignment || {}),
   })
 
   try {
@@ -34,6 +38,8 @@ export const createPickup = asyncHandler(async (req, res) => {
   } catch (err) {
     console.error('Failed to geocode pickup address', err)
   }
+
+  await logAssignmentOutcome(pickup, assignment)
 
   res.status(201).json({ success: true, pickup })
 })
