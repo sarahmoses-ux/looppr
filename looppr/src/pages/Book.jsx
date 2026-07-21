@@ -4,7 +4,8 @@ import Input from '../components/Input'
 import Select from '../components/Select'
 import Button from '../components/Button'
 import SEO from '../components/SEO'
-import { createPickup, fetchMyPickups } from '../services/pickupApi'
+import StripePaymentForm from '../components/StripePaymentForm'
+import { confirmPayment, createPickup, fetchMyPickups } from '../services/pickupApi'
 import { fetchAddresses, saveAddress } from '../services/addressApi'
 
 const WINDOWS = [
@@ -60,10 +61,11 @@ export default function Book() {
   })
   const [errors, setErrors] = useState({})
   const [formError, setFormError] = useState('')
-  const [card, setCard] = useState({ number: '', expiry: '', cvc: '', name: '' })
-  const [cardErrors, setCardErrors] = useState({})
+  const [payError, setPayError] = useState('')
   const [status, setStatus] = useState('idle')
   const [confirmed, setConfirmed] = useState(null)
+  const [bookedPickup, setBookedPickup] = useState(null)
+  const [clientSecret, setClientSecret] = useState('')
 
   const [savedAddresses, setSavedAddresses] = useState([])
   const [selectedAddressId, setSelectedAddressId] = useState('')
@@ -105,24 +107,6 @@ export default function Book() {
     }
   }
 
-  function handleCardChange(e) {
-    const { name, value } = e.target
-    if (name === 'expiry') {
-      const prev = card.expiry
-      let digits = value.replace(/\D/g, '')
-      // Backspacing over the auto-inserted "/" should remove the month
-      // digit before it too, so deleting doesn't get stuck at "MM/".
-      if (value.length === prev.length - 1 && prev[value.length] === '/') {
-        digits = digits.slice(0, -1)
-      }
-      digits = digits.slice(0, 4)
-      const formatted = digits.length < 2 ? digits : `${digits.slice(0, 2)}/${digits.slice(2)}`
-      setCard((c) => ({ ...c, expiry: formatted }))
-      return
-    }
-    setCard((c) => ({ ...c, [name]: value }))
-  }
-
   function validate() {
     const next = {}
     if (form.street.trim().length < 3) next.street = 'Enter your street address.'
@@ -139,15 +123,6 @@ export default function Book() {
       if (form.deliveryCity.trim().length < 2) next.deliveryCity = 'Enter the delivery city.'
       if (!/^\d{5}(-\d{4})?$/.test(form.deliveryZip)) next.deliveryZip = 'Enter a valid delivery ZIP code.'
     }
-    return next
-  }
-
-  function validateCard() {
-    const next = {}
-    if (!/^[\d\s]{13,19}$/.test(card.number)) next.number = 'Enter a valid card number.'
-    if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(card.expiry)) next.expiry = 'MM/YY'
-    if (!/^\d{3,4}$/.test(card.cvc)) next.cvc = 'Invalid'
-    if (card.name.trim().length < 2) next.name = 'Enter the name on your card.'
     return next
   }
 
@@ -179,14 +154,11 @@ export default function Book() {
 
   async function handlePay(e) {
     e.preventDefault()
-    const next = validateCard()
-    setCardErrors(next)
     setFormError('')
-    if (Object.keys(next).length > 0) return
 
     setStatus('pending')
     try {
-      const { pickup } = await createPickup({
+      const { pickup, clientSecret: secret } = await createPickup({
         address: { street: form.street, apartment: form.apartment, city: form.city, state: 'OK', zip: form.zip },
         preferredDate: form.preferredDate,
         window: form.window,
@@ -203,14 +175,34 @@ export default function Book() {
               zip: form.deliveryZip,
             },
       })
-      setConfirmed(pickup)
+      setBookedPickup(pickup)
+      if (secret) {
+        setClientSecret(secret)
+      } else {
+        // Stripe hiccupped at booking time — the order still exists
+        // (paymentStatus 'pending'), payable later from Orders.jsx.
+        setConfirmed(pickup)
+      }
     } catch (err) {
       const message =
         err.response?.data?.details?.[0]?.message ||
         err.response?.data?.message ||
         'Something went wrong requesting your pickup. Please try again.'
       setFormError(message)
+    } finally {
       setStatus('idle')
+    }
+  }
+
+  async function handlePaymentSuccess(status) {
+    try {
+      const { pickup } = await confirmPayment(bookedPickup._id)
+      setConfirmed(pickup)
+    } catch {
+      // Payment succeeded (or is processing) on Stripe's side even if this
+      // confirm call failed — the webhook will still reconcile paymentStatus
+      // server-side. Reflect what Stripe told us client-side in the meantime.
+      setConfirmed({ ...bookedPickup, paymentStatus: status === 'succeeded' ? 'paid' : bookedPickup.paymentStatus })
     }
   }
 
@@ -243,6 +235,19 @@ export default function Book() {
           August 1, 2026 — we'll email you to confirm your exact window as we
           get closer.
         </p>
+
+        {confirmed.paymentStatus === 'paid' ? (
+          <p className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-success-soft px-4 py-2 text-sm font-semibold text-success-dark">
+            Payment received — {formatMoney(confirmed.pricing.amount)} charged
+          </p>
+        ) : (
+          <p className="mt-5 rounded-lg bg-periwinkle-soft px-4 py-3 text-xs font-medium text-periwinkle-text">
+            {confirmed.paymentStatus === 'pending'
+              ? "Your payment is still processing — we'll email you once it clears, or check anytime from your Orders page."
+              : "We couldn't confirm your payment yet — you can complete it anytime from your Orders page."}
+          </p>
+        )}
+
         <Button to="/home" variant="primary" className="mt-8">
           Back to home
         </Button>
@@ -254,22 +259,24 @@ export default function Book() {
     return (
       <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6 lg:px-8">
         <SEO title="Review & pay" noindex />
-        <button
-          type="button"
-          onClick={() => setStep('details')}
-          className="flex items-center gap-1.5 text-sm font-semibold text-ink/60 transition-colors hover:text-ink"
-        >
-          <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" aria-hidden="true">
-            <path
-              d="M12.5 15.5 7 10l5.5-5.5"
-              stroke="currentColor"
-              strokeWidth="1.75"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          Back
-        </button>
+        {!clientSecret && (
+          <button
+            type="button"
+            onClick={() => setStep('details')}
+            className="flex items-center gap-1.5 text-sm font-semibold text-ink/60 transition-colors hover:text-ink"
+          >
+            <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" aria-hidden="true">
+              <path
+                d="M12.5 15.5 7 10l5.5-5.5"
+                stroke="currentColor"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            Back
+          </button>
+        )}
 
         <p className="mt-5 text-sm font-semibold uppercase tracking-[0.08em] text-periwinkle">
           Step 2 of 2
@@ -278,7 +285,7 @@ export default function Book() {
           Review &amp; pay
         </h1>
         <p className="mt-2 text-sm text-ink/60">
-          Your card is charged once your pickup is confirmed by a laundry pro.
+          Your card (or bank account) is charged now to confirm your pickup.
         </p>
 
         <div className="mt-8 rounded-3xl border border-line bg-white p-6 sm:p-8">
@@ -286,13 +293,15 @@ export default function Book() {
             <h2 className="text-sm font-semibold uppercase tracking-wide text-ink/45">
               Pickup details
             </h2>
-            <button
-              type="button"
-              onClick={() => setStep('details')}
-              className="text-sm font-semibold text-periwinkle-text hover:underline"
-            >
-              Edit
-            </button>
+            {!clientSecret && (
+              <button
+                type="button"
+                onClick={() => setStep('details')}
+                className="text-sm font-semibold text-periwinkle-text hover:underline"
+              >
+                Edit
+              </button>
+            )}
           </div>
           <dl className="mt-4 space-y-2 text-sm">
             <div className="flex justify-between">
@@ -324,13 +333,15 @@ export default function Book() {
             <h2 className="text-sm font-semibold uppercase tracking-wide text-ink/45">
               Delivery preferences
             </h2>
-            <button
-              type="button"
-              onClick={() => setStep('details')}
-              className="text-sm font-semibold text-periwinkle-text hover:underline"
-            >
-              Edit
-            </button>
+            {!clientSecret && (
+              <button
+                type="button"
+                onClick={() => setStep('details')}
+                className="text-sm font-semibold text-periwinkle-text hover:underline"
+              >
+                Edit
+              </button>
+            )}
           </div>
           <dl className="mt-4 space-y-2 text-sm">
             <div className="flex justify-between">
@@ -390,73 +401,44 @@ export default function Book() {
           </div>
         </div>
 
-        <form onSubmit={handlePay} noValidate className="mt-6 space-y-5 rounded-3xl border border-line bg-white p-6 sm:p-8">
+        <div className="mt-6 space-y-5 rounded-3xl border border-line bg-white p-6 sm:p-8">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-ink/45">
-            Payment method
+            Payment
           </h2>
 
-          <Input
-            id="cardName"
-            name="name"
-            label="Name on card"
-            value={card.name}
-            onChange={handleCardChange}
-            error={cardErrors.name}
-            placeholder="Jane Doe"
-            autoComplete="cc-name"
-          />
-          <Input
-            id="cardNumber"
-            name="number"
-            label="Card number"
-            value={card.number}
-            onChange={handleCardChange}
-            error={cardErrors.number}
-            placeholder="4242 4242 4242 4242"
-            inputMode="numeric"
-            autoComplete="cc-number"
-          />
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              id="cardExpiry"
-              name="expiry"
-              label="Expiry"
-              value={card.expiry}
-              onChange={handleCardChange}
-              error={cardErrors.expiry}
-              placeholder="MM/YY"
-              inputMode="numeric"
-              maxLength={5}
-              autoComplete="cc-exp"
-            />
-            <Input
-              id="cardCvc"
-              name="cvc"
-              label="CVC"
-              value={card.cvc}
-              onChange={handleCardChange}
-              error={cardErrors.cvc}
-              placeholder="123"
-              inputMode="numeric"
-              autoComplete="cc-csc"
-            />
-          </div>
-
-          <p className="rounded-lg bg-periwinkle-soft px-4 py-3 text-xs font-medium text-periwinkle-text">
-            Secure payment isn't wired up to Stripe yet — that's the next
-            milestone. This screen is ready to go once it is.
-          </p>
-
-          {formError && (
-            <p role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
-              {formError}
-            </p>
+          {clientSecret ? (
+            <>
+              <p className="rounded-lg bg-periwinkle-soft px-4 py-3 text-xs font-medium text-periwinkle-text">
+                Your pickup is reserved — complete payment below to confirm it.
+              </p>
+              {payError && (
+                <p role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
+                  {payError}
+                </p>
+              )}
+              <StripePaymentForm
+                clientSecret={clientSecret}
+                amountLabel={formatMoney(total)}
+                onSuccess={handlePaymentSuccess}
+                onError={setPayError}
+              />
+            </>
+          ) : (
+            <>
+              <p className="rounded-lg bg-periwinkle-soft px-4 py-3 text-xs font-medium text-periwinkle-text">
+                You'll pay by card or bank transfer on the next step to confirm your pickup.
+              </p>
+              {formError && (
+                <p role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
+                  {formError}
+                </p>
+              )}
+              <Button type="button" onClick={handlePay} variant="primary" className="w-full" disabled={status === 'pending'}>
+                {status === 'pending' ? 'Processing…' : 'Continue to payment'}
+              </Button>
+            </>
           )}
-
-          <Button type="submit" variant="primary" className="w-full" disabled={status === 'pending'}>
-            {status === 'pending' ? 'Processing…' : `Pay ${formatMoney(total)} and schedule pickup`}
-          </Button>
-        </form>
+        </div>
       </div>
     )
   }

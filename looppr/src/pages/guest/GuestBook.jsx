@@ -94,7 +94,7 @@ export default function GuestBook() {
 
     setStatus('pending')
     try {
-      const { pickup, guestAccessToken } = await createGuestPickup({
+      const { pickup, guestAccessToken, clientSecret } = await createGuestPickup({
         guest: { name: form.name, email: form.email, phone: form.phone },
         address: { street: form.street, apartment: form.apartment, city: form.city, state: 'OK', zip: form.zip },
         preferredDate: form.preferredDate,
@@ -112,7 +112,7 @@ export default function GuestBook() {
               zip: form.deliveryZip,
             },
       })
-      navigate(`/guest/request/${pickup.id}?token=${guestAccessToken}`)
+      navigate(`/guest/request/${pickup.id}?token=${guestAccessToken}`, { state: { clientSecret } })
     } catch (err) {
       const message =
         err.response?.status === 429
@@ -136,8 +136,7 @@ export default function GuestBook() {
       </h1>
       <p className="mt-2 text-sm text-ink/60">
         Tell us who you are and what you need washed — no account required.
-        You'll see your price right away, and we'll email you when it's time
-        to pay.
+        You'll see your price right away and pay immediately to confirm your pickup.
       </p>
 
       <form onSubmit={handleSubmit} noValidate className="mt-8 space-y-5">

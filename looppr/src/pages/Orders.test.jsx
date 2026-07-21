@@ -5,7 +5,8 @@ import { ToastProvider } from '../context/ToastContext'
 import { PickupCard } from './Orders'
 
 vi.mock('../services/pickupApi', () => ({
-  payMyOrder: vi.fn(),
+  createPaymentIntent: vi.fn(),
+  confirmPayment: vi.fn(),
   fetchMyPickups: vi.fn(),
 }))
 

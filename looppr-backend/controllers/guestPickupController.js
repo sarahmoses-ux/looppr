@@ -2,9 +2,11 @@ import crypto from 'crypto'
 import { PickupRequest } from '../models/PickupRequest.js'
 import { geocodeAddress } from '../services/geocodeService.js'
 import { logAssignmentOutcome, resolveAssignment } from '../services/assignmentService.js'
+import { createOrReusePaymentIntent } from '../services/paymentService.js'
 import { ApiError } from '../utils/ApiError.js'
 import { asyncHandler } from '../utils/asyncHandler.js'
 import { computeOrderPrice } from '../utils/pricing.js'
+import { stripe } from '../utils/stripeClient.js'
 
 function guestPublic(pickup) {
   return {
@@ -60,6 +62,10 @@ export const createGuestPickup = asyncHandler(async (req, res) => {
     deliveryAddress,
     guestAccessToken,
     pricing: computeOrderPrice(loadSize, priorOrderCount),
+    // Charged immediately at booking (see createOrReusePaymentIntent below)
+    // rather than waiting on an admin to send a payment request — 'pending'
+    // is what unlocks createOrReusePaymentIntent's paymentStatus guard.
+    paymentStatus: 'pending',
     ...(assignment || {}),
   })
 
@@ -75,7 +81,17 @@ export const createGuestPickup = asyncHandler(async (req, res) => {
 
   await logAssignmentOutcome(pickup, assignment)
 
-  res.status(201).json({ success: true, pickup: guestPublic(pickup), guestAccessToken })
+  // Don't fail the booking itself over a Stripe hiccup — the guest can still
+  // pay from the tracking page afterward (paymentStatus stays 'pending').
+  let clientSecret = null
+  try {
+    const intent = await createOrReusePaymentIntent(pickup)
+    clientSecret = intent.client_secret
+  } catch (err) {
+    console.error('Failed to create PaymentIntent at guest booking time', err)
+  }
+
+  res.status(201).json({ success: true, pickup: guestPublic(pickup), guestAccessToken, clientSecret })
 })
 
 export const getGuestPickup = asyncHandler(async (req, res) => {
@@ -84,22 +100,34 @@ export const getGuestPickup = asyncHandler(async (req, res) => {
   res.json({ success: true, pickup: guestPublic(pickup) })
 })
 
-// Simulated payment confirmation — see the identical caveat on
-// pickupController.payMyOrder: this is a placeholder for real Stripe
-// webhook verification, not a real payment check.
-export const payGuestOrder = asyncHandler(async (req, res) => {
+// Guest counterpart to pickupController.createPaymentIntent — same
+// create-or-reuse PaymentIntent logic, just scoped by guestAccessToken
+// instead of clientId since guests have no account.
+export const createGuestPaymentIntent = asyncHandler(async (req, res) => {
   const { token } = req.body
   const pickup = await findGuestPickupByToken(req.params.id, token)
-
   if (pickup.status === 'cancelled') throw new ApiError(409, 'This request has been cancelled.')
-  if (pickup.paymentStatus === 'paid') throw new ApiError(409, 'This request has already been paid for.')
+
+  const intent = await createOrReusePaymentIntent(pickup)
+  res.json({ success: true, clientSecret: intent.client_secret })
+})
+
+// Guest counterpart to pickupController.confirmPayment.
+export const confirmGuestPayment = asyncHandler(async (req, res) => {
+  const { token } = req.body
+  const pickup = await findGuestPickupByToken(req.params.id, token)
+  if (!pickup.stripePaymentIntentId) throw new ApiError(409, 'No payment has been started for this request.')
+
+  const intent = await stripe.paymentIntents.retrieve(pickup.stripePaymentIntentId)
+  if (intent.status !== 'succeeded') {
+    return res.json({ success: true, pickup: guestPublic(pickup) })
+  }
 
   const updated = await PickupRequest.findOneAndUpdate(
     { _id: pickup._id, paymentStatus: { $ne: 'paid' } },
     { paymentStatus: 'paid', paidAt: new Date() },
     { new: true },
   )
-  if (!updated) throw new ApiError(409, 'This request has already been paid for.')
 
-  res.json({ success: true, pickup: guestPublic(updated) })
+  res.json({ success: true, pickup: guestPublic(updated || pickup) })
 })

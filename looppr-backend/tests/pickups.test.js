@@ -4,7 +4,16 @@ import request from 'supertest'
 import { createApp } from '../app.js'
 import { DriverUser } from '../models/DriverUser.js'
 import { PickupRequest } from '../models/PickupRequest.js'
+import { __setIntentStatus } from '../utils/stripeClient.js'
 import { createTestUser, tokenFor } from './helpers/auth.js'
+
+// A freshly-created order's paymentStatus is already 'pending' (charged
+// immediately at booking, see createPickup) with a PaymentIntent already
+// attached — kept as a no-op-ish helper so these tests still read clearly
+// even though it's no longer strictly required.
+async function markPending(pickupId) {
+  await PickupRequest.updateOne({ _id: pickupId }, { paymentStatus: 'pending' })
+}
 
 const app = createApp()
 
@@ -57,6 +66,18 @@ describe('authenticated pickup creation & pricing', () => {
       .send(pickupPayload())
 
     expect(third.body.pickup.pricing.deliveryFee).toBe(4.99)
+  })
+
+  it('creates a PaymentIntent immediately and returns its clientSecret, with paymentStatus already pending', async () => {
+    const { token } = await clientToken()
+    const res = await request(app)
+      .post('/api/pickups')
+      .set('Authorization', `Bearer ${token}`)
+      .send(pickupPayload())
+
+    expect(res.status).toBe(201)
+    expect(res.body.clientSecret).toMatch(/^pi_test_/)
+    expect(res.body.pickup.paymentStatus).toBe('pending')
   })
 
   it('rejects an invalid load size', async () => {
@@ -123,52 +144,90 @@ describe('listMyPickups', () => {
   })
 })
 
-describe('payMyOrder', () => {
-  it('marks an order paid and records paidAt', async () => {
+describe('createPaymentIntent + confirmPayment', () => {
+  it('creates a PaymentIntent, then marks the order paid once it succeeds', async () => {
     const { token } = await clientToken()
     const created = await request(app)
       .post('/api/pickups')
       .set('Authorization', `Bearer ${token}`)
       .send(pickupPayload())
+    await markPending(created.body.pickup._id)
+
+    const intentRes = await request(app)
+      .post(`/api/pickups/${created.body.pickup._id}/pay/intent`)
+      .set('Authorization', `Bearer ${token}`)
+    expect(intentRes.status).toBe(200)
+    expect(intentRes.body.clientSecret).toMatch(/^pi_test_/)
+
+    const intentId = intentRes.body.clientSecret.split('_secret_')[0]
+    __setIntentStatus(intentId, 'succeeded')
+
+    const confirmRes = await request(app)
+      .post(`/api/pickups/${created.body.pickup._id}/pay/confirm`)
+      .set('Authorization', `Bearer ${token}`)
+    expect(confirmRes.status).toBe(200)
+    expect(confirmRes.body.pickup.paymentStatus).toBe('paid')
+    expect(confirmRes.body.pickup.paidAt).toBeTruthy()
+  })
+
+  it('does not mark the order paid if the PaymentIntent has not succeeded yet', async () => {
+    const { token } = await clientToken()
+    const created = await request(app)
+      .post('/api/pickups')
+      .set('Authorization', `Bearer ${token}`)
+      .send(pickupPayload())
+    await markPending(created.body.pickup._id)
+
+    await request(app).post(`/api/pickups/${created.body.pickup._id}/pay/intent`).set('Authorization', `Bearer ${token}`)
+    const confirmRes = await request(app)
+      .post(`/api/pickups/${created.body.pickup._id}/pay/confirm`)
+      .set('Authorization', `Bearer ${token}`)
+
+    expect(confirmRes.status).toBe(200)
+    expect(confirmRes.body.pickup.paymentStatus).toBe('pending')
+  })
+
+  it('rejects creating a PaymentIntent for an order that has already been paid', async () => {
+    const { token } = await clientToken()
+    const created = await request(app)
+      .post('/api/pickups')
+      .set('Authorization', `Bearer ${token}`)
+      .send(pickupPayload())
+    await PickupRequest.updateOne({ _id: created.body.pickup._id }, { paymentStatus: 'paid' })
 
     const res = await request(app)
-      .post(`/api/pickups/${created.body.pickup._id}/pay`)
+      .post(`/api/pickups/${created.body.pickup._id}/pay/intent`)
       .set('Authorization', `Bearer ${token}`)
-
-    expect(res.status).toBe(200)
-    expect(res.body.pickup.paymentStatus).toBe('paid')
-    expect(res.body.pickup.paidAt).toBeTruthy()
+    expect(res.status).toBe(409)
   })
 
-  it('rejects paying for an order twice', async () => {
-    const { token } = await clientToken()
-    const created = await request(app)
-      .post('/api/pickups')
-      .set('Authorization', `Bearer ${token}`)
-      .send(pickupPayload())
-
-    await request(app).post(`/api/pickups/${created.body.pickup._id}/pay`).set('Authorization', `Bearer ${token}`)
-    const second = await request(app)
-      .post(`/api/pickups/${created.body.pickup._id}/pay`)
-      .set('Authorization', `Bearer ${token}`)
-
-    expect(second.status).toBe(409)
-  })
-
-  it('rejects paying for another customer\'s order', async () => {
+  it('rejects creating a PaymentIntent for another customer\'s order', async () => {
     const a = await clientToken()
     const b = await clientToken()
     const created = await request(app)
       .post('/api/pickups')
       .set('Authorization', `Bearer ${a.token}`)
       .send(pickupPayload())
+    await markPending(created.body.pickup._id)
 
     const res = await request(app)
-      .post(`/api/pickups/${created.body.pickup._id}/pay`)
+      .post(`/api/pickups/${created.body.pickup._id}/pay/intent`)
       .set('Authorization', `Bearer ${b.token}`)
     expect(res.status).toBe(404)
   })
 })
+
+// Exercises the full pay flow end to end for the getMyStats tests below,
+// which only care that a paid order's amount lands in totalSpent.
+async function payOrder(app, token, pickupId) {
+  await markPending(pickupId)
+  const intentRes = await request(app)
+    .post(`/api/pickups/${pickupId}/pay/intent`)
+    .set('Authorization', `Bearer ${token}`)
+  const intentId = intentRes.body.clientSecret.split('_secret_')[0]
+  __setIntentStatus(intentId, 'succeeded')
+  return request(app).post(`/api/pickups/${pickupId}/pay/confirm`).set('Authorization', `Bearer ${token}`)
+}
 
 describe('getMyStats', () => {
   it('starts at zero for a fresh account', async () => {
@@ -188,7 +247,7 @@ describe('getMyStats', () => {
       .post('/api/pickups')
       .set('Authorization', `Bearer ${token}`)
       .send(pickupPayload({ loadSize: 'medium' }))
-    await request(app).post(`/api/pickups/${paid.body.pickup._id}/pay`).set('Authorization', `Bearer ${token}`)
+    await payOrder(app, token, paid.body.pickup._id)
 
     const res = await request(app).get('/api/pickups/me/stats').set('Authorization', `Bearer ${token}`)
     expect(res.body.stats.totalOrders).toBe(2)
@@ -203,7 +262,7 @@ describe('getMyStats', () => {
       .post('/api/pickups')
       .set('Authorization', `Bearer ${a.token}`)
       .send(pickupPayload())
-    await request(app).post(`/api/pickups/${order.body.pickup._id}/pay`).set('Authorization', `Bearer ${a.token}`)
+    await payOrder(app, a.token, order.body.pickup._id)
 
     const res = await request(app).get('/api/pickups/me/stats').set('Authorization', `Bearer ${b.token}`)
     expect(res.body.stats).toEqual({ totalOrders: 0, totalSpent: 0 })

@@ -1,5 +1,6 @@
 import { Helmet } from 'react-helmet-async'
 import { Outlet } from 'react-router-dom'
+import BackToTop from '../components/BackToTop'
 import LaunchBar from '../components/LaunchBar'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
@@ -27,6 +28,7 @@ export default function PublicLayout() {
         <Outlet />
       </main>
       <Footer />
+      <BackToTop />
     </div>
   )
 }

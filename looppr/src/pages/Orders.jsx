@@ -2,9 +2,10 @@ import { useEffect, useMemo, useState } from 'react'
 import Button from '../components/Button'
 import SEO from '../components/SEO'
 import OrderTimeline from '../components/OrderTimeline'
+import StripePaymentForm from '../components/StripePaymentForm'
 import { useToast } from '../context/ToastContext'
 import { ALL_STATUSES, STATUS_LABELS } from '../constants/orderStatus'
-import { fetchMyPickups, payMyOrder } from '../services/pickupApi'
+import { confirmPayment, createPaymentIntent, fetchMyPickups } from '../services/pickupApi'
 
 function EmptyOrdersIllustration() {
   return (
@@ -76,6 +77,12 @@ function statusBadgeClass(status) {
   return 'bg-periwinkle-soft text-periwinkle-text'
 }
 
+function paymentStatusBadgeClass(paymentStatus) {
+  if (paymentStatus === 'paid') return 'bg-success-soft text-success-dark'
+  if (paymentStatus === 'failed' || paymentStatus === 'unpaid') return 'bg-red-50 text-red-600'
+  return 'bg-periwinkle-soft text-periwinkle-text' // pending
+}
+
 function formatMoney(amount, currency = 'usd') {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency.toUpperCase() }).format(amount)
 }
@@ -136,6 +143,8 @@ function OrderReceipt({ pickup }) {
 export function PickupCard({ pickup, detailed = false, onChange }) {
   const { showToast } = useToast()
   const [payStatus, setPayStatus] = useState('idle')
+  const [clientSecret, setClientSecret] = useState('')
+  const [payError, setPayError] = useState('')
   const [showReceipt, setShowReceipt] = useState(false)
 
   const dateLabel = new Date(pickup.preferredDate).toLocaleDateString(undefined, {
@@ -144,16 +153,37 @@ export function PickupCard({ pickup, detailed = false, onChange }) {
     day: 'numeric',
   })
 
-  async function handlePay() {
+  async function handleStartPay() {
     setPayStatus('pending')
+    setPayError('')
     try {
-      const { pickup: updated } = await payMyOrder(pickup._id)
-      onChange?.(updated)
-      showToast('Payment sent.')
+      const { clientSecret: secret } = await createPaymentIntent(pickup._id)
+      setClientSecret(secret)
     } catch (err) {
       showToast(err.response?.data?.message || 'Something went wrong. Please try again.', 'error')
     } finally {
       setPayStatus('idle')
+    }
+  }
+
+  async function handlePaymentSuccess(status) {
+    try {
+      const { pickup: updated } = await confirmPayment(pickup._id)
+      setClientSecret('')
+      onChange?.(updated)
+      showToast(
+        updated.paymentStatus === 'paid'
+          ? 'Payment successful.'
+          : "Payment is processing — you'll see it marked paid once it clears.",
+      )
+    } catch (err) {
+      showToast(
+        err.response?.data?.message ||
+          (status === 'succeeded'
+            ? 'Payment went through, but we couldn\'t refresh this order — refresh the page.'
+            : 'Something went wrong confirming your payment. Refresh the page to check its status.'),
+        'error',
+      )
     }
   }
 
@@ -169,9 +199,13 @@ export function PickupCard({ pickup, detailed = false, onChange }) {
           </p>
           {pickup.notes && <p className="mt-1 text-sm text-ink/45">Note: {pickup.notes}</p>}
           {pickup.pricing?.amount && (
-            <p className="mt-1 text-sm font-semibold text-ink">
+            <p className="mt-1 flex items-center gap-1.5 text-sm font-semibold text-ink">
               {formatMoney(pickup.pricing.amount, pickup.pricing.currency)}
-              <span className="ml-1.5 font-normal text-ink/45 capitalize">· {pickup.paymentStatus}</span>
+              <span
+                className={`rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${paymentStatusBadgeClass(pickup.paymentStatus)}`}
+              >
+                {pickup.paymentStatus}
+              </span>
             </p>
           )}
         </div>
@@ -196,18 +230,30 @@ export function PickupCard({ pickup, detailed = false, onChange }) {
 
       {detailed && (pickup.paymentStatus === 'pending' || pickup.paymentStatus === 'failed') && (
         <div className="mt-4 border-t border-line pt-4">
-          {pickup.paymentStatus === 'failed' && (
+          {pickup.paymentStatus === 'failed' && !clientSecret && (
             <p className="mb-3 rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
               Your last payment attempt failed — try again.
             </p>
           )}
-          {/* Simulated payment — stands in for a real Stripe Checkout
-              redirect until Stripe API keys are wired up. */}
-          <Button onClick={handlePay} variant="primary" className="w-full sm:w-auto" disabled={payStatus === 'pending'}>
-            {payStatus === 'pending'
-              ? 'Processing…'
-              : `Pay ${formatMoney(pickup.pricing.amount, pickup.pricing.currency)} now`}
-          </Button>
+          {payError && (
+            <p role="alert" className="mb-3 rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
+              {payError}
+            </p>
+          )}
+          {clientSecret ? (
+            <StripePaymentForm
+              clientSecret={clientSecret}
+              amountLabel={formatMoney(pickup.pricing.amount, pickup.pricing.currency)}
+              onSuccess={handlePaymentSuccess}
+              onError={setPayError}
+            />
+          ) : (
+            <Button onClick={handleStartPay} variant="primary" className="w-full sm:w-auto" disabled={payStatus === 'pending'}>
+              {payStatus === 'pending'
+                ? 'Loading…'
+                : `Pay ${formatMoney(pickup.pricing.amount, pickup.pricing.currency)} now`}
+            </Button>
+          )}
         </div>
       )}
 

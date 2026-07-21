@@ -190,6 +190,13 @@ const pickupRequestSchema = new mongoose.Schema(
     paymentStatus: { type: String, enum: ['unpaid', 'pending', 'paid', 'failed'], default: 'unpaid' },
     paymentLink: { type: String },
     paidAt: { type: Date },
+    // Set the first time a PaymentIntent is created for this order (see
+    // services/paymentService.js) so re-opening the "Pay now" screen reuses
+    // it instead of creating a new one each time. The Stripe webhook
+    // (routes/stripeWebhookRoutes.js) is keyed off this order's _id via the
+    // PaymentIntent's metadata, not off this field, so it works even if this
+    // hasn't synced for some reason.
+    stripePaymentIntentId: { type: String },
 
     // One-time token handed to a guest at creation so they can view status
     // and pay for their own request without an account.

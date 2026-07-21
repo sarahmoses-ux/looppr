@@ -22,6 +22,50 @@ vi.mock('../services/emailService.js', () => ({
   sendPartnerLeadEmail: vi.fn(async () => {}),
 }))
 
+// Same no-real-network rule for Stripe — paymentIntents are tracked in an
+// in-memory Map so tests can simulate a charge going through (via
+// __setIntentStatus) without ever hitting Stripe's API. constructEvent skips
+// real HMAC verification (that's Stripe's own tested code, not ours) and
+// just checks for a fixed literal signature, so webhook tests can exercise
+// our handler's routing/idempotency logic with a plain JSON body.
+vi.mock('../utils/stripeClient.js', () => {
+  const intents = new Map()
+  let counter = 0
+
+  const stripe = {
+    paymentIntents: {
+      create: vi.fn(async ({ amount, currency, metadata }) => {
+        counter += 1
+        const intent = {
+          id: `pi_test_${counter}`,
+          client_secret: `pi_test_${counter}_secret_test`,
+          amount,
+          currency,
+          metadata,
+          status: 'requires_payment_method',
+        }
+        intents.set(intent.id, intent)
+        return intent
+      }),
+      retrieve: vi.fn(async (id) => intents.get(id)),
+    },
+    webhooks: {
+      constructEvent: vi.fn((rawBody, signature) => {
+        if (signature !== 'test-signature') throw new Error('Invalid signature')
+        return JSON.parse(rawBody.toString())
+      }),
+    },
+  }
+
+  return {
+    stripe,
+    __setIntentStatus(id, status) {
+      const intent = intents.get(id)
+      if (intent) intent.status = status
+    },
+  }
+})
+
 let mongod
 
 beforeAll(async () => {

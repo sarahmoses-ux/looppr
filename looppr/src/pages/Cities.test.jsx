@@ -27,17 +27,31 @@ describe('Cities waitlist flow', () => {
     vi.unstubAllGlobals()
   })
 
-  it('opens a modal for notify me when Join waitlist is clicked', async () => {
+  it('links each city\'s "Join waitlist" card down to the on-page notify form', () => {
     render(
       <MemoryRouter>
         <Cities />
       </MemoryRouter>,
     )
 
-    fireEvent.click(screen.getAllByRole('button', { name: /join waitlist/i })[0])
+    const links = screen.getAllByRole('link', { name: /join waitlist/i })
+    expect(links.length).toBeGreaterThan(0)
+    links.forEach((link) => expect(link).toHaveAttribute('href', '#notify'))
+  })
 
-    expect(await screen.findByRole('dialog')).toBeInTheDocument()
-    expect(screen.getByText(/be the first to know/i)).toBeInTheDocument()
-    expect(screen.getByPlaceholderText(/your@email.com/i)).toBeInTheDocument()
+  it('joins the waitlist from the notify form and shows a confirmation', async () => {
+    render(
+      <MemoryRouter>
+        <Cities />
+      </MemoryRouter>,
+    )
+
+    fireEvent.change(screen.getByPlaceholderText(/your@email.com/i), {
+      target: { value: 'test@example.com' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: /notify me/i }))
+
+    expect(await screen.findByText(/you're on the list/i)).toBeInTheDocument()
+    expect(joinWaitlist).toHaveBeenCalledWith('test@example.com')
   })
 })

@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useParams, useSearchParams } from 'react-router-dom'
 import Button from '../../components/Button'
 import SEO from '../../components/SEO'
 import OrderTimeline from '../../components/OrderTimeline'
-import { fetchGuestPickup, payGuestOrder } from '../../services/guestPickupApi'
+import StripePaymentForm from '../../components/StripePaymentForm'
+import { confirmGuestPayment, createGuestPaymentIntent, fetchGuestPickup } from '../../services/guestPickupApi'
 
 function formatMoney(amount, currency = 'usd') {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency.toUpperCase() }).format(amount)
@@ -13,11 +14,18 @@ export default function GuestRequestStatus() {
   const { id } = useParams()
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token')
+  const location = useLocation()
 
   const [pickup, setPickup] = useState(null)
   const [loadError, setLoadError] = useState('')
   const [payStatus, setPayStatus] = useState('idle')
   const [payError, setPayError] = useState('')
+  const [payInfo, setPayInfo] = useState('')
+  // Populated immediately when arriving fresh from GuestBook.jsx (which now
+  // creates the PaymentIntent at booking time) so the Payment Element shows
+  // up without an extra "Pay now" click. Empty on a direct/bookmarked visit
+  // — that falls back to the button below, which creates one on demand.
+  const [clientSecret, setClientSecret] = useState(location.state?.clientSecret || '')
 
   useEffect(() => {
     if (!token) return undefined
@@ -34,16 +42,36 @@ export default function GuestRequestStatus() {
     }
   }, [id, token])
 
-  async function handlePay() {
+  async function handleStartPay() {
     setPayStatus('pending')
     setPayError('')
     try {
-      const { pickup: updated } = await payGuestOrder(id, token)
-      setPickup(updated)
-      setPayStatus('idle')
+      const { clientSecret: secret } = await createGuestPaymentIntent(id, token)
+      setClientSecret(secret)
     } catch (err) {
       setPayError(err.response?.data?.message || 'Something went wrong. Please try again.')
+    } finally {
       setPayStatus('idle')
+    }
+  }
+
+  async function handlePaymentSuccess(status) {
+    try {
+      const { pickup: updated } = await confirmGuestPayment(id, token)
+      setClientSecret('')
+      setPickup(updated)
+      setPayInfo(
+        updated.paymentStatus === 'paid'
+          ? 'Payment successful — thanks!'
+          : "Payment is processing — you'll see this marked Paid once it clears.",
+      )
+    } catch {
+      setPayInfo('')
+      setPayError(
+        status === 'succeeded'
+          ? "Payment went through, but we couldn't refresh this page — refresh to see your receipt."
+          : 'Something went wrong confirming your payment. Refresh the page to check its status.',
+      )
     }
   }
 
@@ -100,9 +128,20 @@ export default function GuestRequestStatus() {
           </p>
         )}
 
+        {payInfo && (
+          <p
+            role="status"
+            className={`mt-3 rounded-lg px-4 py-3 text-sm font-medium ${
+              pickup.paymentStatus === 'paid' ? 'bg-success-soft text-success-dark' : 'bg-periwinkle-soft text-periwinkle-text'
+            }`}
+          >
+            {payInfo}
+          </p>
+        )}
+
         {(pickup.paymentStatus === 'pending' || pickup.paymentStatus === 'failed') && (
           <div className="mt-5">
-            {pickup.paymentStatus === 'failed' && (
+            {pickup.paymentStatus === 'failed' && !clientSecret && (
               <p className="mb-3 rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
                 Your last payment attempt failed — try again.
               </p>
@@ -112,13 +151,20 @@ export default function GuestRequestStatus() {
                 {payError}
               </p>
             )}
-            {/* Simulated payment — this button stands in for a real Stripe
-                Checkout redirect until Stripe API keys are wired up. */}
-            <Button onClick={handlePay} variant="primary" className="w-full" disabled={payStatus === 'pending'}>
-              {payStatus === 'pending'
-                ? 'Processing…'
-                : `Pay ${formatMoney(pickup.pricing.amount, pickup.pricing.currency)} now`}
-            </Button>
+            {clientSecret ? (
+              <StripePaymentForm
+                clientSecret={clientSecret}
+                amountLabel={formatMoney(pickup.pricing.amount, pickup.pricing.currency)}
+                onSuccess={handlePaymentSuccess}
+                onError={setPayError}
+              />
+            ) : (
+              <Button onClick={handleStartPay} variant="primary" className="w-full" disabled={payStatus === 'pending'}>
+                {payStatus === 'pending'
+                  ? 'Loading…'
+                  : `Pay ${formatMoney(pickup.pricing.amount, pickup.pricing.currency)} now`}
+              </Button>
+            )}
           </div>
         )}
 

@@ -16,6 +16,7 @@ import contactRoutes from './routes/contactRoutes.js'
 import guestPickupRoutes from './routes/guestPickupRoutes.js'
 import partnerLeadRoutes from './routes/partnerLeadRoutes.js'
 import pickupRoutes from './routes/pickupRoutes.js'
+import stripeWebhookRoutes from './routes/stripeWebhookRoutes.js'
 import waitlistRoutes from './routes/waitlistRoutes.js'
 
 // Factory rather than a module-level instance so tests can create an app
@@ -31,6 +32,10 @@ export function createApp() {
       credentials: true,
     }),
   )
+  // Must be registered before express.json() below — see stripeWebhookRoutes.js
+  // for why this endpoint needs the raw, unparsed body.
+  app.use('/api/stripe/webhook', stripeWebhookRoutes)
+
   app.use(express.json({ limit: '1mb' }))
   app.use(cookieParser())
   app.use(mongoSanitize())

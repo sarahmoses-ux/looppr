@@ -217,7 +217,7 @@ export default function DriveForm() {
                       <option value="" disabled>
                         Select city…
                       </option>
-                      <optgroup label="Oklahoma — Launching August 1, 2026">
+                      <optgroup label="Oklahoma — Launching July 23, 2026">
                         <option>Oklahoma City, OK</option>
                         <option>Edmond, OK</option>
                         <option>Norman, OK</option>
@@ -373,7 +373,7 @@ export default function DriveForm() {
                         name="hasLicenseInsurance"
                         checked={form.hasLicenseInsurance}
                         onChange={handleChange}
-                        className="mt-1 h-4 w-4 rounded border-line accent-periwinkle focus:ring-periwinkle"
+                        className="mt-1 h-4 w-4 rounded border-line text-periwinkle focus:ring-periwinkle"
                       />
                       <span className="text-sm leading-relaxed text-ink">
                         I have a valid driver's license and auto insurance in good standing.
@@ -390,7 +390,7 @@ export default function DriveForm() {
                         name="isEligible"
                         checked={form.isEligible}
                         onChange={handleChange}
-                        className="mt-1 h-4 w-4 rounded border-line accent-periwinkle focus:ring-periwinkle"
+                        className="mt-1 h-4 w-4 rounded border-line text-periwinkle focus:ring-periwinkle"
                       />
                       <span className="text-sm leading-relaxed text-ink">
                         I am 18 years or older and legally eligible to work in the United States.
@@ -407,10 +407,11 @@ export default function DriveForm() {
                         name="consentsBackgroundCheck"
                         checked={form.consentsBackgroundCheck}
                         onChange={handleChange}
-                        className="mt-1 h-4 w-4 rounded border-line accent-periwinkle focus:ring-periwinkle"
+                        className="mt-1 h-4 w-4 rounded border-line text-periwinkle focus:ring-periwinkle"
                       />
                       <span className="text-sm leading-relaxed text-ink">
                         I consent to a background check being run after my application is approved.
+                      
                       </span>
                     </label>
                     {errors.consentsBackgroundCheck && (
