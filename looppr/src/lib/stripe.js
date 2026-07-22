@@ -6,6 +6,8 @@ import { loadStripe } from '@stripe/stripe-js'
 let stripePromise
 
 export function getStripe() {
+  // TEMP DEBUG — remove after confirming the deployed value.
+  console.log('[stripe debug] VITE_STRIPE_PUBLISHABLE_KEY:', JSON.stringify(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY))
   stripePromise ??= loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
   return stripePromise
 }
