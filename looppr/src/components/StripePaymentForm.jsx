@@ -51,7 +51,21 @@ function Form({ amountLabel, onSuccess, onError }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-      <PaymentElement />
+      <PaymentElement
+        options={{
+          defaultValues: {
+            billingDetails: {
+              address: {
+                country: 'US',
+              },
+            },
+          },
+          wallets: {
+            applePay: 'auto',
+            googlePay: 'never',
+          },
+        }}
+      />
       <Button type="submit" variant="primary" className="w-full" disabled={!stripe || submitting}>
         {submitting ? 'Processing…' : `Pay ${amountLabel} now`}
       </Button>
