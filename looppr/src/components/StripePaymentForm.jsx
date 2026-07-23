@@ -74,8 +74,27 @@ export default function StripePaymentForm({ clientSecret, amountLabel, onSuccess
     )
   }
 
+  const paymentElementOptions = {
+    clientSecret,
+    appearance: APPEARANCE,
+    defaultValues: {
+      billingDetails: {
+        address: {
+          country: 'US',
+        },
+      },
+    },
+    terms: {
+      card: 'never',
+    },
+    wallets: {
+      applePay: 'auto',
+      googlePay: 'never',
+    },
+  }
+
   return (
-    <Elements stripe={getStripe()} options={{ clientSecret, appearance: APPEARANCE }}>
+    <Elements stripe={getStripe()} options={paymentElementOptions}>
       <Form amountLabel={amountLabel} onSuccess={onSuccess} onError={onError} />
     </Elements>
   )
