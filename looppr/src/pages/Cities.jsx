@@ -26,6 +26,16 @@ const STATES = [
     ],
   },
   {
+    key: 'in',
+    name: 'Indiana',
+    sub: 'Now available · Indianapolis',
+    cities: [
+      { name: 'Indianapolis', region: 'Marion County', eta: 'Available now', isAvailable: true },
+      { name: 'Carmel', region: 'Hamilton County', eta: EXPANSION_ETA },
+      { name: 'Fishers', region: 'Hamilton County', eta: EXPANSION_ETA },
+    ],
+  },
+  {
     key: 'tx',
     name: 'Texas',
     sub: `Launching ${EXPANSION_ETA}`,
@@ -76,7 +86,7 @@ function CityCard({ city, isYou }) {
       <div className="flex items-center gap-2.5">
         <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-line-soft" />
         <span className="text-[11px] font-bold uppercase tracking-wide text-ink/45">
-          Coming {city.eta}
+          {city.isAvailable ? 'Available now' : `Coming ${city.eta}`}
         </span>
       </div>
       <h3 className="mt-3 font-display text-xl font-semibold text-ink">{city.name}</h3>
@@ -185,8 +195,8 @@ export default function Cities() {
             to your city.
           </h1>
           <p className="mt-4 text-lg leading-relaxed text-periwinkle-muted">
-            We're launching across the OKC metro, expanding into Texas and Georgia in 2027. Join
-            the waitlist and be first when we arrive.
+            Looppr is now live in Indianapolis, IN, with more Indiana cities and other markets
+            coming soon. Join the waitlist and be first when we arrive.
           </p>
 
           <div className="mt-8 inline-flex items-center gap-3 rounded-2xl border border-white/15 bg-white/[0.07] px-5 py-4">
