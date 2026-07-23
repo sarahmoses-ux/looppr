@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import Button from '../components/Button'
 import SEO from '../components/SEO'
 import { PUBLIC_PAGES } from '../seo/publicPages'
@@ -6,19 +7,23 @@ import { joinWaitlist } from '../services/waitlistApi'
 
 const PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/cities')
 
-const OK_LAUNCH_ETA = 'July 23, 2026'
 const EXPANSION_ETA = 'Feb 2027'
+const OK_AVAILABLE_CITIES = ['Oklahoma City', 'Edmond', 'Norman', 'Moore']
+
+function availableCity(name, region) {
+  return { name, region, eta: 'Available now', isAvailable: true }
+}
 
 const STATES = [
   {
     key: 'ok',
     name: 'Oklahoma',
-    sub: `4 cities · Launching ${OK_LAUNCH_ETA}`,
+    sub: 'Available now in 4 cities',
     cities: [
-      { name: 'Oklahoma City', region: 'Oklahoma County', eta: OK_LAUNCH_ETA },
-      { name: 'Edmond', region: 'Oklahoma County', eta: OK_LAUNCH_ETA },
-      { name: 'Norman', region: 'Cleveland County', eta: OK_LAUNCH_ETA },
-      { name: 'Moore', region: 'Cleveland County', eta: OK_LAUNCH_ETA },
+      availableCity('Oklahoma City', 'Oklahoma County'),
+      availableCity('Edmond', 'Oklahoma County'),
+      availableCity('Norman', 'Cleveland County'),
+      availableCity('Moore', 'Cleveland County'),
       { name: 'Tulsa', region: 'Tulsa County', eta: EXPANSION_ETA },
       { name: 'Broken Arrow', region: 'Tulsa County', eta: EXPANSION_ETA },
       { name: 'Lawton', region: 'Comanche County', eta: EXPANSION_ETA },
@@ -28,7 +33,7 @@ const STATES = [
   {
     key: 'in',
     name: 'Indiana',
-    sub: 'Now available · Indianapolis',
+    sub: 'Now available - Indianapolis',
     cities: [
       { name: 'Indianapolis', region: 'Marion County', eta: 'Available now', isAvailable: true },
       { name: 'Carmel', region: 'Hamilton County', eta: EXPANSION_ETA },
@@ -72,31 +77,49 @@ const STATES = [
 ]
 
 function CityCard({ city, isYou }) {
+  const isAvailable = city.isAvailable
+
   return (
     <div
-      className={`relative rounded-2xl border-[1.5px] bg-white p-6 transition-all hover:-translate-y-0.5 hover:shadow-[0_10px_32px_rgba(30,27,75,0.1)] ${
-        isYou ? 'border-periwinkle' : 'border-line'
-      }`}
+      className={`relative overflow-hidden rounded-2xl border-[1.5px] bg-white p-6 transition-all hover:-translate-y-0.5 ${
+        isAvailable
+          ? 'border-success/35 shadow-[0_14px_40px_rgba(29,158,117,0.14)] hover:shadow-[0_18px_46px_rgba(29,158,117,0.2)]'
+          : 'border-line hover:shadow-[0_10px_32px_rgba(30,27,75,0.1)]'
+      } ${isYou ? 'ring-2 ring-periwinkle/45' : ''}`}
     >
+      {isAvailable && <span className="absolute inset-x-0 top-0 h-1 bg-success" />}
       {isYou && (
         <span className="absolute right-3.5 top-3.5 rounded-full bg-periwinkle px-2.5 py-1 text-[10px] font-bold tracking-wide text-white">
           YOU'RE HERE
         </span>
       )}
       <div className="flex items-center gap-2.5">
-        <span className="h-2.5 w-2.5 shrink-0 rounded-full bg-line-soft" />
-        <span className="text-[11px] font-bold uppercase tracking-wide text-ink/45">
-          {city.isAvailable ? 'Available now' : `Coming ${city.eta}`}
+        <span
+          className={`h-2.5 w-2.5 shrink-0 rounded-full ${
+            isAvailable ? 'animate-pulse bg-success shadow-[0_0_0_5px_rgba(29,158,117,0.12)]' : 'bg-line-soft'
+          }`}
+        />
+        <span className={`text-[11px] font-bold uppercase tracking-wide ${isAvailable ? 'text-success-dark' : 'text-ink/45'}`}>
+          {isAvailable ? 'Available now' : `Coming ${city.eta}`}
         </span>
       </div>
       <h3 className="mt-3 font-display text-xl font-semibold text-ink">{city.name}</h3>
       <p className="mb-3.5 text-sm text-ink/45">{city.region}</p>
-      <a
-        href="#notify"
-        className="inline-flex items-center gap-1.5 rounded-lg border-[1.5px] border-line px-4 py-2 text-sm font-semibold text-periwinkle-text transition-colors hover:border-periwinkle"
-      >
-        Join waitlist
-      </a>
+      {isAvailable ? (
+        <Link
+          to="/book"
+          className="inline-flex items-center gap-1.5 rounded-lg bg-success px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-success-dark"
+        >
+          Book pickup
+        </Link>
+      ) : (
+        <a
+          href="#notify"
+          className="inline-flex items-center gap-1.5 rounded-lg border-[1.5px] border-line px-4 py-2 text-sm font-semibold text-periwinkle-text transition-colors hover:border-periwinkle"
+        >
+          Join waitlist
+        </a>
+      )}
     </div>
   )
 }
@@ -146,9 +169,10 @@ export default function Cities() {
       locationSub = 'Browse cities below to check coverage'
       dotClass = 'bg-white/30'
     } else {
-      locationLabel = `${userCity}${userState ? `, ${userState}` : ''} — coming soon`
-      locationSub = 'Join the waitlist to be first when we launch'
-      dotClass = 'bg-periwinkle'
+      const availableHere = userState === 'OK' && OK_AVAILABLE_CITIES.some((city) => isYourCity(city))
+      locationLabel = `${userCity}${userState ? `, ${userState}` : ''} - ${availableHere ? 'available now' : 'coming soon'}`
+      locationSub = availableHere ? 'Book pickup and delivery today' : 'Join the waitlist to be first when we launch'
+      dotClass = availableHere ? 'bg-success' : 'bg-periwinkle'
     }
   }
 
@@ -190,13 +214,13 @@ export default function Cities() {
             Coverage map
           </p>
           <h1 className="mt-4 font-display text-4xl font-semibold leading-[1.08] tracking-tight text-white sm:text-5xl">
-            Looppr is coming
+            Looppr is available
             <br />
-            to your city.
+            in more cities.
           </h1>
           <p className="mt-4 text-lg leading-relaxed text-periwinkle-muted">
-            Looppr is now live in Indianapolis, IN, with more Indiana cities and other markets
-            coming soon. Join the waitlist and be first when we arrive.
+            Looppr is live in Oklahoma City, Edmond, Norman, Moore, and Indianapolis,
+            with more cities coming soon. Pick an available city to book today.
           </p>
 
           <div className="mt-8 inline-flex items-center gap-3 rounded-2xl border border-white/15 bg-white/[0.07] px-5 py-4">

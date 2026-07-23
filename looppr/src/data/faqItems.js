@@ -22,7 +22,7 @@ export const FAQ_ITEMS = [
   {
     question: 'Is Looppr available in my area?',
     answer:
-      'Looppr launches August 1, 2026 across the OKC metro — Oklahoma City, Edmond, Norman, and Moore — with Texas and Georgia cities following in 2027. Visit our cities & coverage page to check your city and join the waitlist if we\'re not there yet.',
+      'Looppr is available now across the OKC metro - Oklahoma City, Edmond, Norman, and Moore - with Texas and Georgia cities following in 2027. Visit our cities & coverage page to check your city and join the waitlist if we\'re not there yet.',
     linkTo: '/cities',
     linkLabel: 'Check coverage in your city',
   },

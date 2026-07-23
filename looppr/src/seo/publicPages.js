@@ -98,7 +98,7 @@ export const PUBLIC_PAGES = [
   {
     path: '/cities',
     title: 'Cities & coverage',
-    description: 'Find laundry pickup and delivery near you — see where Looppr laundry service is available, launching in OKC, Edmond, Norman & Moore.',
+    description: 'Find laundry pickup and delivery near you - see where Looppr is available now in OKC, Edmond, Norman & Moore.',
     keywords: ['laundry near me', 'laundry pickup and delivery', 'laundry service coverage area', 'laundromat near me', 'laundry pickup'],
     changefreq: 'weekly',
     priority: 0.7,
