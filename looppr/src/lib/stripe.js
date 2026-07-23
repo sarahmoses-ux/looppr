@@ -5,9 +5,15 @@ import { loadStripe } from '@stripe/stripe-js'
 // re-fetching it per mount.
 let stripePromise
 
+const publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY?.trim()
+
+export function hasStripeConfig() {
+  return Boolean(publishableKey)
+}
+
 export function getStripe() {
-  // TEMP DEBUG — remove after confirming the deployed value.
-  console.log('[stripe debug] VITE_STRIPE_PUBLISHABLE_KEY:', JSON.stringify(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY))
-  stripePromise ??= loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY)
+  if (!publishableKey) return null
+
+  stripePromise ??= loadStripe(publishableKey)
   return stripePromise
 }
