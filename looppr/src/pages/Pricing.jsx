@@ -25,11 +25,11 @@ const PLANS = [
   },
   {
     name: 'Looppr+',
-    price: '$14.99',
+    price: '$80.99',
     unit: '/mo',
-    detail: 'Pays for itself at 3 orders a month.',
+    detail: 'For regular customers with up to 100 lb monthly.',
     features: [
-      '$1.59 per lb, wash & fold',
+      'Up to 100 lb of wash & fold monthly',
       'Free delivery on every order',
       'Priority driver matching',
       '10% off express upgrades',
@@ -42,11 +42,11 @@ const PLANS = [
   },
   {
     name: 'LoopprBiz',
-    price: '$49.99',
+    price: '$500',
     unit: '/mo',
-    detail: 'For hotels, gyms & Airbnb hosts.',
+    detail: 'Monthly business laundry service.',
     features: [
-      '$1.29 per lb (volume rate)',
+      'Built for recurring business volume',
       'Free delivery, all orders',
       'Monthly invoice billing',
       'Dedicated account manager',
@@ -60,7 +60,7 @@ const PLANS = [
 ]
 
 const COMPARISON_ROWS = [
-  { label: 'Per-pound rate', values: ['$1.59', '$1.59', '$1.29'] },
+  { label: 'Included laundry', values: ['Pay by lb', 'Up to 100 lb/mo', 'Business volume'] },
   { label: 'Delivery fee', values: ['$4.99', 'Free', 'Free'], freeFrom: 1 },
   { label: 'Real-time tracking', values: ['✓', '✓', '✓'] },
   { label: 'Priority driver matching', values: ['—', '✓', '✓'] },
