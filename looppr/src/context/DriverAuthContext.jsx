@@ -51,7 +51,10 @@ export function DriverAuthProvider({ children }) {
 
   async function login(payload) {
     const data = await loginDriver(payload)
-    if (data.requiresVerification) return data
+    // None of these issue a session — only an 'active' account gets one
+    // (see driverLogin in the backend). Return the flagged response as-is
+    // so the caller (DriverLogin.jsx) can show the right message.
+    if (data.requiresVerification || data.pendingApproval || data.applicationRejected) return data
     setDriverAccessToken(data.accessToken)
     setDriver(data.driver)
     setStatus('authenticated')
@@ -59,10 +62,15 @@ export function DriverAuthProvider({ children }) {
   }
 
   async function verifyEmail(email, code) {
-    const { accessToken, driver: verified } = await verifyDriverEmail(email, code)
-    setDriverAccessToken(accessToken)
-    setDriver(verified)
+    const data = await verifyDriverEmail(email, code)
+    // A pending/rejected application gets no session (see driverVerifyEmail
+    // in the backend) — return the response so the caller can navigate to
+    // the application-submitted screen instead of the dashboard.
+    if (data.pendingApproval || data.applicationRejected) return data
+    setDriverAccessToken(data.accessToken)
+    setDriver(data.driver)
     setStatus('authenticated')
+    return data
   }
 
   async function resendVerification(email) {

@@ -1,4 +1,7 @@
 import nodemailer from 'nodemailer'
+import { adminApplicationNotificationHtml, adminApplicationNotificationSubject } from './adminApplicationNotificationTemplate.js'
+import { applicationApprovedEmailHtml, applicationApprovedEmailSubject } from './applicationApprovedEmailTemplate.js'
+import { applicationRejectedEmailHtml, applicationRejectedEmailSubject } from './applicationRejectedEmailTemplate.js'
 import { contactConfirmationEmailHtml, contactConfirmationEmailSubject } from './contactConfirmationEmailTemplate.js'
 import { otpEmailHtml, otpEmailSubject } from './otpEmailTemplate.js'
 import { partnerLeadEmailHtml, partnerLeadEmailSubject } from './partnerLeadEmailTemplate.js'
@@ -106,5 +109,45 @@ export async function sendPartnerLeadEmail(toEmail, type, name) {
     replyTo: replyTo(),
     subject: partnerLeadEmailSubject(type),
     html: partnerLeadEmailHtml(type, name),
+  })
+}
+
+// Recipient is fixed (not chosen per-call like every other function here) —
+// defaults to laundrylooppr@gmail.com, overridable via ADMIN_NOTIFICATION_EMAIL
+// for staging/other environments.
+export async function sendAdminApplicationNotification(details) {
+  const fromName = process.env.GMAIL_FROM_NAME || 'Looppr'
+  const to = process.env.ADMIN_NOTIFICATION_EMAIL || 'laundrylooppr@gmail.com'
+
+  await getTransporter().sendMail({
+    from: `${fromName} <${process.env.GMAIL_USER}>`,
+    to,
+    replyTo: replyTo(),
+    subject: adminApplicationNotificationSubject(details.applicantType, details.fullName),
+    html: adminApplicationNotificationHtml(details),
+  })
+}
+
+export async function sendApplicationApprovedEmail(toEmail, name, portalType, loginUrl) {
+  const fromName = process.env.GMAIL_FROM_NAME || 'Looppr'
+
+  await getTransporter().sendMail({
+    from: `${fromName} <${process.env.GMAIL_USER}>`,
+    to: toEmail,
+    replyTo: replyTo(),
+    subject: applicationApprovedEmailSubject(portalType),
+    html: applicationApprovedEmailHtml(name, portalType, loginUrl),
+  })
+}
+
+export async function sendApplicationRejectedEmail(toEmail, name, reason) {
+  const fromName = process.env.GMAIL_FROM_NAME || 'Looppr'
+
+  await getTransporter().sendMail({
+    from: `${fromName} <${process.env.GMAIL_USER}>`,
+    to: toEmail,
+    replyTo: replyTo(),
+    subject: applicationRejectedEmailSubject(),
+    html: applicationRejectedEmailHtml(name, reason),
   })
 }

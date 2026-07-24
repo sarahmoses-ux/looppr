@@ -1,15 +1,45 @@
 import bcrypt from 'bcryptjs'
 import { DriverUser } from '../models/DriverUser.js'
-import { sendOtpEmail, sendPasswordResetEmail } from '../services/emailService.js'
+import { sendAdminApplicationNotification, sendOtpEmail, sendPasswordResetEmail } from '../services/emailService.js'
 import { ApiError } from '../utils/ApiError.js'
 import { asyncHandler } from '../utils/asyncHandler.js'
 import { assignOtp, canResendOtp, verifyOtpCode } from '../utils/otp.js'
 import { issueDriverSession, publicDriver } from '../utils/session.js'
 import { verifyDriverRefreshToken } from '../utils/tokens.js'
 
+const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173'
+
 async function sendVerificationCode(driver) {
   const code = await assignOtp(driver)
   await sendOtpEmail(driver.email, driver.name, code)
+}
+
+function vehicleDetailsLabel(driver) {
+  const parts = [driver.vehicleType]
+  if (driver.vehicleName) parts.push(`— ${driver.vehicleName}`)
+  const label = parts.join(' ')
+  return driver.vehiclePlate ? `${label} (plate ${driver.vehiclePlate})` : label
+}
+
+// Fired once, the moment a Driver application is email-verified — see the
+// matching comment in partnerAuthController.js for why not at raw
+// registration submit. Never blocks the response the applicant sees.
+async function notifyAdminOfApplication(driver) {
+  try {
+    await sendAdminApplicationNotification({
+      applicantType: 'Driver',
+      fullName: driver.name,
+      email: driver.email,
+      phone: driver.phone,
+      vehicleDetails: vehicleDetailsLabel(driver),
+      city: driver.city,
+      state: driver.state,
+      appliedAt: driver.createdAt,
+      reviewUrl: `${CLIENT_URL}/admin/applications`,
+    })
+  } catch (err) {
+    console.error('Failed to send admin application notification (driver)', err)
+  }
 }
 
 // Step 1 of onboarding: create the (unverified) account and email a code.
@@ -57,7 +87,8 @@ export const driverRegister = asyncHandler(async (req, res) => {
   res.status(201).json({ success: true, requiresVerification: true, email: driver.email })
 })
 
-// Step 2: verify the emailed code, mark verified, and sign in.
+// Step 2: verify the emailed code, mark verified, then branch on
+// accountStatus — see the matching comment in partnerAuthController.js.
 export const driverVerifyEmail = asyncHandler(async (req, res) => {
   const { email, code } = req.body
   const driver = await DriverUser.findOne({ email }).select(
@@ -68,8 +99,18 @@ export const driverVerifyEmail = asyncHandler(async (req, res) => {
   const result = await verifyOtpCode(driver, code)
   if (!result.ok) throw new ApiError(400, result.reason)
 
-  const accessToken = issueDriverSession(res, driver)
-  res.json({ success: true, accessToken, driver: publicDriver(driver) })
+  if (driver.accountStatus === 'active') {
+    const accessToken = issueDriverSession(res, driver)
+    return res.json({ success: true, accessToken, driver: publicDriver(driver) })
+  }
+  if (driver.accountStatus === 'pending') {
+    await notifyAdminOfApplication(driver)
+    return res.json({ success: true, pendingApproval: true, email: driver.email })
+  }
+  if (driver.accountStatus === 'rejected') {
+    return res.json({ success: true, applicationRejected: true, email: driver.email })
+  }
+  throw new ApiError(403, 'This account cannot sign in right now. Contact Looppr support.')
 })
 
 export const driverResendVerification = asyncHandler(async (req, res) => {
@@ -111,6 +152,18 @@ export const driverLogin = asyncHandler(async (req, res) => {
       }
     }
     return res.json({ success: true, requiresVerification: true, email: driver.email })
+  }
+
+  // A session is only ever issued to an 'active' account — mirrors the
+  // branch in driverVerifyEmail above.
+  if (driver.accountStatus === 'pending') {
+    return res.json({ success: true, pendingApproval: true, email: driver.email })
+  }
+  if (driver.accountStatus === 'rejected') {
+    return res.json({ success: true, applicationRejected: true, email: driver.email })
+  }
+  if (driver.accountStatus !== 'active') {
+    throw new ApiError(403, 'This account cannot sign in right now. Contact Looppr support.')
   }
 
   const accessToken = issueDriverSession(res, driver, rememberMe !== false)

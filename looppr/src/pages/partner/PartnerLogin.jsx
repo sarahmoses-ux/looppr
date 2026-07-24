@@ -19,6 +19,7 @@ export default function PartnerLogin() {
   const [form, setForm] = useState({ email: '', password: '', rememberMe: true })
   const [errors, setErrors] = useState({})
   const [formError, setFormError] = useState('')
+  const [statusNote, setStatusNote] = useState('')
   const [status, setStatus] = useState('idle')
 
   function handleChange(e) {
@@ -38,6 +39,7 @@ export default function PartnerLogin() {
     const next = validate()
     setErrors(next)
     setFormError('')
+    setStatusNote('')
     if (Object.keys(next).length > 0) return
 
     setStatus('pending')
@@ -45,6 +47,18 @@ export default function PartnerLogin() {
       const result = await login(form)
       if (result.requiresVerification) {
         navigate('/partners/verify-email', { state: { email: result.email } })
+        return
+      }
+      if (result.pendingApproval) {
+        setStatusNote(
+          "Thanks for applying to Looppr! Your application is currently being reviewed by our team. We'll notify you via email once a decision has been made.",
+        )
+        setStatus('idle')
+        return
+      }
+      if (result.applicationRejected) {
+        setStatusNote('Your Looppr application was not approved. Contact support if you believe this is a mistake.')
+        setStatus('idle')
         return
       }
       navigate(redirectTo, { replace: true })
@@ -92,6 +106,9 @@ export default function PartnerLogin() {
 
         {formError && (
           <p role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm font-medium text-red-600">{formError}</p>
+        )}
+        {statusNote && (
+          <p role="status" className="rounded-lg bg-periwinkle-soft px-4 py-3 text-sm font-medium text-periwinkle-text">{statusNote}</p>
         )}
 
         <Button type="submit" variant="primary" className="w-full" disabled={status === 'pending'}>

@@ -6,6 +6,7 @@ process.env.JWT_PARTNER_REFRESH_SECRET = 'test-partner-refresh-secret'
 import { describe, expect, it } from 'vitest'
 import request from 'supertest'
 import { createApp } from '../app.js'
+import { PartnerUser } from '../models/PartnerUser.js'
 import { PickupRequest } from '../models/PickupRequest.js'
 import { sendOtpEmail } from '../services/emailService.js'
 import { createTestUser, tokenFor } from './helpers/auth.js'
@@ -25,11 +26,19 @@ const BASE_PARTNER = {
   agreedToTerms: 'true',
 }
 
+// For tests about something other than the approval flow itself (order
+// management, portal isolation) — pre-approves the account (accountStatus:
+// 'active') before verifying, so verify-email issues a session exactly like
+// it did before the approval system existed. The approval flow itself
+// (pending -> admin review -> active/rejected) is covered separately below,
+// in 'partner application approval'.
 async function registerAndVerify(overrides = {}) {
   const payload = { ...BASE_PARTNER, ...overrides }
   const reg = await request(app).post('/api/partner-auth/register').send(payload)
   expect(reg.status).toBe(201)
   expect(reg.body.requiresVerification).toBe(true)
+
+  await PartnerUser.updateOne({ email: payload.email }, { accountStatus: 'active' })
 
   const code = sendOtpEmail.mock.calls.at(-1)[2]
   const verify = await request(app).post('/api/partner-auth/verify-email').send({ email: payload.email, code })
@@ -148,5 +157,99 @@ describe('partner portal isolation', () => {
   it('rejects unauthenticated access to partner routes', async () => {
     const res = await request(app).get('/api/partner/overview')
     expect(res.status).toBe(401)
+  })
+})
+
+describe('partner application approval', () => {
+  async function registerAndVerifyPending(overrides = {}) {
+    const payload = { ...BASE_PARTNER, ...overrides }
+    const reg = await request(app).post('/api/partner-auth/register').send(payload)
+    expect(reg.status).toBe(201)
+
+    const code = sendOtpEmail.mock.calls.at(-1)[2]
+    const verify = await request(app).post('/api/partner-auth/verify-email').send({ email: payload.email, code })
+    return { email: payload.email, verify }
+  }
+
+  it('defaults new signups to accountStatus pending, not active', async () => {
+    const payload = { ...BASE_PARTNER, email: 'default-status@sparkle.test' }
+    await request(app).post('/api/partner-auth/register').send(payload)
+    const partner = await PartnerUser.findOne({ email: payload.email })
+    expect(partner.accountStatus).toBe('pending')
+  })
+
+  it('verify-email issues no session for a pending account, and notifies the admin', async () => {
+    const { verify } = await registerAndVerifyPending({ email: 'pending-verify@sparkle.test' })
+    expect(verify.status).toBe(200)
+    expect(verify.body.pendingApproval).toBe(true)
+    expect(verify.body.accessToken).toBeUndefined()
+  })
+
+  it('blocks login with a pendingApproval flag while pending, no session issued', async () => {
+    const { email } = await registerAndVerifyPending({ email: 'pending-login@sparkle.test' })
+    const login = await request(app).post('/api/partner-auth/login').send({ email, password: BASE_PARTNER.password })
+    expect(login.status).toBe(200)
+    expect(login.body.pendingApproval).toBe(true)
+    expect(login.body.accessToken).toBeUndefined()
+  })
+
+  it('admin can approve a pending application, unlocking login and the dashboard', async () => {
+    const { email } = await registerAndVerifyPending({ email: 'approve-me@sparkle.test' })
+    const partner = await PartnerUser.findOne({ email })
+    const admin = await createTestUser({ role: 'admin', email: 'approver@example.com' })
+
+    const approve = await request(app)
+      .post(`/api/admin/partners/${partner._id}/approve`)
+      .set('Authorization', `Bearer ${tokenFor(admin)}`)
+    expect(approve.status).toBe(200)
+    expect(approve.body.partner.accountStatus).toBe('active')
+
+    // Approving twice is rejected — an application can only be reviewed once.
+    const approveAgain = await request(app)
+      .post(`/api/admin/partners/${partner._id}/approve`)
+      .set('Authorization', `Bearer ${tokenFor(admin)}`)
+    expect(approveAgain.status).toBe(409)
+
+    const login = await request(app).post('/api/partner-auth/login').send({ email, password: BASE_PARTNER.password })
+    expect(login.status).toBe(200)
+    expect(login.body.accessToken).toBeTruthy()
+
+    const overview = await request(app)
+      .get('/api/partner/overview')
+      .set('Authorization', `Bearer ${login.body.accessToken}`)
+    expect(overview.status).toBe(200)
+  })
+
+  it('admin can reject a pending application, keeping login/dashboard blocked', async () => {
+    const { email } = await registerAndVerifyPending({ email: 'reject-me@sparkle.test' })
+    const partner = await PartnerUser.findOne({ email })
+    const admin = await createTestUser({ role: 'admin', email: 'rejecter@example.com' })
+
+    const reject = await request(app)
+      .post(`/api/admin/partners/${partner._id}/reject`)
+      .set('Authorization', `Bearer ${tokenFor(admin)}`)
+      .send({ reason: 'Outside our current service area' })
+    expect(reject.status).toBe(200)
+    expect(reject.body.partner.accountStatus).toBe('rejected')
+
+    const login = await request(app).post('/api/partner-auth/login').send({ email, password: BASE_PARTNER.password })
+    expect(login.status).toBe(200)
+    expect(login.body.applicationRejected).toBe(true)
+    expect(login.body.accessToken).toBeUndefined()
+  })
+
+  it('blocks dashboard access via a still-valid token the moment accountStatus changes mid-session (defense in depth)', async () => {
+    const token = await registerAndVerify({ email: 'midsession@sparkle.test' })
+    const overviewBefore = await request(app).get('/api/partner/overview').set('Authorization', `Bearer ${token}`)
+    expect(overviewBefore.status).toBe(200)
+
+    // Simulates an admin suspending/rejecting after the session was issued —
+    // the JWT itself is still valid and unexpired, but requireApprovedPartner
+    // re-checks the DB on every request rather than trusting the token.
+    await PartnerUser.updateOne({ email: 'midsession@sparkle.test' }, { accountStatus: 'rejected' })
+
+    const overviewAfter = await request(app).get('/api/partner/overview').set('Authorization', `Bearer ${token}`)
+    expect(overviewAfter.status).toBe(403)
+    expect(overviewAfter.body.details.accountStatus).toBe('rejected')
   })
 })

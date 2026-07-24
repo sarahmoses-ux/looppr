@@ -1,15 +1,39 @@
 import bcrypt from 'bcryptjs'
 import { PartnerUser } from '../models/PartnerUser.js'
-import { sendOtpEmail, sendPasswordResetEmail } from '../services/emailService.js'
+import { sendAdminApplicationNotification, sendOtpEmail, sendPasswordResetEmail } from '../services/emailService.js'
 import { ApiError } from '../utils/ApiError.js'
 import { asyncHandler } from '../utils/asyncHandler.js'
 import { assignOtp, canResendOtp, verifyOtpCode } from '../utils/otp.js'
 import { issuePartnerSession, publicPartner } from '../utils/session.js'
 import { verifyPartnerRefreshToken } from '../utils/tokens.js'
 
+const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173'
+
 async function sendVerificationCode(partner) {
   const code = await assignOtp(partner)
   await sendOtpEmail(partner.email, partner.ownerName, code)
+}
+
+// Fired once, the moment a Partner application is email-verified (not at
+// raw registration submit — step 1 accepts any address including typos/
+// bots, so notifying admins there would just be noise). Never blocks the
+// response the applicant sees; a failed notification is logged, not fatal.
+async function notifyAdminOfApplication(partner) {
+  try {
+    await sendAdminApplicationNotification({
+      applicantType: 'Partner',
+      fullName: partner.ownerName,
+      email: partner.email,
+      phone: partner.phone,
+      businessName: partner.businessName,
+      city: partner.city,
+      state: partner.state,
+      appliedAt: partner.createdAt,
+      reviewUrl: `${CLIENT_URL}/admin/applications`,
+    })
+  } catch (err) {
+    console.error('Failed to send admin application notification (partner)', err)
+  }
 }
 
 // Step 1 of onboarding: create the (unverified) account and email a code.
@@ -72,7 +96,11 @@ export const partnerRegister = asyncHandler(async (req, res) => {
   res.status(201).json({ success: true, requiresVerification: true, email: partner.email })
 })
 
-// Step 2: verify the emailed code, mark verified, and sign in.
+// Step 2: verify the emailed code, mark verified, then branch on
+// accountStatus — a session is only ever issued to an 'active' account.
+// 'pending' (the default for every new signup) notifies the admin and sends
+// the applicant to the "application submitted" screen instead of the
+// dashboard; 'rejected' sends them to the same screen with no session.
 export const partnerVerifyEmail = asyncHandler(async (req, res) => {
   const { email, code } = req.body
   const partner = await PartnerUser.findOne({ email }).select(
@@ -83,8 +111,18 @@ export const partnerVerifyEmail = asyncHandler(async (req, res) => {
   const result = await verifyOtpCode(partner, code)
   if (!result.ok) throw new ApiError(400, result.reason)
 
-  const accessToken = issuePartnerSession(res, partner)
-  res.json({ success: true, accessToken, partner: publicPartner(partner) })
+  if (partner.accountStatus === 'active') {
+    const accessToken = issuePartnerSession(res, partner)
+    return res.json({ success: true, accessToken, partner: publicPartner(partner) })
+  }
+  if (partner.accountStatus === 'pending') {
+    await notifyAdminOfApplication(partner)
+    return res.json({ success: true, pendingApproval: true, email: partner.email })
+  }
+  if (partner.accountStatus === 'rejected') {
+    return res.json({ success: true, applicationRejected: true, email: partner.email })
+  }
+  throw new ApiError(403, 'This account cannot sign in right now. Contact Looppr support.')
 })
 
 export const partnerResendVerification = asyncHandler(async (req, res) => {
@@ -126,6 +164,19 @@ export const partnerLogin = asyncHandler(async (req, res) => {
       }
     }
     return res.json({ success: true, requiresVerification: true, email: partner.email })
+  }
+
+  // A session is only ever issued to an 'active' account — mirrors the
+  // branch in partnerVerifyEmail above so there's exactly one rule for when
+  // a partner gets a usable session, regardless of entry point.
+  if (partner.accountStatus === 'pending') {
+    return res.json({ success: true, pendingApproval: true, email: partner.email })
+  }
+  if (partner.accountStatus === 'rejected') {
+    return res.json({ success: true, applicationRejected: true, email: partner.email })
+  }
+  if (partner.accountStatus !== 'active') {
+    throw new ApiError(403, 'This account cannot sign in right now. Contact Looppr support.')
   }
 
   const accessToken = issuePartnerSession(res, partner, rememberMe !== false)

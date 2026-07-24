@@ -6,6 +6,8 @@ process.env.JWT_DRIVER_REFRESH_SECRET = 'test-driver-refresh-secret'
 import { describe, expect, it } from 'vitest'
 import request from 'supertest'
 import { createApp } from '../app.js'
+import { DriverUser } from '../models/DriverUser.js'
+import { PartnerUser } from '../models/PartnerUser.js'
 import { PickupRequest } from '../models/PickupRequest.js'
 import { sendOtpEmail } from '../services/emailService.js'
 import { createTestUser, tokenFor } from './helpers/auth.js'
@@ -25,11 +27,19 @@ const BASE_DRIVER = {
   agreedToTerms: 'true',
 }
 
+// For tests about something other than the approval flow itself (delivery
+// management, weight confirmation, location, isolation) — pre-approves the
+// account (accountStatus: 'active') before verifying, so verify-email issues
+// a session exactly like it did before the approval system existed. The
+// approval flow itself is covered separately below, in 'driver application
+// approval'.
 async function registerAndVerify(overrides = {}) {
   const payload = { ...BASE_DRIVER, ...overrides }
   const reg = await request(app).post('/api/driver-auth/register').send(payload)
   expect(reg.status).toBe(201)
   expect(reg.body.requiresVerification).toBe(true)
+
+  await DriverUser.updateOne({ email: payload.email }, { accountStatus: 'active' })
 
   const code = sendOtpEmail.mock.calls.at(-1)[2]
   const verify = await request(app).post('/api/driver-auth/verify-email').send({ email: payload.email, code })
@@ -158,6 +168,7 @@ describe('driver delivery management', () => {
       state: 'OK', agreedToTerms: 'true',
     })
     expect(partnerReg.status).toBe(201)
+    await PartnerUser.updateOne({ email: 'coclaim@partner.test' }, { accountStatus: 'active' })
     const partnerCode = sendOtpEmail.mock.calls.at(-1)[2]
     const partnerVerify = await request(app).post('/api/partner-auth/verify-email').send({ email: 'coclaim@partner.test', code: partnerCode })
     const partnerToken = partnerVerify.body.accessToken
@@ -287,5 +298,95 @@ describe('driver portal isolation', () => {
   it('rejects unauthenticated access to driver routes', async () => {
     const res = await request(app).get('/api/driver/overview')
     expect(res.status).toBe(401)
+  })
+})
+
+describe('driver application approval', () => {
+  async function registerAndVerifyPending(overrides = {}) {
+    const payload = { ...BASE_DRIVER, ...overrides }
+    const reg = await request(app).post('/api/driver-auth/register').send(payload)
+    expect(reg.status).toBe(201)
+
+    const code = sendOtpEmail.mock.calls.at(-1)[2]
+    const verify = await request(app).post('/api/driver-auth/verify-email').send({ email: payload.email, code })
+    return { email: payload.email, verify }
+  }
+
+  it('defaults new signups to accountStatus pending, not active', async () => {
+    const payload = { ...BASE_DRIVER, email: 'default-status@driver.test' }
+    await request(app).post('/api/driver-auth/register').send(payload)
+    const driver = await DriverUser.findOne({ email: payload.email })
+    expect(driver.accountStatus).toBe('pending')
+  })
+
+  it('verify-email issues no session for a pending account, and notifies the admin', async () => {
+    const { verify } = await registerAndVerifyPending({ email: 'pending-verify@driver.test' })
+    expect(verify.status).toBe(200)
+    expect(verify.body.pendingApproval).toBe(true)
+    expect(verify.body.accessToken).toBeUndefined()
+  })
+
+  it('blocks login with a pendingApproval flag while pending, no session issued', async () => {
+    const { email } = await registerAndVerifyPending({ email: 'pending-login@driver.test' })
+    const login = await request(app).post('/api/driver-auth/login').send({ email, password: BASE_DRIVER.password })
+    expect(login.status).toBe(200)
+    expect(login.body.pendingApproval).toBe(true)
+    expect(login.body.accessToken).toBeUndefined()
+  })
+
+  it('admin can approve a pending application, unlocking login and the dashboard', async () => {
+    const { email } = await registerAndVerifyPending({ email: 'approve-me@driver.test' })
+    const driver = await DriverUser.findOne({ email })
+    const admin = await createTestUser({ role: 'admin', email: 'approver-d@example.com' })
+
+    const approve = await request(app)
+      .post(`/api/admin/drivers/${driver._id}/approve`)
+      .set('Authorization', `Bearer ${tokenFor(admin)}`)
+    expect(approve.status).toBe(200)
+    expect(approve.body.driver.accountStatus).toBe('active')
+
+    const approveAgain = await request(app)
+      .post(`/api/admin/drivers/${driver._id}/approve`)
+      .set('Authorization', `Bearer ${tokenFor(admin)}`)
+    expect(approveAgain.status).toBe(409)
+
+    const login = await request(app).post('/api/driver-auth/login').send({ email, password: BASE_DRIVER.password })
+    expect(login.status).toBe(200)
+    expect(login.body.accessToken).toBeTruthy()
+
+    const overview = await request(app)
+      .get('/api/driver/overview')
+      .set('Authorization', `Bearer ${login.body.accessToken}`)
+    expect(overview.status).toBe(200)
+  })
+
+  it('admin can reject a pending application, keeping login/dashboard blocked', async () => {
+    const { email } = await registerAndVerifyPending({ email: 'reject-me@driver.test' })
+    const driver = await DriverUser.findOne({ email })
+    const admin = await createTestUser({ role: 'admin', email: 'rejecter-d@example.com' })
+
+    const reject = await request(app)
+      .post(`/api/admin/drivers/${driver._id}/reject`)
+      .set('Authorization', `Bearer ${tokenFor(admin)}`)
+      .send({ reason: 'Vehicle does not meet requirements' })
+    expect(reject.status).toBe(200)
+    expect(reject.body.driver.accountStatus).toBe('rejected')
+
+    const login = await request(app).post('/api/driver-auth/login').send({ email, password: BASE_DRIVER.password })
+    expect(login.status).toBe(200)
+    expect(login.body.applicationRejected).toBe(true)
+    expect(login.body.accessToken).toBeUndefined()
+  })
+
+  it('blocks dashboard access via a still-valid token the moment accountStatus changes mid-session (defense in depth)', async () => {
+    const token = await registerAndVerify({ email: 'midsession@driver.test' })
+    const overviewBefore = await request(app).get('/api/driver/overview').set('Authorization', `Bearer ${token}`)
+    expect(overviewBefore.status).toBe(200)
+
+    await DriverUser.updateOne({ email: 'midsession@driver.test' }, { accountStatus: 'rejected' })
+
+    const overviewAfter = await request(app).get('/api/driver/overview').set('Authorization', `Bearer ${token}`)
+    expect(overviewAfter.status).toBe(403)
+    expect(overviewAfter.body.details.accountStatus).toBe('rejected')
   })
 })

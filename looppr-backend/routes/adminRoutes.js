@@ -6,9 +6,17 @@ import {
   sendPaymentRequest,
   updateOrderStatus,
 } from '../controllers/adminController.js'
+import {
+  approveDriverApplication,
+  approvePartnerApplication,
+  listDriverApplications,
+  listPartnerApplications,
+  rejectDriverApplication,
+  rejectPartnerApplication,
+} from '../controllers/adminApplicationsController.js'
 import { requireAuth, requireRole } from '../middleware/auth.js'
 import { validate } from '../middleware/validate.js'
-import { updateOrderStatusValidation } from '../validations/adminValidation.js'
+import { adminRejectApplicationValidation, updateOrderStatusValidation } from '../validations/adminValidation.js'
 
 const router = Router()
 
@@ -20,5 +28,12 @@ router.get('/customers', listCustomers)
 router.get('/pickups', listAllPickups)
 router.post('/pickups/:id/send-payment-request', sendPaymentRequest)
 router.patch('/pickups/:id/status', updateOrderStatusValidation, validate, updateOrderStatus)
+
+router.get('/partners', listPartnerApplications)
+router.get('/drivers', listDriverApplications)
+router.post('/partners/:id/approve', approvePartnerApplication)
+router.post('/partners/:id/reject', adminRejectApplicationValidation, validate, rejectPartnerApplication)
+router.post('/drivers/:id/approve', approveDriverApplication)
+router.post('/drivers/:id/reject', adminRejectApplicationValidation, validate, rejectDriverApplication)
 
 export default router

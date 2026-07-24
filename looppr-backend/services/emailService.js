@@ -33,3 +33,18 @@ export async function sendContactConfirmationEmail(toEmail, name) {
 export async function sendPartnerLeadEmail(toEmail, type, name) {
   return provider.sendPartnerLeadEmail(toEmail, type, name)
 }
+
+// Recipient is fixed (ADMIN_NOTIFICATION_EMAIL, resolved inside each
+// provider) — `details` carries applicantType/fullName/email/phone/
+// businessName/vehicleDetails/city/state/appliedAt/reviewUrl.
+export async function sendAdminApplicationNotification(details) {
+  return provider.sendAdminApplicationNotification(details)
+}
+
+export async function sendApplicationApprovedEmail(toEmail, name, portalType, loginUrl) {
+  return provider.sendApplicationApprovedEmail(toEmail, name, portalType, loginUrl)
+}
+
+export async function sendApplicationRejectedEmail(toEmail, name, reason) {
+  return provider.sendApplicationRejectedEmail(toEmail, name, reason)
+}

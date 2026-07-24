@@ -14,6 +14,7 @@ import {
   updateLocation,
 } from '../controllers/driverController.js'
 import { requireDriverAuth } from '../middleware/auth.js'
+import { requireApprovedDriver } from '../middleware/approval.js'
 import { driverLocationLimiter } from '../middleware/rateLimiter.js'
 import { validate } from '../middleware/validate.js'
 import {
@@ -29,7 +30,9 @@ const router = Router()
 
 // Every route requires a valid Driver Portal session. Customer/admin/
 // business/partner tokens fail requireDriverAuth (dedicated signing secret).
-router.use(requireDriverAuth)
+// requireApprovedDriver additionally blocks pending/rejected/suspended
+// accounts even with an otherwise-valid token (see middleware/approval.js).
+router.use(requireDriverAuth, requireApprovedDriver)
 
 router.get('/overview', getDriverOverview)
 router.get('/earnings', getDriverEarnings)

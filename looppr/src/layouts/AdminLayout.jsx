@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { to: '/admin/dashboard', label: 'Overview', end: true },
   { to: '/admin/orders', label: 'Orders' },
   { to: '/admin/customers', label: 'Customers' },
+  { to: '/admin/applications', label: 'Applications' },
 ]
 
 export default function AdminLayout() {

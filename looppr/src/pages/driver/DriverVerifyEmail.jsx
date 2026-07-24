@@ -28,7 +28,11 @@ export default function DriverVerifyEmail() {
 
     setStatus('pending')
     try {
-      await verifyEmail(email, code)
+      const result = await verifyEmail(email, code)
+      if (result?.pendingApproval || result?.applicationRejected) {
+        navigate('/drive/application-submitted', { replace: true })
+        return
+      }
       navigate('/drive/dashboard', { replace: true })
     } catch (err) {
       setFormError(err.response?.data?.message || 'That code is invalid or expired.')

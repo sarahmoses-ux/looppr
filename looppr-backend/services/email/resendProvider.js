@@ -1,4 +1,7 @@
 import { Resend } from 'resend'
+import { adminApplicationNotificationHtml, adminApplicationNotificationSubject } from './adminApplicationNotificationTemplate.js'
+import { applicationApprovedEmailHtml, applicationApprovedEmailSubject } from './applicationApprovedEmailTemplate.js'
+import { applicationRejectedEmailHtml, applicationRejectedEmailSubject } from './applicationRejectedEmailTemplate.js'
 import { contactConfirmationEmailHtml, contactConfirmationEmailSubject } from './contactConfirmationEmailTemplate.js'
 import { otpEmailHtml, otpEmailSubject } from './otpEmailTemplate.js'
 import { partnerLeadEmailHtml, partnerLeadEmailSubject } from './partnerLeadEmailTemplate.js'
@@ -115,6 +118,58 @@ export async function sendPartnerLeadEmail(toEmail, type, name) {
     replyTo: replyTo(),
     subject: partnerLeadEmailSubject(type),
     html: partnerLeadEmailHtml(type, name),
+  })
+
+  if (error) {
+    throw new Error(error.message || 'Failed to send email')
+  }
+}
+
+// Recipient is fixed (not chosen per-call like every other function here) —
+// defaults to laundrylooppr@gmail.com, overridable via ADMIN_NOTIFICATION_EMAIL
+// for staging/other environments.
+export async function sendAdminApplicationNotification(details) {
+  const from = process.env.OTP_FROM_EMAIL || 'Looppr <onboarding@resend.dev>'
+  const to = process.env.ADMIN_NOTIFICATION_EMAIL || 'laundrylooppr@gmail.com'
+
+  const { error } = await getClient().emails.send({
+    from,
+    to,
+    replyTo: replyTo(),
+    subject: adminApplicationNotificationSubject(details.applicantType, details.fullName),
+    html: adminApplicationNotificationHtml(details),
+  })
+
+  if (error) {
+    throw new Error(error.message || 'Failed to send email')
+  }
+}
+
+export async function sendApplicationApprovedEmail(toEmail, name, portalType, loginUrl) {
+  const from = process.env.OTP_FROM_EMAIL || 'Looppr <onboarding@resend.dev>'
+
+  const { error } = await getClient().emails.send({
+    from,
+    to: toEmail,
+    replyTo: replyTo(),
+    subject: applicationApprovedEmailSubject(portalType),
+    html: applicationApprovedEmailHtml(name, portalType, loginUrl),
+  })
+
+  if (error) {
+    throw new Error(error.message || 'Failed to send email')
+  }
+}
+
+export async function sendApplicationRejectedEmail(toEmail, name, reason) {
+  const from = process.env.OTP_FROM_EMAIL || 'Looppr <onboarding@resend.dev>'
+
+  const { error } = await getClient().emails.send({
+    from,
+    to: toEmail,
+    replyTo: replyTo(),
+    subject: applicationRejectedEmailSubject(),
+    html: applicationRejectedEmailHtml(name, reason),
   })
 
   if (error) {

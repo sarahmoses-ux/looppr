@@ -4,7 +4,11 @@ export const DRIVER_VEHICLE_TYPES = ['bike', 'car', 'van']
 
 // Admin-managed account state, distinct from `isVerified` (email ownership)
 // and from `availability` (live dispatch state the driver controls).
-export const DRIVER_ACCOUNT_STATUSES = ['pending', 'active', 'suspended', 'inactive']
+// 'pending' = awaiting manual admin review (see middleware/approval.js) —
+// new signups start here and can only reach 'active' via an admin approval,
+// never automatically. 'rejected' is a terminal state for this application;
+// there is no self-serve re-apply flow.
+export const DRIVER_ACCOUNT_STATUSES = ['pending', 'active', 'rejected', 'suspended', 'inactive']
 
 // Live dispatch state — mirrors the ops-foundation Rider.availability enum
 // so both concepts speak the same vocabulary even though they're separate
@@ -50,7 +54,10 @@ const driverUserSchema = new mongoose.Schema(
     profilePhoto: { type: String, default: '' },
 
     isVerified: { type: Boolean, default: false },
-    accountStatus: { type: String, enum: DRIVER_ACCOUNT_STATUSES, default: 'active' },
+    // Defaults to 'pending', not 'active' — every new driver requires manual
+    // admin approval before requireApprovedDriver (middleware/approval.js)
+    // lets them into the dashboard.
+    accountStatus: { type: String, enum: DRIVER_ACCOUNT_STATUSES, default: 'pending' },
     availability: { type: String, enum: DRIVER_AVAILABILITY_STATES, default: 'offline' },
 
     // GeoJSON Point, left unset until the driver shares a location at least

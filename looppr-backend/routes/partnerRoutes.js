@@ -12,6 +12,7 @@ import {
   updatePartnerProfile,
 } from '../controllers/partnerController.js'
 import { requirePartnerAuth } from '../middleware/auth.js'
+import { requireApprovedPartner } from '../middleware/approval.js'
 import { validate } from '../middleware/validate.js'
 import {
   partnerAvailabilityValidation,
@@ -24,7 +25,9 @@ const router = Router()
 
 // Every route requires a valid Partner Portal session. Customer/admin/
 // business tokens fail requirePartnerAuth (dedicated signing secret).
-router.use(requirePartnerAuth)
+// requireApprovedPartner additionally blocks pending/rejected/suspended
+// accounts even with an otherwise-valid token (see middleware/approval.js).
+router.use(requirePartnerAuth, requireApprovedPartner)
 
 router.get('/overview', getPartnerOverview)
 router.get('/earnings', getPartnerEarnings)

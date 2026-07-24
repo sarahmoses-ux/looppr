@@ -55,6 +55,16 @@ driverApi.interceptors.response.use(
       }
     }
 
+    // requireApprovedDriver (backend) returns 403 with { accountStatus } for
+    // a driver who was suspended/rejected mid-session — a refresh wouldn't
+    // help here (the account is still not approved), so bounce straight to
+    // guest instead of leaving dashboard pages silently failing their fetches.
+    const accountStatus = error.response?.data?.details?.accountStatus
+    if (error.response?.status === 403 && accountStatus && accountStatus !== 'active') {
+      setDriverAccessToken(null)
+      onAuthFailure?.()
+    }
+
     return Promise.reject(error)
   },
 )

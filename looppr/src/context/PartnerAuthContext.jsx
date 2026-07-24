@@ -50,7 +50,10 @@ export function PartnerAuthProvider({ children }) {
 
   async function login(payload) {
     const data = await loginPartner(payload)
-    if (data.requiresVerification) return data
+    // None of these issue a session — only an 'active' account gets one
+    // (see partnerLogin in the backend). Return the flagged response as-is
+    // so the caller (PartnerLogin.jsx) can show the right message.
+    if (data.requiresVerification || data.pendingApproval || data.applicationRejected) return data
     setPartnerAccessToken(data.accessToken)
     setPartner(data.partner)
     setStatus('authenticated')
@@ -58,10 +61,15 @@ export function PartnerAuthProvider({ children }) {
   }
 
   async function verifyEmail(email, code) {
-    const { accessToken, partner: verified } = await verifyPartnerEmail(email, code)
-    setPartnerAccessToken(accessToken)
-    setPartner(verified)
+    const data = await verifyPartnerEmail(email, code)
+    // A pending/rejected application gets no session (see partnerVerifyEmail
+    // in the backend) — return the response so the caller can navigate to
+    // the application-submitted screen instead of the dashboard.
+    if (data.pendingApproval || data.applicationRejected) return data
+    setPartnerAccessToken(data.accessToken)
+    setPartner(data.partner)
     setStatus('authenticated')
+    return data
   }
 
   async function resendVerification(email) {

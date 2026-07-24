@@ -44,6 +44,7 @@ const AdminLoginVerify = lazy(() => import('./pages/admin/AdminLoginVerify'))
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
 const AdminOrders = lazy(() => import('./pages/admin/AdminOrders'))
 const AdminCustomers = lazy(() => import('./pages/admin/AdminCustomers'))
+const AdminApplications = lazy(() => import('./pages/admin/AdminApplications'))
 const GuestBook = lazy(() => import('./pages/guest/GuestBook'))
 const GuestRequestStatus = lazy(() => import('./pages/guest/GuestRequestStatus'))
 
@@ -67,6 +68,7 @@ const PartnerLogin = lazy(() => import('./pages/partner/PartnerLogin'))
 const PartnerSignup = lazy(() => import('./pages/partner/PartnerSignup'))
 const PartnerVerifyEmail = lazy(() => import('./pages/partner/PartnerVerifyEmail'))
 const PartnerForgotPassword = lazy(() => import('./pages/partner/PartnerForgotPassword'))
+const ApplicationSubmittedModal = lazy(() => import('./components/ApplicationSubmittedModal'))
 const PartnerOverview = lazy(() => import('./pages/partner/dashboard/PartnerOverview'))
 const PartnerIncoming = lazy(() => import('./pages/partner/dashboard/IncomingOrders'))
 const PartnerAccepted = lazy(() => import('./pages/partner/dashboard/AcceptedOrders'))
@@ -161,6 +163,7 @@ function App() {
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/orders" element={<AdminOrders />} />
           <Route path="/admin/customers" element={<AdminCustomers />} />
+          <Route path="/admin/applications" element={<AdminApplications />} />
         </Route>
 
         {/* Business Portal: its own auth context so a business session is
@@ -207,6 +210,10 @@ function App() {
           <Route path="/partners/signup" element={<PartnerSignup />} />
           <Route path="/partners/verify-email" element={<PartnerVerifyEmail />} />
           <Route path="/partners/forgot-password" element={<PartnerForgotPassword />} />
+          <Route
+            path="/partners/application-submitted"
+            element={<ApplicationSubmittedModal signInHref="/partners/login" />}
+          />
 
           <Route
             element={
@@ -241,6 +248,10 @@ function App() {
           <Route path="/drive/signup" element={<DriverSignup />} />
           <Route path="/drive/verify-email" element={<DriverVerifyEmail />} />
           <Route path="/drive/forgot-password" element={<DriverForgotPassword />} />
+          <Route
+            path="/drive/application-submitted"
+            element={<ApplicationSubmittedModal signInHref="/drive/login" />}
+          />
 
           <Route
             element={

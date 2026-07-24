@@ -17,7 +17,11 @@ export const PARTNER_SERVICES = [
 
 // Admin-managed account state, distinct from `isVerified` (email ownership)
 // and from `availability` (live online/offline toggle the partner controls).
-export const PARTNER_ACCOUNT_STATUSES = ['pending', 'active', 'suspended', 'inactive']
+// 'pending' = awaiting manual admin review (see middleware/approval.js) —
+// new signups start here and can only reach 'active' via an admin approval,
+// never automatically. 'rejected' is a terminal state for this application;
+// there is no self-serve re-apply flow.
+export const PARTNER_ACCOUNT_STATUSES = ['pending', 'active', 'rejected', 'suspended', 'inactive']
 
 export const PARTNER_AVAILABILITY = ['online', 'offline']
 
@@ -78,7 +82,12 @@ const partnerUserSchema = new mongoose.Schema(
     businessDocument: { type: String, default: '', select: false },
 
     isVerified: { type: Boolean, default: false },
-    accountStatus: { type: String, enum: PARTNER_ACCOUNT_STATUSES, default: 'active' },
+    // Defaults to 'pending', not 'active' — every new partner requires manual
+    // admin approval before requireApprovedPartner (middleware/approval.js)
+    // lets them into the dashboard. services/assignmentService.js's default-
+    // laundromat lookup already filters accountStatus: 'active', so that path
+    // is unaffected by this default change.
+    accountStatus: { type: String, enum: PARTNER_ACCOUNT_STATUSES, default: 'pending' },
     availability: { type: String, enum: PARTNER_AVAILABILITY, default: 'offline' },
 
     averageRating: { type: Number, min: 0, max: 5, default: null },
