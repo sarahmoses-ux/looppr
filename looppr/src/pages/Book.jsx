@@ -231,9 +231,8 @@ export default function Book() {
         <h1 className="mt-4 font-display text-2xl font-semibold text-ink">You're on the list!</h1>
         <p className="mt-3 text-sm leading-relaxed text-ink/65">
           We've saved your pickup request for <strong>{dateLabel}</strong>,{' '}
-          {windowLabel?.toLowerCase()}. Looppr launches in your area on
-          August 1, 2026 — we'll email you to confirm your exact window as we
-          get closer.
+          {windowLabel?.toLowerCase()}. Looppr is available in your area now,
+          and we'll email you to confirm your exact pickup window.
         </p>
 
         {confirmed.paymentStatus === 'paid' ? (

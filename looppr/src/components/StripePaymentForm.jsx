@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Elements, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import Button from './Button'
-import { getStripe } from '../lib/stripe'
+import { getStripe, hasStripeConfig } from '../lib/stripe'
 
 const APPEARANCE = {
   theme: 'stripe',
@@ -51,7 +51,21 @@ function Form({ amountLabel, onSuccess, onError }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-      <PaymentElement />
+      <PaymentElement
+        options={{
+          defaultValues: {
+            billingDetails: {
+              address: {
+                country: 'US',
+              },
+            },
+          },
+          wallets: {
+            applePay: 'auto',
+            googlePay: 'never',
+          },
+        }}
+      />
       <Button type="submit" variant="primary" className="w-full" disabled={!stripe || submitting}>
         {submitting ? 'Processing…' : `Pay ${amountLabel} now`}
       </Button>
@@ -65,8 +79,36 @@ function Form({ amountLabel, onSuccess, onError }) {
 // responsible for telling the backend (confirmPayment/confirmGuestPayment)
 // so paymentStatus flips without waiting on the webhook.
 export default function StripePaymentForm({ clientSecret, amountLabel, onSuccess, onError }) {
+  if (!hasStripeConfig()) {
+    return (
+      <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+        Stripe payment is unavailable right now because the publishable key is not configured. Please add
+        a valid VITE_STRIPE_PUBLISHABLE_KEY and refresh the page.
+      </div>
+    )
+  }
+
+  const paymentElementOptions = {
+    clientSecret,
+    appearance: APPEARANCE,
+    defaultValues: {
+      billingDetails: {
+        address: {
+          country: 'US',
+        },
+      },
+    },
+    terms: {
+      card: 'never',
+    },
+    wallets: {
+      applePay: 'auto',
+      googlePay: 'never',
+    },
+  }
+
   return (
-    <Elements stripe={getStripe()} options={{ clientSecret, appearance: APPEARANCE }}>
+    <Elements stripe={getStripe()} options={paymentElementOptions}>
       <Form amountLabel={amountLabel} onSuccess={onSuccess} onError={onError} />
     </Elements>
   )
