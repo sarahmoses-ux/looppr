@@ -46,6 +46,30 @@ const pickupRequestSchema = new mongoose.Schema(
       enum: ['small', 'medium', 'large'],
       required: true,
     },
+    // How the customer wants their laundry folded/packed for delivery.
+    // Defaults to 'standard' so older orders and flows that don't collect
+    // this yet (e.g. tests) still validate.
+    foldStyle: {
+      type: String,
+      enum: ['standard', 'konmari', 'hangers'],
+      default: 'standard',
+    },
+    // Which detergent to wash with. Defaults to 'freeAndClear' so older
+    // orders and flows that don't collect this yet (e.g. tests) still
+    // validate.
+    detergent: {
+      type: String,
+      enum: ['freeAndClear', 'freshScent', 'eco'],
+      default: 'freeAndClear',
+    },
+    // Wash water temperature. Defaults to 'cold' (safest for colors/fabric)
+    // so older orders and flows that don't collect this yet (e.g. tests)
+    // still validate.
+    waterTemperature: {
+      type: String,
+      enum: ['cold', 'warm', 'hot'],
+      default: 'cold',
+    },
     // Driver-confirmed actual weight, set at pickup to correct a customer/
     // business mistake in the `loadSize` estimate above. When present, this
     // is authoritative over loadSize for display and pricing — loadSize

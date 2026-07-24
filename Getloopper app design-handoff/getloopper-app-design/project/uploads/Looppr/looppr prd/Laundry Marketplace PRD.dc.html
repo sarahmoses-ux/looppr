@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>doc-page:not(:defined){visibility:hidden}</style>
+</helmet>
+<x-import component-from-global-scope="doc-page" from="./doc-page.js" size="letter" margin="0.85in" hint-size="100%,1100px">
+
+<div style="font-family:'Hanken Grotesk',system-ui,sans-serif; color:#332F5C;">
+
+<p style="font-size:12px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:#7C73E6; margin:0 0 10px;">Product Requirements Document · v1.0 · July 2026</p>
+<h1 style="font-family:'Bricolage Grotesque',sans-serif; font-size:34px; font-weight:700; color:#1E1B4B; letter-spacing:-.02em; margin:0 0 10px;">Laundry Marketplace Platform</h1>
+<p style="font-size:15.5px; color:#8885A0; margin:0 0 8px; line-height:1.6;">A two-sided marketplace connecting Clients with independent LaundryMart vendors for on-demand wash, fold, and delivery service.</p>
+<p style="font-size:13px; color:#8885A0; margin:0 0 36px;">Prepared for: Engineering, Design, QA, DevOps &amp; Product · Status: Ready for implementation</p>
+
+<h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:700; color:#1E1B4B; margin:0 0 14px; padding-top:0; border-top:none;">1. Executive Summary</h2>
+<p style="font-size:14.5px; line-height:1.7; color:#332F5C; margin:0 0 12px;">This document specifies a production-ready, two-sided marketplace web application built on the MERN stack (MongoDB, Express, React, Node.js). The platform has exactly two user roles for MVP — <strong>Client</strong> (customer) and <strong>LaundryMart</strong> (vendor) — with no administrative panel. Clients discover nearby LaundryMarts using geolocation search, compare services and pricing, schedule pickup and delivery, pay securely online, and track orders in real time. LaundryMarts manage their business profile, service catalog, pricing, and incoming orders through a dedicated dashboard.</p>
+<p style="font-size:14.5px; line-height:1.7; color:#332F5C; margin:0 0 12px;">The document below is organized as the single source of truth for the project: it covers product scope, every frontend screen with its states and validation rules, the complete backend architecture and database schema, the full REST API surface, the reusable UI component library, core user flows, security and testing strategy, and a phased delivery roadmap. Each functional requirement includes business logic, validation rules, acceptance criteria, and edge cases so that no team needs additional clarification to begin building.</p>
+
+<h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:700; color:#1E1B4B; margin:36px 0 14px; padding-top:18px; border-top:1px solid #E8E6F4;">2. Product Vision &amp; Scope</h2>
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:16px; font-weight:700; color:#3C3489; margin:18px 0 8px;">2.1 Vision</h3>
+<p style="font-size:14.5px; line-height:1.7; color:#332F5C; margin:0 0 12px;">Make professional laundry service as easy to book as a rideshare: find a trusted local LaundryMart, schedule a pickup in under a minute, and track the order until clean laundry is back at the door — with transparent, itemized pricing on both sides of the marketplace.</p>
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:16px; font-weight:700; color:#3C3489; margin:18px 0 8px;">2.2 In Scope (MVP)</h3>
+<ul style="margin:0 0 14px; padding-left:20px;">
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">Client and LaundryMart authentication, each with its own dashboard</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">Geolocation-based vendor search, filtering, and sorting</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">Vendor service catalogs with per-item pricing set by the vendor</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">Booking, scheduled pickup/delivery windows, and checkout with online payment</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">Order lifecycle management and live status tracking for both roles</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">Ratings &amp; reviews, notifications, and profile/business settings</li>
+</ul>
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:16px; font-weight:700; color:#3C3489; margin:18px 0 8px;">2.3 Out of Scope (MVP)</h3>
+<ul style="margin:0 0 14px; padding-left:20px;">
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">Admin panel / internal ops console (flagged for Phase 2 — see §20)</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">Native mobile apps (responsive web only for MVP)</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">In-app driver/logistics fleet management (pickup/delivery is arranged by the LaundryMart itself in MVP)</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">Multi-currency support, subscriptions/recurring billing, loyalty programs</li>
+</ul>
+
+<h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:700; color:#1E1B4B; margin:36px 0 14px; padding-top:18px; border-top:1px solid #E8E6F4;">3. Technology Stack</h2>
+<table style="width:100%; border-collapse:collapse; margin:0 0 8px; font-size:13px;">
+<thead><tr>
+<th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:8px 10px; border:1px solid #E0DCF5;">Layer</th>
+<th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:8px 10px; border:1px solid #E0DCF5;">Choice</th>
+<th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:8px 10px; border:1px solid #E0DCF5;">Notes</th>
+</tr></thead>
+<tbody>
+<tr><td style="padding:7px 10px; border:1px solid #EDEBFA;">Frontend</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">React.js (JS, ES6+), React Router, Context API</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Redux is not needed at MVP scale; revisit only if cross-cutting state (e.g. real-time order status across many components) outgrows Context.</td></tr>
+<tr><td style="padding:7px 10px; border:1px solid #EDEBFA;">Styling</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Tailwind CSS</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Utility classes; shared design tokens in <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">tailwind.config.js</code>.</td></tr>
+<tr><td style="padding:7px 10px; border:1px solid #EDEBFA;">HTTP client</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Axios</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Centralized instance with interceptors for JWT attach + 401 refresh/redirect.</td></tr>
+<tr><td style="padding:7px 10px; border:1px solid #EDEBFA;">Backend</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Node.js, Express.js</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">REST architecture, layered controller/service pattern.</td></tr>
+<tr><td style="padding:7px 10px; border:1px solid #EDEBFA;">Database</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">MongoDB + Mongoose ODM</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">2dsphere geospatial indexes for vendor search.</td></tr>
+<tr><td style="padding:7px 10px; border:1px solid #EDEBFA;">Auth</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">JWT (access + refresh), bcrypt.js</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Access token 15 min, refresh token 30 days, httpOnly cookie.</td></tr>
+<tr><td style="padding:7px 10px; border:1px solid #EDEBFA;">File uploads</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Multer + Cloudinary</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Multer buffers to memory, streams to Cloudinary; no local disk writes.</td></tr>
+<tr><td style="padding:7px 10px; border:1px solid #EDEBFA;">Validation</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">express-validator</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Schema-level validators run before controller logic on every mutating route.</td></tr>
+<tr><td style="padding:7px 10px; border:1px solid #EDEBFA;">Payments</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Stripe</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">See §4 for full rationale and workflow.</td></tr>
+</tbody>
+</table>
+
+<h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:700; color:#1E1B4B; margin:36px 0 14px; padding-top:18px; border-top:1px solid #E8E6F4;">4. Payment Gateway: Stripe vs. Flutterwave</h2>
+<p style="font-size:14.5px; line-height:1.7; color:#332F5C; margin:0 0 12px;"><strong>Recommendation: Stripe.</strong></p>
+<table style="width:100%; border-collapse:collapse; margin:0 0 14px; font-size:13px;">
+<thead><tr>
+<th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:8px 10px; border:1px solid #E0DCF5;">Criteria</th>
+<th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:8px 10px; border:1px solid #E0DCF5;">Stripe</th>
+<th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:8px 10px; border:1px solid #E0DCF5;">Flutterwave</th>
+</tr></thead>
+<tbody>
+<tr><td style="padding:7px 10px; border:1px solid #EDEBFA;">Marketplace payouts</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Stripe Connect natively splits a payment between platform fee and vendor payout, with vendor onboarding (KYC) built in.</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Sub-account/split payment support exists but is less mature for automated marketplace payouts.</td></tr>
+<tr><td style="padding:7px 10px; border:1px solid #EDEBFA;">Docs &amp; SDKs</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Best-in-class Node.js SDK, Elements for PCI-compliant card capture, extensive test tooling.</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Solid SDK, smaller ecosystem, fewer pre-built UI primitives.</td></tr>
+<tr><td style="padding:7px 10px; border:1px solid #EDEBFA;">Geographic fit</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Strongest in US/EU/UK markets.</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Strongest in Africa; not the target launch geography here.</td></tr>
+<tr><td style="padding:7px 10px; border:1px solid #EDEBFA;">Compliance</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">PCI DSS SAQ-A eligible via Elements/Payment Element (card data never touches our server).</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Comparable, but fewer client libraries reach the same SAQ-A simplicity.</td></tr>
+</tbody>
+</table>
+<p style="font-size:14.5px; line-height:1.7; color:#332F5C; margin:0 0 8px;"><strong>Given the target markets (US launch cities), Stripe is the better fit</strong> — primarily because of Stripe Connect, which is purpose-built for exactly this app's shape: a platform that collects payment from a Client and pays out a percentage to a LaundryMart vendor.</p>
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:16px; font-weight:700; color:#3C3489; margin:18px 0 8px;">4.1 Integration Workflow</h3>
+<ol style="margin:0 0 14px; padding-left:20px;">
+  <li style="font-size:14.5px; line-height:1.65; color:#332F5C; margin-bottom:6px;"><strong>Vendor onboarding:</strong> On business registration, create a Stripe Connect Express account for the LaundryMart (<code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">stripe.accounts.create({'{'} type: 'express' {'}'})</code>); redirect to Stripe-hosted onboarding link to collect KYC/bank details. Store <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">stripeAccountId</code> on the Vendor document.</li>
+  <li style="font-size:14.5px; line-height:1.65; color:#332F5C; margin-bottom:6px;"><strong>Checkout:</strong> Client submits card via Stripe Elements (client-side tokenization; raw card data never hits our API). Frontend sends the resulting <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">paymentMethodId</code> to <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">POST /api/payments/create-intent</code>.</li>
+  <li style="font-size:14.5px; line-height:1.65; color:#332F5C; margin-bottom:6px;"><strong>PaymentIntent with destination charge:</strong> Backend creates a PaymentIntent with <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">application_fee_amount</code> (platform commission, default 15%) and <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">transfer_data.destination</code> set to the vendor's connected account ID — Stripe splits funds automatically at settlement.</li>
+  <li style="font-size:14.5px; line-height:1.65; color:#332F5C; margin-bottom:6px;"><strong>Confirmation:</strong> Client confirms via <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">stripe.confirmCardPayment</code>; on success the Order status moves from <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">pending_payment</code> → <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">confirmed</code>.</li>
+  <li style="font-size:14.5px; line-height:1.65; color:#332F5C; margin-bottom:6px;"><strong>Webhooks (source of truth):</strong> Listen for <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">payment_intent.succeeded</code>, <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">payment_intent.payment_failed</code>, and <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">account.updated</code> at <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">POST /api/webhooks/stripe</code>; verify signature with the webhook secret before trusting the payload. Never mark an order paid from the client-side confirmation alone.</li>
+  <li style="font-size:14.5px; line-height:1.65; color:#332F5C; margin-bottom:6px;"><strong>Refunds:</strong> Triggered from an order cancellation within the cancellation window (§9); calls <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">stripe.refunds.create</code> with <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">reverse_transfer: true</code> to claw back the vendor's portion too.</li>
+</ol>
+
+<h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:700; color:#1E1B4B; margin:36px 0 14px; padding-top:18px; border-top:1px solid #E8E6F4;">5. User Roles &amp; Authentication</h2>
+<p style="font-size:14.5px; line-height:1.7; color:#332F5C; margin:0 0 12px;">Exactly two roles for MVP: <strong>Client</strong> and <strong>LaundryMart</strong>. No admin role. Role is stored on the User document (<code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">role: 'client' | 'vendor'</code>) and encoded in the JWT payload; middleware checks it on every protected route (RBAC, §14).</p>
+
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:16px; font-weight:700; color:#3C3489; margin:18px 0 8px;">5.1 Client Authentication Flow</h3>
+<ol style="margin:0 0 14px; padding-left:20px;">
+  <li style="font-size:14.5px; line-height:1.65; color:#332F5C; margin-bottom:6px;"><strong>Sign Up:</strong> name, email, phone, password, confirm password. Validation: email format + uniqueness check (async, on blur); password ≥ 8 chars with 1 number + 1 letter; phone via libphonenumber pattern. On submit: <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">POST /api/auth/client/register</code> hashes password (bcrypt, 12 rounds), creates User, sends verification email, returns access+refresh tokens. Edge case: duplicate email returns 409 with a field-level error, not a generic toast.</li>
+  <li style="font-size:14.5px; line-height:1.65; color:#332F5C; margin-bottom:6px;"><strong>Login:</strong> email + password → <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">POST /api/auth/client/login</code>. Rate-limited to 5 attempts / 15 min per IP+email pair; on the 6th, respond 429 with retry-after.</li>
+  <li style="font-size:14.5px; line-height:1.65; color:#332F5C; margin-bottom:6px;"><strong>Forgot Password:</strong> email → <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">POST /api/auth/forgot-password</code> issues a signed, single-use reset token (JWT, 1-hour expiry) emailed as a link. Always returns 200 (never reveal whether the email exists).</li>
+  <li style="font-size:14.5px; line-height:1.65; color:#332F5C; margin-bottom:6px;"><strong>Reset Password:</strong> token + new password → <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">POST /api/auth/reset-password</code> verifies token signature + expiry + single-use flag, updates password hash, invalidates all existing refresh tokens for that user.</li>
+  <li style="font-size:14.5px; line-height:1.65; color:#332F5C; margin-bottom:6px;"><strong>Logout:</strong> <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">POST /api/auth/logout</code> clears the httpOnly refresh cookie and blacklists the refresh token server-side.</li>
+</ol>
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:16px; font-weight:700; color:#3C3489; margin:18px 0 8px;">5.2 LaundryMart Authentication Flow</h3>
+<ol style="margin:0 0 14px; padding-left:20px;">
+  <li style="font-size:14.5px; line-height:1.65; color:#332F5C; margin-bottom:6px;"><strong>Register Business:</strong> multi-step form — (1) owner name, email, phone, password; (2) business name, address (geocoded to lat/lng via Google Geocoding API), business hours; (3) Stripe Connect onboarding redirect. Vendor record is created with <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">status: 'pending_verification'</code> until Stripe onboarding completes (webhook flips it to <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">active</code>) — a pending vendor is not shown in client search results.</li>
+  <li style="font-size:14.5px; line-height:1.65; color:#332F5C; margin-bottom:6px;"><strong>Login / Forgot / Reset / Logout:</strong> identical mechanics to Client flows above, on vendor-scoped routes (<code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">/api/auth/vendor/*</code>) so tokens are minted with <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">role: 'vendor'</code>.</li>
+</ol>
+<p style="font-size:13.5px; line-height:1.6; color:#8885A0; margin:0 0 12px;">Acceptance criteria (both roles): a successful auth call returns a user/vendor object (no password hash), sets the refresh token as httpOnly+Secure+SameSite=Lax, and the access token in the response body for the client to hold in memory (never localStorage, to reduce XSS token theft surface).</p>
+
+<h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:700; color:#1E1B4B; margin:36px 0 14px; padding-top:18px; border-top:1px solid #E8E6F4;">6. Frontend Pages — Public</h2>
+<table style="width:100%; border-collapse:collapse; margin:0 0 14px; font-size:12.5px;">
+<thead><tr>
+<th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:7px 9px; border:1px solid #E0DCF5;">Page</th>
+<th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:7px 9px; border:1px solid #E0DCF5;">Purpose &amp; Key Components</th>
+<th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:7px 9px; border:1px solid #E0DCF5;">States &amp; Behavior</th>
+</tr></thead>
+<tbody>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Landing</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Navbar, Hero with location-aware "Find LaundryMarts near you" search bar, How-it-works, featured vendor cards, testimonials, CTA banner, Footer.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Loading: skeleton for featured vendors. Empty: generic "Coming to your area soon" if geolocation resolves outside launch cities. Responsive: hero stacks vertically &lt;768px.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">About</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Static brand/mission content, team or founding story section.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">No dynamic states — static content page.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Services</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Explains service categories (wash &amp; fold, dry cleaning, bedding) generically; CTA to search vendors.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Static; CTA routes to search with geolocation prompt.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Contact</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Contact form (name, email, subject, message) + support email/phone.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Loading: submit button spinner. Success: inline confirmation, form clears. Error: inline banner, form retains input.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">FAQs</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Accordion grouped by topic (Clients, Vendors, Payments).</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Client-side only; one panel open at a time on mobile.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Privacy Policy / Terms</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Long-form legal text, table of contents anchor nav.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Static; print-friendly styling.</td></tr>
+</tbody>
+</table>
+
+<h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:700; color:#1E1B4B; margin:36px 0 14px; padding-top:18px; border-top:1px solid #E8E6F4;">7. Frontend Pages — Authentication</h2>
+<table style="width:100%; border-collapse:collapse; margin:0 0 14px; font-size:12.5px;">
+<thead><tr>
+<th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:7px 9px; border:1px solid #E0DCF5;">Page</th>
+<th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:7px 9px; border:1px solid #E0DCF5;">Validation Rules</th>
+<th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:7px 9px; border:1px solid #E0DCF5;">States</th>
+</tr></thead>
+<tbody>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Client Sign Up</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Required fields; email format + async uniqueness; password strength meter; ToS checkbox required.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Inline field errors on blur; submit disabled until valid; loading spinner on submit; success redirects to Client Dashboard.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Client Login</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Required email + password; generic "invalid credentials" (never reveal which field is wrong).</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Error banner on 401; lockout notice on 429 with countdown.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Vendor Registration</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">3-step wizard with step-level validation; address must resolve via geocoding before step 2 can advance.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Progress indicator; step state persisted in sessionStorage so a refresh doesn't lose progress; final step shows Stripe onboarding redirect loading state.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Vendor Login</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Same as Client Login, vendor-scoped endpoint.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">If Stripe onboarding incomplete, redirect to a "finish setup" screen instead of the dashboard.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Forgot / Reset Password</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Email format (forgot); password strength + match (reset); reset token must be present in URL.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Forgot always shows the same "check your email" success state. Reset shows an expired/invalid-token error state with a re-request link.</td></tr>
+</tbody>
+</table>
+
+<h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:700; color:#1E1B4B; margin:36px 0 14px; padding-top:18px; border-top:1px solid #E8E6F4;">8. Frontend Pages — Client Dashboard</h2>
+<table style="width:100%; border-collapse:collapse; margin:0 0 14px; font-size:12.5px;">
+<thead><tr>
+<th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:7px 9px; border:1px solid #E0DCF5;">Page</th>
+<th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:7px 9px; border:1px solid #E0DCF5;">Purpose &amp; Components</th>
+<th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:7px 9px; border:1px solid #E0DCF5;">States / Logic</th>
+</tr></thead>
+<tbody>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Dashboard Overview</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Active order status card, quick-rebook shortcuts, recent activity feed.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Empty: "No orders yet" with a search CTA for first-time users.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Nearby LaundryMarts</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Map + list toggle, vendor cards (rating, distance, price range, turnaround time).</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Requires geolocation permission; fallback to manual ZIP entry if denied. Empty: no vendors within radius → suggest widening radius.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Search Vendors</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Filters (distance, price, rating, service type, turnaround), sort (distance/rating/price).</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Skeleton cards while loading; filters persist in URL query params for shareable/back-button-safe state.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Vendor Details</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Business profile, photo gallery, service list with prices, reviews, hours, "Book Now" CTA.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Closed-now banner if outside business hours (booking still allowed for next window). Error: vendor not found → 404 state with back-to-search link.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Book Laundry Service</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Service picker with per-item quantity/weight estimator, running subtotal.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Validation: at least 1 service line item required to proceed; quantity must be &gt; 0.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Schedule Pickup</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Date &amp; time-window picker (pickup + delivery), address selector/entry, special instructions field.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Validation: only future slots within vendor's published availability are selectable; delivery window must be ≥ vendor's minimum turnaround after pickup.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Checkout</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Order summary, promo code field, tip selector, total breakdown (subtotal, fee, tip, tax).</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Recalculates live as tip/promo change; "Place Order" disabled until payment step validates.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Payment</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Stripe Payment Element, saved cards list, add-new-card flow.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Loading: processing overlay blocks double-submit. Error: card-decline message inline from Stripe's error object, order remains editable.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Order Tracking</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Status timeline (Placed → Accepted → Picked Up → In Progress → Ready → Delivered), live map placeholder, vendor contact button.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Polls/subscribes for status changes; each transition pushes a Notification (see §12).</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Order History</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Paginated table/list of past orders, filter by status/date, "Reorder" and "Leave a review" actions.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Empty state for first-time users; pagination via cursor, 20/page.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Notifications</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Chronological list, unread badge, mark-all-read.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Empty: "You're all caught up" illustration state.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Profile</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Name, email, phone, saved addresses, profile photo upload.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Inline field-level save (autosave on blur) with toast confirmation.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Settings</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Notification preferences, password change, saved payment methods, delete-account flow.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Delete-account requires typed confirmation + password re-entry.</td></tr>
+</tbody>
+</table>
+
+<h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:700; color:#1E1B4B; margin:36px 0 14px; padding-top:18px; border-top:1px solid #E8E6F4;">9. Frontend Pages — LaundryMart Dashboard</h2>
+<table style="width:100%; border-collapse:collapse; margin:0 0 14px; font-size:12.5px;">
+<thead><tr>
+<th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:7px 9px; border:1px solid #E0DCF5;">Page</th>
+<th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:7px 9px; border:1px solid #E0DCF5;">Purpose &amp; Components</th>
+<th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:7px 9px; border:1px solid #E0DCF5;">States / Logic</th>
+</tr></thead>
+<tbody>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Dashboard Overview</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Today's orders count, pending requests badge, earnings snapshot, rating summary.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Onboarding checklist shown until profile + first service + Stripe setup are all complete.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Manage Orders</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Kanban-style columns (New, Accepted, In Progress, Ready, Completed) or filterable table; per-order action buttons.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Empty per column. New orders bordered/highlighted with a response-time indicator (auto-cancel if not actioned within X minutes, per §9 business rules below).</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Manage Services</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">CRUD list of services (name, category, unit — per lb/per item, price, est. turnaround), add/edit modal.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Validation: price &gt; 0, name required, at least one active service required before going live.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Update Prices</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Bulk price-editing table across all services with percentage adjust helper.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Confirms before applying bulk change; changes logged with timestamp for dispute resolution.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Manage Availability</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Weekly hours grid, blackout-date picker, max daily order capacity.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Closing early/blackout dates immediately removes those slots from Client scheduling.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Earnings</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Revenue chart (daily/weekly/monthly), payout history, platform fee breakdown, CSV export.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Pulls from Stripe Connect balance/payout API; empty state before first completed order.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Customer Requests</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Inbound messages/special requests tied to an order thread.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Unread badge; read-receipt on open.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Notifications</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">New order, cancellation, review, and payout notifications.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Same pattern as Client Notifications (§8).</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Business Profile</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Business name, description, logo + gallery upload (Cloudinary), address, contact info.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Image upload: max 5MB/file, jpg/png/webp only, client-side compression before upload.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA; font-weight:600;">Settings</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Password change, payout bank details (deep-links to Stripe Express dashboard), notification prefs, deactivate business.</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Deactivating hides the vendor from search but preserves historical order data.</td></tr>
+</tbody>
+</table>
+
+<h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:700; color:#1E1B4B; margin:36px 0 14px; padding-top:18px; border-top:1px solid #E8E6F4;">10. Functional Requirements &amp; Business Rules</h2>
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:16px; font-weight:700; color:#3C3489; margin:18px 0 8px;">10.1 Order Lifecycle (Business Logic)</h3>
+<p style="font-size:14.5px; line-height:1.7; color:#332F5C; margin:0 0 10px;">Order status enum: <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">pending_payment → confirmed → accepted → picked_up → in_progress → ready_for_delivery → delivered → completed</code>, with terminal branches <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">cancelled</code> and <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">disputed</code>.</p>
+<ul style="margin:0 0 14px; padding-left:20px;">
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>Acceptance window:</strong> a vendor has 15 minutes to accept or reject a new order; if it times out, the order auto-cancels and the Client is refunded in full and prompted to rebook with another vendor.</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>Cancellation policy:</strong> Client may cancel free of charge up until the vendor marks <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">picked_up</code>; after that, a cancellation requires vendor approval and may incur a partial charge for work already done.</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>Reviews:</strong> only enabled on orders in <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">completed</code> status, one review per order, editable within 48 hours of submission.</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>Platform fee:</strong> default 15% commission on order subtotal (configurable per-vendor field for future negotiated rates), computed server-side — never trust a client-submitted total.</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>Geosearch radius:</strong> default 8 miles, user-adjustable up to 25 miles; vendors beyond that are excluded from results regardless of rating.</li>
+</ul>
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:16px; font-weight:700; color:#3C3489; margin:18px 0 8px;">10.2 Client Features</h3>
+<ul style="margin:0 0 14px; padding-left:20px;">
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">Register/login, geolocation vendor search with filter/sort, vendor profile comparison</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">Schedule pickup/delivery, place orders, pay securely, track live status, view order history</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">Rate &amp; review completed orders, manage notifications and profile</li>
+</ul>
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:16px; font-weight:700; color:#3C3489; margin:18px 0 8px;">10.3 LaundryMart Features</h3>
+<ul style="margin:0 0 14px; padding-left:20px;">
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">Register business, manage profile + logo/gallery uploads, manage services and pricing</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">Accept/reject orders, update order status through the lifecycle, view earnings and payouts</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">Respond to customer requests, manage notifications</li>
+</ul>
+
+<h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:700; color:#1E1B4B; margin:36px 0 14px; padding-top:18px; border-top:1px solid #E8E6F4;">11. Backend Architecture</h2>
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:16px; font-weight:700; color:#3C3489; margin:18px 0 8px;">11.1 System Overview</h3>
+<p style="font-size:14.5px; line-height:1.7; color:#332F5C; margin:0 0 12px;">A layered Express application: <strong>routes</strong> declare endpoints and attach validators/middleware → <strong>controllers</strong> parse the request and call <strong>services</strong> (business logic, framework-agnostic) → services talk to <strong>Mongoose models</strong>. Cross-cutting concerns (auth, error handling, logging, rate limiting) live in middleware applied globally or per-router.</p>
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:16px; font-weight:700; color:#3C3489; margin:18px 0 8px;">11.2 Backend Folder Structure</h3>
+<pre style="font-family:'SF Mono',Consolas,monospace; background:#1E1B4B; color:#E4E2FA; padding:14px 16px; border-radius:8px; font-size:12px; line-height:1.6; overflow-x:auto; margin:0 0 14px; white-space:pre-wrap;">server/
+├── config/          # db connection, cloudinary, stripe, env loader
+├── controllers/      # auth, client, vendor, order, payment, review, notification
+├── models/            # User, Vendor, Service, Order, Payment, Review, Notification
+├── routes/            # one router per resource, mounted under /api
+├── middleware/       # auth (JWT verify + RBAC), validate, rateLimiter, errorHandler, upload (multer)
+├── services/          # geocode.service, stripe.service, cloudinary.service, notification.service
+├── validations/      # express-validator chains per route
+├── utils/              # asyncHandler, ApiError, ApiResponse, logger
+├── uploads/            # multer memory storage tmp (not persisted; streamed to Cloudinary)
+└── server.js</pre>
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:16px; font-weight:700; color:#3C3489; margin:18px 0 8px;">11.3 Frontend Folder Structure</h3>
+<pre style="font-family:'SF Mono',Consolas,monospace; background:#1E1B4B; color:#E4E2FA; padding:14px 16px; border-radius:8px; font-size:12px; line-height:1.6; overflow-x:auto; margin:0 0 14px; white-space:pre-wrap;">client/src/
+├── components/       # shared UI (Button, Input, Modal, Toast, VendorCard…)
+├── pages/              # one folder per route, e.g. pages/client/OrderTracking
+├── layouts/            # ClientDashboardLayout, VendorDashboardLayout, PublicLayout
+├── hooks/              # useAuth, useGeolocation, useDebounce, useOrderStatus
+├── context/            # AuthContext, NotificationContext, CartContext
+├── services/           # api/ axios wrappers per resource (authApi, orderApi…)
+├── routes/             # AppRouter.jsx, ProtectedRoute.jsx, RoleRoute.jsx
+├── utils/              # formatCurrency, validators, dateHelpers
+└── assets/</pre>
+
+<h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:700; color:#1E1B4B; margin:36px 0 14px; padding-top:18px; border-top:1px solid #E8E6F4;">12. Database Design</h2>
+<p style="font-size:14.5px; line-height:1.7; color:#332F5C; margin:0 0 12px;">Collections use referenced relationships (ObjectId) rather than deep embedding, except where sub-documents are always accessed with their parent (e.g. OrderItems inside Order).</p>
+
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:15px; font-weight:700; color:#3C3489; margin:18px 0 6px;">Users (Clients)</h3>
+<table style="width:100%; border-collapse:collapse; margin:0 0 14px; font-size:12.5px;">
+<thead><tr><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 9px; border:1px solid #E0DCF5;">Field</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 9px; border:1px solid #E0DCF5;">Type</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 9px; border:1px solid #E0DCF5;">Notes</th></tr></thead>
+<tbody>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">name</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">String</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">required, 2–60 chars</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">email</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">String</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">required, unique, lowercase, indexed</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">phone</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">String</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">required, E.164 format</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">passwordHash</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">String</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">required, select:false</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">role</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">String enum</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">'client' (default)</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">addresses</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">[{'{'}label,line1,city,state,zip,lat,lng{'}'}]</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">embedded array, max 10</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">stripeCustomerId</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">String</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">set on first checkout</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">avatarUrl</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">String</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Cloudinary URL</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">isVerified</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Boolean</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">default false</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">timestamps</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Date</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">createdAt/updatedAt</td></tr>
+</tbody>
+</table>
+
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:15px; font-weight:700; color:#3C3489; margin:18px 0 6px;">Vendors (+ embedded Vendor Profile)</h3>
+<table style="width:100%; border-collapse:collapse; margin:0 0 14px; font-size:12.5px;">
+<thead><tr><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 9px; border:1px solid #E0DCF5;">Field</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 9px; border:1px solid #E0DCF5;">Type</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 9px; border:1px solid #E0DCF5;">Notes</th></tr></thead>
+<tbody>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">ownerName, email, phone, passwordHash</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">String</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">same rules as User</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">businessName</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">String</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">required, 2–80 chars</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">description</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">String</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">max 1000 chars</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">location</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">GeoJSON Point</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">{'{'} type:'Point', coordinates:[lng,lat] {'}'}, <strong>2dsphere indexed</strong></td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">address</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">{'{'}line1,city,state,zip{'}'}</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">required</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">logoUrl, galleryUrls</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">String, [String]</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Cloudinary, gallery max 10 images</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">hours</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">[{'{'}day,open,close{'}'}]</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">7 entries, closed = null</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">blackoutDates</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">[Date]</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">optional</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">commissionRate</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Number</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">default 0.15</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">stripeAccountId, stripeOnboardingComplete</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">String, Boolean</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">gates <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">status:'active'</code></td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">status</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">String enum</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">pending_verification / active / deactivated</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">ratingAvg, ratingCount</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Number</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">denormalized, recomputed on new Review</td></tr>
+</tbody>
+</table>
+
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:15px; font-weight:700; color:#3C3489; margin:18px 0 6px;">Services</h3>
+<table style="width:100%; border-collapse:collapse; margin:0 0 14px; font-size:12.5px;">
+<thead><tr><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 9px; border:1px solid #E0DCF5;">Field</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 9px; border:1px solid #E0DCF5;">Type</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 9px; border:1px solid #E0DCF5;">Notes</th></tr></thead>
+<tbody>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">vendorId</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">ObjectId → Vendor</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">indexed</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">name, category</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">String</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">category enum: wash_fold / dry_clean / bedding / ironing / other</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">unit</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">String enum</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">per_lb / per_item</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">price</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Number</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">required, min 0, stored in cents</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">estTurnaroundHrs</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Number</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">used to compute earliest delivery slot</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">isActive</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Boolean</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">soft-disable without deleting</td></tr>
+</tbody>
+</table>
+
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:15px; font-weight:700; color:#3C3489; margin:18px 0 6px;">Orders (+ embedded OrderItems)</h3>
+<table style="width:100%; border-collapse:collapse; margin:0 0 14px; font-size:12.5px;">
+<thead><tr><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 9px; border:1px solid #E0DCF5;">Field</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 9px; border:1px solid #E0DCF5;">Type</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 9px; border:1px solid #E0DCF5;">Notes</th></tr></thead>
+<tbody>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">clientId, vendorId</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">ObjectId</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">both indexed</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">items</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">[{'{'}serviceId,name,unit,unitPrice,qty,lineTotal{'}'}]</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">snapshot at time of order — price changes later don't retroactively affect placed orders</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">pickupWindow, deliveryWindow</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">{'{'}start,end{'}'} Date</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">required</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">address</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">embedded (copy of chosen address)</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">snapshot, not a live reference</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">subtotal, platformFee, tip, tax, total</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Number (cents)</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">all server-computed, never trusted from client</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">status</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">String enum</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">see §10.1 lifecycle</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">statusHistory</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">[{'{'}status,at{'}'}]</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">audit trail, powers the tracking timeline</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">paymentId</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">ObjectId → Payment</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">1:1</td></tr>
+</tbody>
+</table>
+
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:15px; font-weight:700; color:#3C3489; margin:18px 0 6px;">Payments</h3>
+<table style="width:100%; border-collapse:collapse; margin:0 0 14px; font-size:12.5px;">
+<thead><tr><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 9px; border:1px solid #E0DCF5;">Field</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 9px; border:1px solid #E0DCF5;">Type</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 9px; border:1px solid #E0DCF5;">Notes</th></tr></thead>
+<tbody>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">orderId</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">ObjectId → Order</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">indexed, unique</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">stripePaymentIntentId</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">String</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">unique, source of truth for status</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">amount, applicationFee</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Number (cents)</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">mirror of Stripe object for reporting</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">status</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">String enum</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">requires_payment_method / succeeded / failed / refunded</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">refundedAmount</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Number</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">default 0, supports partial refunds</td></tr>
+</tbody>
+</table>
+
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:15px; font-weight:700; color:#3C3489; margin:18px 0 6px;">Reviews</h3>
+<table style="width:100%; border-collapse:collapse; margin:0 0 14px; font-size:12.5px;">
+<thead><tr><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 9px; border:1px solid #E0DCF5;">Field</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 9px; border:1px solid #E0DCF5;">Type</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 9px; border:1px solid #E0DCF5;">Notes</th></tr></thead>
+<tbody>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">orderId, clientId, vendorId</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">ObjectId</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">orderId unique (1 review/order)</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">rating</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Number</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">required, 1–5 integer</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">comment</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">String</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">optional, max 500 chars</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">editableUntil</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Date</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">createdAt + 48h</td></tr>
+</tbody>
+</table>
+
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:15px; font-weight:700; color:#3C3489; margin:18px 0 6px;">Notifications</h3>
+<table style="width:100%; border-collapse:collapse; margin:0 0 8px; font-size:12.5px;">
+<thead><tr><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 9px; border:1px solid #E0DCF5;">Field</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 9px; border:1px solid #E0DCF5;">Type</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 9px; border:1px solid #E0DCF5;">Notes</th></tr></thead>
+<tbody>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">recipientId, recipientRole</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">ObjectId, String</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">polymorphic recipient</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">type</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">String enum</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">order_update / new_order / new_review / payout / message</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">title, body, linkTo</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">String</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">linkTo is a client-side route</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">isRead</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Boolean</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">default false, indexed with recipientId for unread counts</td></tr>
+</tbody>
+</table>
+
+<h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:700; color:#1E1B4B; margin:36px 0 14px; padding-top:18px; border-top:1px solid #E8E6F4;">13. API Documentation</h2>
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:15px; font-weight:700; color:#3C3489; margin:18px 0 6px;">13.1 Auth</h3>
+<table style="width:100%; border-collapse:collapse; margin:0 0 14px; font-size:12px;">
+<thead><tr><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 8px; border:1px solid #E0DCF5;">Method &amp; Route</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 8px; border:1px solid #E0DCF5;">Auth</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 8px; border:1px solid #E0DCF5;">Description</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 8px; border:1px solid #E0DCF5;">Responses</th></tr></thead>
+<tbody>
+<tr><td style="padding:6px 8px; border:1px solid #EDEBFA;"><code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">POST /api/auth/client/register</code></td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Public</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Create client account</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">201 user+tokens · 409 email taken · 422 validation</td></tr>
+<tr><td style="padding:6px 8px; border:1px solid #EDEBFA;"><code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">POST /api/auth/client/login</code></td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Public</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Client login</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">200 user+tokens · 401 invalid · 429 rate-limited</td></tr>
+<tr><td style="padding:6px 8px; border:1px solid #EDEBFA;"><code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">POST /api/auth/vendor/register</code></td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Public</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Create vendor + business profile</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">201 vendor+tokens+stripeOnboardingUrl · 409 · 422</td></tr>
+<tr><td style="padding:6px 8px; border:1px solid #EDEBFA;"><code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">POST /api/auth/vendor/login</code></td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Public</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Vendor login</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">200 · 401 · 429</td></tr>
+<tr><td style="padding:6px 8px; border:1px solid #EDEBFA;"><code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">POST /api/auth/refresh</code></td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Refresh cookie</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Rotate access token</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">200 new access token · 401 expired/invalid</td></tr>
+<tr><td style="padding:6px 8px; border:1px solid #EDEBFA;"><code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">POST /api/auth/forgot-password</code></td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Public</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Email reset link</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">200 always</td></tr>
+<tr><td style="padding:6px 8px; border:1px solid #EDEBFA;"><code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">POST /api/auth/reset-password</code></td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Reset token</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Set new password</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">200 · 400 expired/invalid token</td></tr>
+<tr><td style="padding:6px 8px; border:1px solid #EDEBFA;"><code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">POST /api/auth/logout</code></td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Authenticated</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Clear session</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">200</td></tr>
+</tbody>
+</table>
+
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:15px; font-weight:700; color:#3C3489; margin:18px 0 6px;">13.2 Vendors &amp; Search</h3>
+<table style="width:100%; border-collapse:collapse; margin:0 0 14px; font-size:12px;">
+<thead><tr><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 8px; border:1px solid #E0DCF5;">Method &amp; Route</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 8px; border:1px solid #E0DCF5;">Auth</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 8px; border:1px solid #E0DCF5;">Description</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 8px; border:1px solid #E0DCF5;">Responses</th></tr></thead>
+<tbody>
+<tr><td style="padding:6px 8px; border:1px solid #EDEBFA;"><code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">GET /api/vendors?lat&amp;lng&amp;radius&amp;sort&amp;category&amp;minRating</code></td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Public</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Geo search, <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">$geoNear</code> aggregation on 2dsphere index</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">200 paginated list · 422 bad coords</td></tr>
+<tr><td style="padding:6px 8px; border:1px solid #EDEBFA;"><code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">GET /api/vendors/:id</code></td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Public</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Vendor detail incl. services + rating</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">200 · 404</td></tr>
+<tr><td style="padding:6px 8px; border:1px solid #EDEBFA;"><code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">PATCH /api/vendors/me</code></td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Vendor</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Update business profile</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">200 · 422</td></tr>
+<tr><td style="padding:6px 8px; border:1px solid #EDEBFA;"><code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">POST /api/vendors/me/media</code></td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Vendor</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Upload logo/gallery (multipart, Multer→Cloudinary)</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">200 urls · 413 too large · 415 bad type</td></tr>
+<tr><td style="padding:6px 8px; border:1px solid #EDEBFA;"><code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">PATCH /api/vendors/me/availability</code></td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Vendor</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Update hours/blackout dates</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">200 · 422</td></tr>
+</tbody>
+</table>
+
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:15px; font-weight:700; color:#3C3489; margin:18px 0 6px;">13.3 Services, Orders, Payments, Reviews</h3>
+<table style="width:100%; border-collapse:collapse; margin:0 0 14px; font-size:12px;">
+<thead><tr><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 8px; border:1px solid #E0DCF5;">Method &amp; Route</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 8px; border:1px solid #E0DCF5;">Auth</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 8px; border:1px solid #E0DCF5;">Description</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 8px; border:1px solid #E0DCF5;">Responses</th></tr></thead>
+<tbody>
+<tr><td style="padding:6px 8px; border:1px solid #EDEBFA;"><code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">POST /api/services</code></td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Vendor</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Create service</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">201 · 422</td></tr>
+<tr><td style="padding:6px 8px; border:1px solid #EDEBFA;"><code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">PATCH /api/services/:id · DELETE /api/services/:id</code></td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Vendor (owner only)</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Edit/soft-delete service</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">200 · 403 not owner · 404</td></tr>
+<tr><td style="padding:6px 8px; border:1px solid #EDEBFA;"><code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">POST /api/orders</code></td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Client</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Create order in <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">pending_payment</code>, server recomputes totals</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">201 · 422 invalid slot/items</td></tr>
+<tr><td style="padding:6px 8px; border:1px solid #EDEBFA;"><code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">POST /api/payments/create-intent</code></td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Client</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Create Stripe PaymentIntent for order</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">200 clientSecret · 402 card error</td></tr>
+<tr><td style="padding:6px 8px; border:1px solid #EDEBFA;"><code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">POST /api/webhooks/stripe</code></td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Stripe signature</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Confirm payment, flip order → confirmed</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">200 · 400 bad signature</td></tr>
+<tr><td style="padding:6px 8px; border:1px solid #EDEBFA;"><code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">GET /api/orders/me</code></td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Client or Vendor</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Own orders, paginated + filterable</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">200</td></tr>
+<tr><td style="padding:6px 8px; border:1px solid #EDEBFA;"><code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">PATCH /api/orders/:id/status</code></td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Vendor (owner)</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Advance status; validates legal transition only</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">200 · 409 illegal transition · 403</td></tr>
+<tr><td style="padding:6px 8px; border:1px solid #EDEBFA;"><code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">POST /api/orders/:id/cancel</code></td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Client or Vendor</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Cancel + trigger refund per policy (§10.1)</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">200 · 409 past cutoff</td></tr>
+<tr><td style="padding:6px 8px; border:1px solid #EDEBFA;"><code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">POST /api/reviews</code></td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Client</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Review a completed order</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">201 · 409 order not completed / already reviewed</td></tr>
+<tr><td style="padding:6px 8px; border:1px solid #EDEBFA;"><code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:11.5px;">GET /api/notifications · PATCH /api/notifications/:id/read</code></td><td style="padding:6px 8px; border:1px solid #EDEBFA;">Authenticated</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">List / mark read</td><td style="padding:6px 8px; border:1px solid #EDEBFA;">200</td></tr>
+</tbody>
+</table>
+
+<h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:700; color:#1E1B4B; margin:36px 0 14px; padding-top:18px; border-top:1px solid #E8E6F4;">14. UI Component Library</h2>
+<table style="width:100%; border-collapse:collapse; margin:0 0 14px; font-size:12.5px;">
+<thead><tr><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 9px; border:1px solid #E0DCF5;">Component</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:6px 9px; border:1px solid #E0DCF5;">Notes</th></tr></thead>
+<tbody>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">Navbar</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Role-aware — shows auth links (guest) or dashboard/avatar menu (logged in); mobile hamburger drawer.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">Hero Section</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Headline + embedded Search Bar, illustrative background.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">Search Bar</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Location autocomplete (Google Places) + "use my location" button.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">Vendor Card</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Logo, name, rating stars, distance, price-range indicator, "open now" badge.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">Service Card</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Name, unit price, quantity stepper.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">Booking Form</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Composed of Service Card list + Date &amp; Time Picker + Address selector.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">Button</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Primary / secondary / destructive / ghost variants; loading spinner state.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">Input / Select / Dropdown</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Shared label + error-message slot; consistent focus ring.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">Date &amp; Time Picker</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Disables past dates and slots outside vendor availability.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">Payment Modal</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Wraps Stripe Payment Element; handles 3DS challenge iframe.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">Order Status Timeline</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Horizontal (desktop) / vertical (mobile) step indicator driven by statusHistory.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">Table</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Sortable headers, sticky header row, row-level actions menu.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">Modal</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Focus-trapped, ESC to close, backdrop click configurable.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">Toast Notification</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Success/error/info variants, auto-dismiss 4s, stackable.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">Skeleton Loader</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Card/list/table variants matching final content's shape.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">Empty / Error States</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Shared illustration placeholder + message + optional retry/CTA button.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">Pagination</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Cursor-based, prev/next + page-size selector.</td></tr>
+<tr><td style="padding:6px 9px; border:1px solid #EDEBFA;">Footer</td><td style="padding:6px 9px; border:1px solid #EDEBFA;">Sitemap links, social icons, legal links.</td></tr>
+</tbody>
+</table>
+
+<h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:700; color:#1E1B4B; margin:36px 0 14px; padding-top:18px; border-top:1px solid #E8E6F4;">15. Core User Flows</h2>
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:15px; font-weight:700; color:#3C3489; margin:18px 0 6px;">15.1 Client: Search → Book → Pay → Track</h3>
+<p style="font-size:14px; line-height:1.7; color:#332F5C; margin:0 0 12px;">Landing → grant/deny geolocation → Nearby LaundryMarts (list+map) → apply filters → open Vendor Details → Book Laundry Service (select items) → Schedule Pickup (date/time/address) → Checkout (review totals, add tip/promo) → Payment (Stripe Element, 3DS if required) → Order confirmed → Order Tracking (live timeline) → Delivered → prompted to Leave Review.</p>
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:15px; font-weight:700; color:#3C3489; margin:18px 0 6px;">15.2 Vendor: Registration → First Order</h3>
+<p style="font-size:14px; line-height:1.7; color:#332F5C; margin:0 0 12px;">Register Business (3-step) → Stripe Connect onboarding (external redirect + return) → status flips to active on webhook → add ≥1 Service → set Availability → appears in Client search → receives New Order notification → Accept within 15-min window → update status through pickup/in-progress/ready/delivered → Earnings updates on webhook-confirmed payout.</p>
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:15px; font-weight:700; color:#3C3489; margin:18px 0 6px;">15.3 Order Cancellation</h3>
+<p style="font-size:14px; line-height:1.7; color:#332F5C; margin:0 0 12px;">Client or Vendor initiates cancel → system checks current status against cutoff (§10.1) → if before pickup: auto full refund via Stripe (<code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">reverse_transfer:true</code>), order → cancelled, both parties notified → if after pickup: requires Vendor approval of a partial refund amount before the refund fires.</p>
+
+<h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:700; color:#1E1B4B; margin:36px 0 14px; padding-top:18px; border-top:1px solid #E8E6F4;">16. Security Requirements</h2>
+<ul style="margin:0 0 14px; padding-left:20px;">
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>JWT:</strong> short-lived access token (15 min) in memory; refresh token (30 days) as httpOnly+Secure+SameSite=Lax cookie; refresh rotation with reuse detection (a reused refresh token revokes the whole family).</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>Password hashing:</strong> bcrypt, 12 salt rounds; never log or return password hashes (<code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">select:false</code> on schema).</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>RBAC:</strong> middleware reads <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">req.user.role</code> from verified JWT; route-level <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">requireRole('vendor')</code> guards; resource-level ownership checks (e.g. a vendor can only PATCH their own Service/Order).</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>Input validation:</strong> express-validator chains on every mutating route; reject unknown fields; sanitize/escape free-text fields (review comments, order instructions) before storage.</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>File uploads:</strong> Multer memory storage, 5MB limit, MIME allowlist (jpg/png/webp), re-encode via Cloudinary (strips EXIF/GPS metadata automatically).</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>Rate limiting:</strong> global 100 req/min/IP; stricter 5 req/15min on auth endpoints; keyed by IP+identifier to prevent credential-stuffing.</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>NoSQL injection:</strong> Mongoose schema typing rejects operator-shaped input by default; additionally strip <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">$</code>/<code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">.</code>-prefixed keys from all request bodies via sanitization middleware.</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>XSS:</strong> React's default escaping + Content-Security-Policy header; never <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">dangerouslySetInnerHTML</code> on user-supplied text.</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>CSRF:</strong> SameSite=Lax cookie + custom header requirement on state-changing requests mitigates CSRF without a separate token scheme.</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>CORS:</strong> allowlist the production frontend origin only; credentials:true for cookie-based refresh.</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>Secrets:</strong> all keys (Stripe, Cloudinary, JWT secret, Mongo URI) in environment variables, never committed; separate test/live Stripe keys per environment.</li>
+</ul>
+
+<h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:700; color:#1E1B4B; margin:36px 0 14px; padding-top:18px; border-top:1px solid #E8E6F4;">17. Testing Strategy</h2>
+<table style="width:100%; border-collapse:collapse; margin:0 0 14px; font-size:13px;">
+<thead><tr><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:7px 9px; border:1px solid #E0DCF5;">Level</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:7px 9px; border:1px solid #E0DCF5;">Tooling</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:7px 9px; border:1px solid #E0DCF5;">Coverage focus</th></tr></thead>
+<tbody>
+<tr><td style="padding:7px 9px; border:1px solid #EDEBFA;">Unit</td><td style="padding:7px 9px; border:1px solid #EDEBFA;">Jest</td><td style="padding:7px 9px; border:1px solid #EDEBFA;">Services (price calc, order-status transitions, geocode helpers), React components (RTL)</td></tr>
+<tr><td style="padding:7px 9px; border:1px solid #EDEBFA;">Integration</td><td style="padding:7px 9px; border:1px solid #EDEBFA;">Jest + Supertest + mongodb-memory-server</td><td style="padding:7px 9px; border:1px solid #EDEBFA;">Route → controller → DB round trips, RBAC enforcement</td></tr>
+<tr><td style="padding:7px 9px; border:1px solid #EDEBFA;">API</td><td style="padding:7px 9px; border:1px solid #EDEBFA;">Postman/Newman collection in CI</td><td style="padding:7px 9px; border:1px solid #EDEBFA;">Contract tests against every documented endpoint in §13</td></tr>
+<tr><td style="padding:7px 9px; border:1px solid #EDEBFA;">E2E</td><td style="padding:7px 9px; border:1px solid #EDEBFA;">Playwright</td><td style="padding:7px 9px; border:1px solid #EDEBFA;">Full flows: client booking→payment→tracking; vendor onboarding→accept order</td></tr>
+<tr><td style="padding:7px 9px; border:1px solid #EDEBFA;">UAT</td><td style="padding:7px 9px; border:1px solid #EDEBFA;">Staging env + scripted scenarios</td><td style="padding:7px 9px; border:1px solid #EDEBFA;">Real device/browser pass with pilot LaundryMart partners before launch</td></tr>
+</tbody>
+</table>
+
+<h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:700; color:#1E1B4B; margin:36px 0 14px; padding-top:18px; border-top:1px solid #E8E6F4;">18. Deployment</h2>
+<ul style="margin:0 0 14px; padding-left:20px;">
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>Frontend:</strong> Vercel, auto-deploy on merge to <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">main</code>, preview deployments per PR.</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>Backend:</strong> Render or Railway, containerized Node service; health-check endpoint <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">/api/health</code>.</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>Database:</strong> MongoDB Atlas, M10+ cluster with automated daily backups and point-in-time recovery.</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>Images:</strong> Cloudinary, auto-format/quality (f_auto,q_auto) delivery.</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>Domain:</strong> apex + www on Vercel; <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">api.</code> subdomain pointed at the backend host.</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>Env vars:</strong> managed per-environment in each platform's secret store; never in source control.</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>CI/CD:</strong> GitHub Actions — lint → unit/integration tests → Newman API tests → build → deploy; block merge on red pipeline.</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>Monitoring/Logging:</strong> Sentry for frontend+backend error tracking; structured JSON logs (Winston/Pino) shipped to the hosting platform's log stream; Stripe Dashboard + webhook delivery logs monitored for failed events.</li>
+</ul>
+
+<h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:700; color:#1E1B4B; margin:36px 0 14px; padding-top:18px; border-top:1px solid #E8E6F4;">19. Non-Functional Requirements</h2>
+<ul style="margin:0 0 14px; padding-left:20px;">
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>Performance:</strong> geo-search API p95 &lt; 400ms; dashboard pages first-contentful-paint &lt; 1.5s on 4G.</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>Availability:</strong> 99.5% uptime target for API; graceful degradation (cached last-known vendor list) if geo-search is briefly unavailable.</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>Scalability:</strong> stateless API instances behind the host's load balancer; MongoDB indexes reviewed at 100k+ orders.</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>Accessibility:</strong> WCAG 2.1 AA — keyboard navigable, focus-visible states, form errors announced via <code style="font-family:'SF Mono',Consolas,monospace; background:#F3F2FF; color:#5A52C5; padding:1px 5px; border-radius:4px; font-size:12px;">aria-live</code>.</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;"><strong>Responsiveness:</strong> full functionality at 320px–2560px; dashboards use a collapsible sidebar &lt; 1024px.</li>
+</ul>
+
+<h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:700; color:#1E1B4B; margin:36px 0 14px; padding-top:18px; border-top:1px solid #E8E6F4;">20. Assumptions, Risks &amp; Dependencies</h2>
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:16px; font-weight:700; color:#3C3489; margin:18px 0 8px;">Assumptions</h3>
+<ul style="margin:0 0 14px; padding-left:20px;">
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">Pickup/delivery logistics are handled by each LaundryMart itself (own staff/couriers) — the platform does not dispatch drivers in MVP.</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">Single currency (USD) and single-region (US) launch; tax calculated as a flat configurable rate, not full nexus-based tax compliance.</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">Vendors are individually vetted/onboarded manually before their Stripe Connect account is approved for payouts (Stripe's own risk review).</li>
+</ul>
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:16px; font-weight:700; color:#3C3489; margin:18px 0 8px;">Risks</h3>
+<ul style="margin:0 0 14px; padding-left:20px;">
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">No admin panel in MVP means disputes/fraud require direct database intervention — mitigate with a minimal internal read-only ops view before public launch if order volume is non-trivial.</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">Vendor-managed logistics means delivery time reliability varies by vendor — surfaced to Clients via the vendor's rating/turnaround stats rather than a platform guarantee.</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">Stripe Connect Express onboarding drop-off could bottleneck vendor supply — track completion rate and add reminder emails.</li>
+</ul>
+<h3 style="font-family:'Bricolage Grotesque',sans-serif; font-size:16px; font-weight:700; color:#3C3489; margin:18px 0 8px;">Dependencies</h3>
+<ul style="margin:0 0 14px; padding-left:20px;">
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">Google Geocoding/Places API key (address entry + geocoding)</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">Stripe account (Connect enabled) with live + test keys</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">Cloudinary account for media storage</li>
+  <li style="font-size:14.5px; line-height:1.6; color:#332F5C; margin-bottom:5px;">Transactional email provider (e.g. SendGrid/Postmark) for auth + notification emails</li>
+</ul>
+
+<h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:700; color:#1E1B4B; margin:36px 0 14px; padding-top:18px; border-top:1px solid #E8E6F4;">21. Milestones &amp; Development Roadmap</h2>
+<table style="width:100%; border-collapse:collapse; margin:0 0 8px; font-size:13px;">
+<thead><tr><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:8px 10px; border:1px solid #E0DCF5;">Phase</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:8px 10px; border:1px solid #E0DCF5;">Scope</th><th style="text-align:left; background:#F3F2FF; color:#3C3489; font-weight:700; padding:8px 10px; border:1px solid #E0DCF5;">Est. Duration</th></tr></thead>
+<tbody>
+<tr><td style="padding:7px 10px; border:1px solid #EDEBFA;">1 — Foundations</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Repo scaffolding, DB schemas, auth (both roles), RBAC middleware, CI pipeline</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">2 weeks</td></tr>
+<tr><td style="padding:7px 10px; border:1px solid #EDEBFA;">2 — Vendor Core</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Vendor registration + Stripe Connect onboarding, business profile, services, availability</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">2 weeks</td></tr>
+<tr><td style="padding:7px 10px; border:1px solid #EDEBFA;">3 — Client Discovery</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Geo search, vendor details, filters/sort</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">1.5 weeks</td></tr>
+<tr><td style="padding:7px 10px; border:1px solid #EDEBFA;">4 — Booking &amp; Payments</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Booking flow, checkout, Stripe PaymentIntent + webhooks, order lifecycle</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">2.5 weeks</td></tr>
+<tr><td style="padding:7px 10px; border:1px solid #EDEBFA;">5 — Order Ops</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Manage Orders dashboard, status tracking, notifications, cancellations/refunds</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">2 weeks</td></tr>
+<tr><td style="padding:7px 10px; border:1px solid #EDEBFA;">6 — Trust &amp; Polish</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Reviews, earnings dashboard, profile/settings, public pages, accessibility pass</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">1.5 weeks</td></tr>
+<tr><td style="padding:7px 10px; border:1px solid #EDEBFA;">7 — Hardening &amp; UAT</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Full test suite, security review, pilot vendor UAT, staging soak</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">2 weeks</td></tr>
+<tr><td style="padding:7px 10px; border:1px solid #EDEBFA;">8 — Launch</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">Production deploy, monitoring live, phased city rollout</td><td style="padding:7px 10px; border:1px solid #EDEBFA;">1 week</td></tr>
+</tbody>
+</table>
+<p style="font-size:13px; color:#8885A0; margin:8px 0 0;">Total: ~14.5 weeks with one full-stack pair; parallelizable to ~9–10 weeks with a dedicated frontend + backend engineer working concurrently from Phase 2 onward.</p>
+
+</div>
+</x-import>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:900,&quot;height&quot;:1100}}"></script>
+</body>
+</html>

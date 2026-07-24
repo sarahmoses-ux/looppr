@@ -8,7 +8,13 @@ export const CUSTOMER_PLANS = [
     price: '$0',
     unit: '/mo',
     detail: 'No subscription. Order when you need it.',
-    features: ['Pay per order', 'Schedule pickups', 'Track orders', 'Standard customer support'],
+    features: [
+      'Wash up to 20 lbs of clothes',
+      'Pay per order',
+      'Schedule pickups',
+      'Track orders',
+      'Standard customer support',
+    ],
     cta: 'Get started free',
     to: '/guest/book',
     highlight: false,
@@ -57,6 +63,7 @@ export const BUSINESS_PLANS = [
     unit: '/mo',
     detail: 'For single-location businesses getting started with Looppr.',
     features: [
+      'Wash up to 500 lbs of clothes',
       'Business dashboard',
       'Dedicated account manager',
       'Scheduled commercial pickups',
@@ -70,10 +77,11 @@ export const BUSINESS_PLANS = [
   },
   {
     name: 'Looppr Business Enterprise',
-    price: '$2,000',
+    price: '$5,000',
     unit: '/mo',
     detail: 'For multi-location operations with higher volume.',
     features: [
+      'Wash up to 1,000 lbs of clothes',
       'Everything included in the Starter plan',
       'Unlimited commercial pickups',
       'Multi-location management',

@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import Input from '../components/Input'
 import Select from '../components/Select'
+import FoldStylePicker from '../components/FoldStylePicker'
+import { FOLD_STYLE_OPTIONS } from '../constants/foldStyles'
 import Button from '../components/Button'
 import SEO from '../components/SEO'
 import StripePaymentForm from '../components/StripePaymentForm'
@@ -15,9 +17,21 @@ const WINDOWS = [
 ]
 
 const LOAD_SIZES = [
-  { value: 'small', label: 'Small · 1–2 bags', lbs: 10 },
-  { value: 'medium', label: 'Medium · 3–4 bags', lbs: 20 },
-  { value: 'large', label: 'Large · 5+ bags', lbs: 35 },
+  { value: 'small', label: 'Small · 10–15 lbs', lbs: 10 },
+  { value: 'medium', label: 'Medium · 16–25 lbs', lbs: 20 },
+  { value: 'large', label: 'Large · 26–35 lbs', lbs: 35 },
+]
+
+const DETERGENTS = [
+  { value: 'freeAndClear', label: 'Free & Clear (unscented)' },
+  { value: 'freshScent', label: 'Fresh Scent' },
+  { value: 'eco', label: 'Eco-Friendly' },
+]
+
+const WATER_TEMPERATURES = [
+  { value: 'cold', label: 'Cold' },
+  { value: 'warm', label: 'Warm' },
+  { value: 'hot', label: 'Hot' },
 ]
 
 const PRICE_PER_LB = 1.59
@@ -51,6 +65,9 @@ export default function Book() {
     preferredDate: '',
     window: '',
     loadSize: rebook?.loadSize || '',
+    foldStyle: rebook?.foldStyle || '',
+    detergent: rebook?.detergent || '',
+    waterTemperature: rebook?.waterTemperature || '',
     notes: rebook?.notes || '',
     deliveryWindow: '',
     deliverySameAsPickup: true,
@@ -116,6 +133,9 @@ export default function Book() {
     if (!form.preferredDate) next.preferredDate = 'Choose a date.'
     if (!form.window) next.window = 'Choose a pickup window.'
     if (!form.loadSize) next.loadSize = 'Choose a load size.'
+    if (!form.foldStyle) next.foldStyle = 'Choose a fold style.'
+    if (!form.detergent) next.detergent = 'Choose a detergent.'
+    if (!form.waterTemperature) next.waterTemperature = 'Choose a water temperature.'
     if (!form.deliveryWindow) next.deliveryWindow = 'Choose a delivery window.'
     if (!form.deliverySameAsPickup) {
       if (form.deliveryStreet.trim().length < 3) next.deliveryStreet = 'Enter the delivery street address.'
@@ -147,6 +167,9 @@ export default function Book() {
   }
 
   const selectedLoad = LOAD_SIZES.find((l) => l.value === form.loadSize)
+  const selectedFold = FOLD_STYLE_OPTIONS.find((f) => f.value === form.foldStyle)
+  const selectedDetergent = DETERGENTS.find((d) => d.value === form.detergent)
+  const selectedWaterTemperature = WATER_TEMPERATURES.find((t) => t.value === form.waterTemperature)
   const subtotal = selectedLoad ? selectedLoad.lbs * PRICE_PER_LB : 0
   const freeDelivery = priorOrderCount !== null && priorOrderCount < FREE_DELIVERY_ORDER_LIMIT
   const deliveryFee = freeDelivery ? 0 : DELIVERY_FEE
@@ -163,6 +186,9 @@ export default function Book() {
         preferredDate: form.preferredDate,
         window: form.window,
         loadSize: form.loadSize,
+        foldStyle: form.foldStyle,
+        detergent: form.detergent,
+        waterTemperature: form.waterTemperature,
         notes: form.notes,
         deliveryWindow: form.deliveryWindow,
         deliveryAddress: form.deliverySameAsPickup
@@ -323,6 +349,18 @@ export default function Book() {
             <div className="flex justify-between">
               <dt className="text-ink/50">Load size</dt>
               <dd className="text-ink">{selectedLoad?.label}</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-ink/50">Fold style</dt>
+              <dd className="text-ink">{selectedFold?.label}</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-ink/50">Detergent</dt>
+              <dd className="text-ink">{selectedDetergent?.label}</dd>
+            </div>
+            <div className="flex justify-between">
+              <dt className="text-ink/50">Water temperature</dt>
+              <dd className="text-ink">{selectedWaterTemperature?.label}</dd>
             </div>
           </dl>
         </div>
@@ -607,6 +645,44 @@ export default function Book() {
         <p className="-mt-3 text-xs font-medium text-ink/50">
           Minimum order is 10 lbs (Small) — the least we take per pickup.
         </p>
+
+        <FoldStylePicker name="foldStyle" value={form.foldStyle} onChange={handleChange} error={errors.foldStyle} />
+
+        <Select
+          id="detergent"
+          name="detergent"
+          label="Detergent"
+          value={form.detergent}
+          onChange={handleChange}
+          error={errors.detergent}
+        >
+          <option value="" disabled>
+            Choose a detergent
+          </option>
+          {DETERGENTS.map((d) => (
+            <option key={d.value} value={d.value}>
+              {d.label}
+            </option>
+          ))}
+        </Select>
+
+        <Select
+          id="waterTemperature"
+          name="waterTemperature"
+          label="Water temperature"
+          value={form.waterTemperature}
+          onChange={handleChange}
+          error={errors.waterTemperature}
+        >
+          <option value="" disabled>
+            Choose a water temperature
+          </option>
+          {WATER_TEMPERATURES.map((t) => (
+            <option key={t.value} value={t.value}>
+              {t.label}
+            </option>
+          ))}
+        </Select>
 
         <div>
           <label htmlFor="notes" className="block text-base font-medium text-ink/80">

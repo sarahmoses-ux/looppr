@@ -10,6 +10,18 @@ const WINDOW_LABELS = {
   evening: 'Evening · 4pm – 7pm',
 }
 
+const LOAD_SIZE_LABELS = {
+  small: 'Small (10–15 lbs)',
+  medium: 'Medium (16–25 lbs)',
+  large: 'Large (26–35 lbs)',
+}
+
+const FOLD_STYLE_LABELS = {
+  standard: 'Standard fold',
+  konmari: 'KonMari fold',
+  hangers: 'On hangers',
+}
+
 const PAYMENT_STYLES = {
   unpaid: 'bg-ink/5 text-ink/50',
   pending: 'bg-periwinkle-soft text-periwinkle-text',
@@ -85,6 +97,9 @@ function AdminOrderRow({ pickup, onChange }) {
         </p>
         <p className="mt-0.5 text-sm text-ink/55">
           {pickup.address.street}, {pickup.address.city}, {pickup.address.state} {pickup.address.zip}
+        </p>
+        <p className="mt-0.5 text-sm text-ink/55">
+          {LOAD_SIZE_LABELS[pickup.loadSize] || pickup.loadSize} · {FOLD_STYLE_LABELS[pickup.foldStyle] || 'Standard fold'}
         </p>
         <p className="mt-1 text-sm font-semibold text-ink">
           {formatMoney(pickup.pricing.amount, pickup.pricing.currency)}

@@ -74,5 +74,9 @@ export const businessCreatePickupValidation = [
   // 'small' (~10 lbs) is the smallest accepted load — enforces the 10 lb
   // per-pickup minimum server-side, same as the customer flow.
   body('loadSize').isIn(['small', 'medium', 'large']).withMessage('Choose a load size (10 lb minimum).'),
+  body('foldStyle')
+    .optional({ values: 'falsy' })
+    .isIn(['standard', 'konmari', 'hangers'])
+    .withMessage('Choose a valid fold style.'),
   body('notes').optional({ values: 'falsy' }).trim().isLength({ max: 500 }),
 ]

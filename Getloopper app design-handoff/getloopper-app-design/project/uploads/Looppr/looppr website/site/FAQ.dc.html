@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style> html { scroll-behavior:smooth; } body { margin:0; background:#F8F7FF; } </style>
+</helmet>
+<div style="font-family:'Hanken Grotesk',system-ui,sans-serif; color:#1E1B4B; background:#F8F7FF; overflow-x:hidden;">
+  <dc-import name="SiteNav" active="" hint-size="100%,66px"></dc-import>
+
+  <section style="position:relative; padding:80px 24px 56px; text-align:center; overflow:hidden;">
+    <div style="position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse 50% 60% at 50% 16%, #D7D3F7 0%, transparent 60%); opacity:.7;"></div>
+    <div style="position:relative; max-width:640px; margin:0 auto;">
+      <p style="font-size:13px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:#7C73E6; margin:0 0 14px;">Help &amp; FAQ</p>
+      <h1 style="font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(2.3rem,5vw,3.4rem); font-weight:600; letter-spacing:-.025em; color:#1E1B4B; line-height:1.08; margin:0 0 16px;">Questions people actually ask</h1>
+      <p style="font-size:17px; color:#5A52C5; line-height:1.6; margin:0;">Can't find it here? Email <a href="Contact.dc.html" style="color:#7C73E6; font-weight:600; text-decoration:none;">hello@getlooppr.com</a> — we reply within 2 hours.</p>
+    </div>
+  </section>
+
+  <section style="padding:8px 24px 80px;">
+    <div style="max-width:760px; margin:0 auto; display:flex; flex-direction:column; gap:12px;">
+      <sc-for list="{{ faqs }}" as="item" hint-placeholder-count="6">
+        <div style="background:#fff; border:1px solid #E8E6F4; border-radius:14px; overflow:hidden;">
+          <button type="button" onClick="{{ item.toggle }}" style="width:100%; background:none; border:none; cursor:pointer; padding:20px 22px; display:flex; justify-content:space-between; align-items:center; gap:14px; text-align:left; font-family:inherit;">
+            <span style="font-size:15.5px; font-weight:600; color:#1E1B4B;">{{ item.q }}</span>
+            <span style="color:#7C73E6; font-size:14px; flex-shrink:0; transition:transform .2s; transform:{{ item.arrow }};">▾</span>
+          </button>
+          <sc-if value="{{ item.open }}" hint-placeholder-val="{{ false }}">
+            <div style="padding:0 22px 20px;"><p style="font-size:14px; color:#5A52C5; line-height:1.7; margin:0;">{{ item.a }}</p></div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="background:#171433; padding:88px 24px; text-align:center;">
+    <div style="max-width:540px; margin:0 auto;">
+      <h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(1.8rem,4vw,2.6rem); font-weight:600; letter-spacing:-.02em; color:#fff; margin:0 0 14px; line-height:1.12;">Still have a question?</h2>
+      <p style="font-size:16.5px; color:#AFA9EC; line-height:1.6; margin:0 0 32px;">Our support team is real, local, and fast. Reach out any time during support hours.</p>
+      <a href="Contact.dc.html" style="background:#7C73E6; color:#fff; padding:15px 34px; border-radius:12px; font-size:16px; font-weight:600; text-decoration:none; box-shadow:0 8px 26px rgba(124,115,230,.4); transition:transform .12s,background .15s;" style-hover="transform:translateY(-2px); background:#8d86e3;">Contact support</a>
+    </div>
+  </section>
+
+  <dc-import name="SiteFooter" hint-size="100%,380px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = { open: 0 };
+
+  renderVals() {
+    const data = [
+      { q: 'How long does it take?', a: 'Standard orders come back the next morning — most within 18–22 hours. Express orders return within 4 hours. We confirm your expected window when you place the order.' },
+      { q: 'What if something gets lost or damaged?', a: 'Every order is covered up to $300. Contact support within 48 hours of delivery and we\u2019ll make it right — no runaround, no fine print.' },
+      { q: 'Can I request a specific detergent?', a: 'Yes. Your preference card lets you choose from common detergents or request fragrance-free, dye-free washing, and flag allergens. Preferences are saved and applied to every order automatically.' },
+      { q: 'How does Looppr+ pay for itself?', a: 'Each delivery is $4.99. Looppr+ is $14.99/month and removes the delivery fee on every order. At 3 pickups a month you break even — most Plus members do 4–6 and save $5–$15 over pay-per-use.' },
+      { q: 'Which areas do you serve?', a: 'We currently serve Edmond and Oklahoma City, expanding to Tulsa and Norman in early 2026. Enter your address in the app to check coverage in your specific neighborhood.' },
+      { q: 'Can I cancel Looppr+ anytime?', a: 'Yes — cancel any time from the app, no phone call required. Cancel before your 30-day trial ends and you\u2019re never charged. No cancellation fees, ever.' },
+      { q: 'Who actually washes my clothes?', a: 'A vetted local laundromat near you — a real neighborhood business, not a central warehouse. We rate every partner after each order to keep standards high.' },
+      { q: 'How do I prepare my laundry for pickup?', a: 'Just put it in any bag and leave it at your door at the scheduled time. No sorting needed — separate any hang-dry or delicate items if you\u2019d like, and flag them in the app.' },
+    ];
+    const faqs = data.map((d, i) => ({
+      q: d.q, a: d.a,
+      open: this.state.open === i,
+      arrow: this.state.open === i ? 'rotate(180deg)' : 'rotate(0deg)',
+      toggle: () => this.setState(s => ({ open: s.open === i ? -1 : i })),
+    }));
+    return { faqs };
+  }
+}
+</script>
+</body>
+</html>

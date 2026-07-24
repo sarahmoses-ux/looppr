@@ -3,7 +3,7 @@ import logo from '../../assets/looppr-mark-transparent.png'
 import SEO from '../SEO'
 
 const HIGHLIGHTS = [
-  '8-hour turnaround SLA, in writing',
+  '24-hour turnaround SLA, in writing',
   'One consolidated monthly invoice',
   'Dedicated account manager for high-volume accounts',
   'Live pickup tracking across every location',

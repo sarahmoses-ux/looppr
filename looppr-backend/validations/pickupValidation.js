@@ -51,6 +51,18 @@ export const createPickupValidation = [
   // accepted value, which enforces the 10 lb per-pickup minimum — nothing
   // lighter can be submitted. See utils/pricing.js LOAD_SIZE_LBS.
   body('loadSize').isIn(['small', 'medium', 'large']).withMessage('Choose a load size (10 lb minimum).'),
+  body('foldStyle')
+    .optional({ values: 'falsy' })
+    .isIn(['standard', 'konmari', 'hangers'])
+    .withMessage('Choose a valid fold style.'),
+  body('detergent')
+    .optional({ values: 'falsy' })
+    .isIn(['freeAndClear', 'freshScent', 'eco'])
+    .withMessage('Choose a valid detergent.'),
+  body('waterTemperature')
+    .optional({ values: 'falsy' })
+    .isIn(['cold', 'warm', 'hot'])
+    .withMessage('Choose a valid water temperature.'),
   body('notes').optional({ values: 'falsy' }).trim().isLength({ max: 500 }).withMessage('Notes must be 500 characters or fewer.'),
   body('deliveryWindow').isIn(['morning', 'afternoon', 'evening']).withMessage('Choose a delivery window.'),
   deliveryAddressValidator('deliveryAddress'),

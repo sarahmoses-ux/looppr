@@ -35,6 +35,7 @@ const Drive = lazy(() => import('./pages/Drive'))
 const DriveForm = lazy(() => import('./pages/DriveForm'))
 const Pricing = lazy(() => import('./pages/Pricing'))
 const Business = lazy(() => import('./pages/Business'))
+const BusinessSegment = lazy(() => import('./pages/BusinessSegment'))
 const BusinessForm = lazy(() => import('./pages/BusinessForm'))
 const Cities = lazy(() => import('./pages/Cities'))
 const Faq = lazy(() => import('./pages/Faq'))
@@ -113,6 +114,7 @@ function App() {
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/business" element={<Business />} />
           <Route path="/business/apply" element={<BusinessForm />} />
+          <Route path="/business/:segment" element={<BusinessSegment />} />
           <Route path="/cities" element={<Cities />} />
           <Route path="/faq" element={<Faq />} />
 

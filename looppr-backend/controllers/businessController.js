@@ -10,7 +10,7 @@ import { computeOrderPrice } from '../utils/pricing.js'
 // (controllers/pickupController.js) but scoped to businessId + source
 // 'business', and it logs to the ActivityLog so the ops team sees it.
 export const createBusinessPickup = asyncHandler(async (req, res) => {
-  const { address, preferredDate, window, loadSize, notes, deliveryWindow, deliveryAddress } = req.body
+  const { address, preferredDate, window, loadSize, foldStyle, notes, deliveryWindow, deliveryAddress } = req.body
 
   const priorOrderCount = await PickupRequest.countDocuments({
     businessId: req.business.sub,
@@ -26,6 +26,7 @@ export const createBusinessPickup = asyncHandler(async (req, res) => {
     preferredDate,
     window,
     loadSize,
+    foldStyle,
     notes,
     deliveryWindow,
     deliveryAddress,

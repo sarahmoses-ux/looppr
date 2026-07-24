@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Input from '../../components/Input'
 import Select from '../../components/Select'
+import FoldStylePicker from '../../components/FoldStylePicker'
 import Button from '../../components/Button'
 import SEO from '../../components/SEO'
 import { PUBLIC_PAGES } from '../../seo/publicPages'
@@ -18,9 +19,21 @@ const WINDOWS = [
 ]
 
 const LOAD_SIZES = [
-  { value: 'small', label: 'Small · 1–2 bags' },
-  { value: 'medium', label: 'Medium · 3–4 bags' },
-  { value: 'large', label: 'Large · 5+ bags' },
+  { value: 'small', label: 'Small · 10–15 lbs' },
+  { value: 'medium', label: 'Medium · 16–25 lbs' },
+  { value: 'large', label: 'Large · 26–35 lbs' },
+]
+
+const DETERGENTS = [
+  { value: 'freeAndClear', label: 'Free & Clear (unscented)' },
+  { value: 'freshScent', label: 'Fresh Scent' },
+  { value: 'eco', label: 'Eco-Friendly' },
+]
+
+const WATER_TEMPERATURES = [
+  { value: 'cold', label: 'Cold' },
+  { value: 'warm', label: 'Warm' },
+  { value: 'hot', label: 'Hot' },
 ]
 
 function minDate() {
@@ -46,6 +59,9 @@ export default function GuestBook() {
     preferredDate: '',
     window: '',
     loadSize: '',
+    foldStyle: '',
+    detergent: '',
+    waterTemperature: '',
     notes: '',
     deliveryWindow: '',
     deliverySameAsPickup: true,
@@ -75,6 +91,9 @@ export default function GuestBook() {
     if (!form.preferredDate) next.preferredDate = 'Choose a date.'
     if (!form.window) next.window = 'Choose a pickup window.'
     if (!form.loadSize) next.loadSize = 'Choose a load size.'
+    if (!form.foldStyle) next.foldStyle = 'Choose a fold style.'
+    if (!form.detergent) next.detergent = 'Choose a detergent.'
+    if (!form.waterTemperature) next.waterTemperature = 'Choose a water temperature.'
     if (!form.deliveryWindow) next.deliveryWindow = 'Choose a delivery window.'
     if (!form.deliverySameAsPickup) {
       if (form.deliveryStreet.trim().length < 3) next.deliveryStreet = 'Enter the delivery street address.'
@@ -100,6 +119,9 @@ export default function GuestBook() {
         preferredDate: form.preferredDate,
         window: form.window,
         loadSize: form.loadSize,
+        foldStyle: form.foldStyle,
+        detergent: form.detergent,
+        waterTemperature: form.waterTemperature,
         notes: form.notes,
         deliveryWindow: form.deliveryWindow,
         deliveryAddress: form.deliverySameAsPickup
@@ -253,6 +275,44 @@ export default function GuestBook() {
           {LOAD_SIZES.map((l) => (
             <option key={l.value} value={l.value}>
               {l.label}
+            </option>
+          ))}
+        </Select>
+
+        <FoldStylePicker name="foldStyle" value={form.foldStyle} onChange={handleChange} error={errors.foldStyle} />
+
+        <Select
+          id="detergent"
+          name="detergent"
+          label="Detergent"
+          value={form.detergent}
+          onChange={handleChange}
+          error={errors.detergent}
+        >
+          <option value="" disabled>
+            Choose a detergent
+          </option>
+          {DETERGENTS.map((d) => (
+            <option key={d.value} value={d.value}>
+              {d.label}
+            </option>
+          ))}
+        </Select>
+
+        <Select
+          id="waterTemperature"
+          name="waterTemperature"
+          label="Water temperature"
+          value={form.waterTemperature}
+          onChange={handleChange}
+          error={errors.waterTemperature}
+        >
+          <option value="" disabled>
+            Choose a water temperature
+          </option>
+          {WATER_TEMPERATURES.map((t) => (
+            <option key={t.value} value={t.value}>
+              {t.label}
             </option>
           ))}
         </Select>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import StageBadge from './StageBadge'
 import {
+  FOLD_STYLE_LABELS,
   formatAddress,
   formatCurrency,
   formatDate,
@@ -72,6 +73,7 @@ export default function OrderCard({ order, onAccept, onReject, onAdvance }) {
         <Field label="Pickup address">{formatAddress(order.address)}</Field>
         <Field label="Delivery address">{order.deliveryAddress ? formatAddress(order.deliveryAddress) : 'Same as pickup'}</Field>
         <Field label="Services">{LOAD_SIZE_LABELS[order.loadSize] || order.loadSize}</Field>
+        <Field label="Fold style">{FOLD_STYLE_LABELS[order.foldStyle] || 'Standard fold'}</Field>
         <Field label="Pickup time">{formatDate(order.preferredDate)} · {WINDOW_LABELS[order.window]?.split(' ')[0]}</Field>
         <Field label="Delivery deadline">{WINDOW_LABELS[order.deliveryWindow]?.split(' ')[0] || '—'}</Field>
         <Field label="Amount">{formatCurrency(order.pricing?.amount)}</Field>

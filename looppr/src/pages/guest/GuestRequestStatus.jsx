@@ -10,6 +10,12 @@ function formatMoney(amount, currency = 'usd') {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency.toUpperCase() }).format(amount)
 }
 
+const FOLD_STYLE_LABELS = {
+  standard: 'Standard fold',
+  konmari: 'KonMari fold',
+  hangers: 'On hangers',
+}
+
 export default function GuestRequestStatus() {
   const { id } = useParams()
   const [searchParams] = useSearchParams()
@@ -113,7 +119,7 @@ export default function GuestRequestStatus() {
         {pickup.address.street}, {pickup.address.city}
       </h1>
       <p className="mt-2 text-sm text-ink/60">
-        {dateLabel} · {pickup.window} · {pickup.loadSize} load
+        {dateLabel} · {pickup.window} · {pickup.loadSize} load · {FOLD_STYLE_LABELS[pickup.foldStyle] || 'Standard fold'}
       </p>
 
       <div className="mt-8 rounded-3xl border border-line bg-white p-6 sm:p-8">

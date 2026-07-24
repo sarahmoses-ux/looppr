@@ -9,7 +9,7 @@ import { computeOrderPrice } from '../utils/pricing.js'
 import { stripe } from '../utils/stripeClient.js'
 
 export const createPickup = asyncHandler(async (req, res) => {
-  const { address, preferredDate, window, loadSize, notes, deliveryWindow, deliveryAddress } = req.body
+  const { address, preferredDate, window, loadSize, foldStyle, detergent, waterTemperature, notes, deliveryWindow, deliveryAddress } = req.body
 
   const priorOrderCount = await PickupRequest.countDocuments({
     clientId: req.user.sub,
@@ -24,6 +24,9 @@ export const createPickup = asyncHandler(async (req, res) => {
     preferredDate,
     window,
     loadSize,
+    foldStyle,
+    detergent,
+    waterTemperature,
     notes,
     deliveryWindow,
     deliveryAddress,

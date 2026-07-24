@@ -34,9 +34,15 @@ export const WINDOW_LABELS = {
 }
 
 export const LOAD_SIZE_LABELS = {
-  small: 'Small (~10 lbs)',
-  medium: 'Medium (~20 lbs)',
-  large: 'Large (~35 lbs)',
+  small: 'Small (10–15 lbs)',
+  medium: 'Medium (16–25 lbs)',
+  large: 'Large (26–35 lbs)',
+}
+
+export const FOLD_STYLE_LABELS = {
+  standard: 'Standard fold',
+  konmari: 'KonMari fold',
+  hangers: 'On hangers',
 }
 
 export const BUSINESS_TYPE_OPTIONS = [

@@ -66,9 +66,15 @@ function DriverInfo({ driver }) {
 }
 
 const LOAD_SIZE_LABELS = {
-  small: 'Small load · 1–2 bags',
-  medium: 'Medium load · 3–4 bags',
-  large: 'Large load · 5+ bags',
+  small: 'Small load · 10–15 lbs',
+  medium: 'Medium load · 16–25 lbs',
+  large: 'Large load · 26–35 lbs',
+}
+
+const FOLD_STYLE_LABELS = {
+  standard: 'Standard fold',
+  konmari: 'KonMari fold',
+  hangers: 'On hangers',
 }
 
 function statusBadgeClass(status) {
@@ -108,6 +114,10 @@ function OrderReceipt({ pickup }) {
         <span>Order #{pickup._id.slice(-8).toUpperCase()}</span>
         <span>Placed {formatDate(pickup.createdAt)}</span>
         {pickup.paidAt && <span>Paid {formatDate(pickup.paidAt)}</span>}
+      </div>
+
+      <div className="mt-2 text-xs font-medium text-ink/50">
+        Fold style: {FOLD_STYLE_LABELS[pickup.foldStyle] || 'Standard fold'}
       </div>
 
       <div className="mt-3 space-y-1.5 border-t border-line/80 pt-3">
@@ -218,7 +228,7 @@ export function PickupCard({ pickup, detailed = false, onChange }) {
           {detailed && (
             <Button
               to="/book"
-              state={{ rebook: { street: pickup.address.street, city: pickup.address.city, zip: pickup.address.zip, loadSize: pickup.loadSize, notes: pickup.notes || '' } }}
+              state={{ rebook: { street: pickup.address.street, city: pickup.address.city, zip: pickup.address.zip, loadSize: pickup.loadSize, foldStyle: pickup.foldStyle, notes: pickup.notes || '' } }}
               variant="ghost"
               className="px-3! py-1.5! text-xs!"
             >

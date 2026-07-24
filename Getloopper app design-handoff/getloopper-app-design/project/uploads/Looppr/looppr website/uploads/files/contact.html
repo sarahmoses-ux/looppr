@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — TidyFolds</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #F1EFE8; color: #26215C; line-height: 1.6; font-size: 16px; }
+
+  /* Nav */
+  nav { position: sticky; top: 0; z-index: 100; background: rgba(241,239,232,.94); backdrop-filter: blur(12px); border-bottom: 1px solid #D3D1C7; padding: 0 24px; }
+  .nav-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .nav-logomark { width: 34px; height: 34px; border-radius: 9px; background: #7F77DD; display: flex; align-items: center; justify-content: center; }
+  .nav-logomark svg { width: 18px; height: 18px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .nav-wordmark { font-size: 17px; font-weight: 500; color: #26215C; }
+  .nav-wordmark span { color: #7F77DD; }
+  .nav-links { display: flex; align-items: center; gap: 28px; }
+  .nav-links a { font-size: 14px; color: #534AB7; text-decoration: none; transition: color .15s; }
+  .nav-links a:hover { color: #26215C; }
+  .nav-cta { background: #7F77DD; color: #fff !important; padding: 8px 18px; border-radius: 8px; font-weight: 500 !important; }
+  .nav-cta:hover { background: #534AB7 !important; }
+
+  /* Page layout */
+  .page-hero { background: #26215C; padding: 80px 24px 72px; }
+  .page-hero-inner { max-width: 1100px; margin: 0 auto; }
+  .page-eyebrow { font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: #AFA9EC; margin-bottom: 14px; }
+  .page-hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 500; color: #fff; line-height: 1.15; letter-spacing: -.02em; margin-bottom: 14px; }
+  .page-hero p { font-size: 17px; color: #AFA9EC; max-width: 500px; line-height: 1.7; }
+
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+  /* Main content grid */
+  .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; padding: 80px 24px; max-width: 1100px; margin: 0 auto; }
+
+  /* Left column — channels */
+  .contact-channels { display: flex; flex-direction: column; gap: 16px; }
+  .channels-title { font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: #7F77DD; margin-bottom: 4px; }
+  .channel-card { background: #fff; border: 1px solid #D3D1C7; border-radius: 14px; padding: 22px 24px; display: flex; gap: 16px; align-items: flex-start; text-decoration: none; transition: border-color .15s, box-shadow .15s; }
+  .channel-card:hover { border-color: #AFA9EC; box-shadow: 0 4px 20px rgba(127,119,221,.1); }
+  .ch-icon { width: 42px; height: 42px; border-radius: 11px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .ch-icon svg { width: 20px; height: 20px; }
+  .ch-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .06em; color: #888780; margin: 0 0 3px; }
+  .ch-title { font-size: 15px; font-weight: 500; color: #26215C; margin: 0 0 4px; }
+  .ch-desc { font-size: 13px; color: #534AB7; margin: 0; line-height: 1.5; }
+  .ch-arrow { margin-left: auto; color: #AFA9EC; font-size: 18px; align-self: center; flex-shrink: 0; }
+
+  .resp-note { background: #EEEDFE; border-radius: 12px; padding: 18px 20px; margin-top: 8px; }
+  .resp-note p { font-size: 13px; color: #534AB7; line-height: 1.6; margin: 0; }
+  .resp-note strong { color: #3C3489; font-weight: 500; }
+
+  .hours-card { background: #F1EFE8; border-radius: 12px; padding: 20px 22px; }
+  .hours-title { font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: .06em; color: #888780; margin: 0 0 12px; }
+  .hours-row { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: .5px solid #D3D1C7; }
+  .hours-row:last-child { border-bottom: none; }
+  .hours-row span:first-child { color: #534AB7; }
+  .hours-row span:last-child { color: #26215C; font-weight: 500; }
+
+  /* Right column — form */
+  .form-card { background: #fff; border: 1px solid #D3D1C7; border-radius: 20px; padding: 40px; }
+  .form-title { font-size: 20px; font-weight: 500; color: #26215C; margin: 0 0 6px; }
+  .form-sub { font-size: 14px; color: #534AB7; margin: 0 0 28px; line-height: 1.5; }
+
+  /* Topic selector */
+  .topic-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 24px; }
+  .topic-btn { padding: 10px 12px; border-radius: 9px; border: 1px solid #D3D1C7; background: #F1EFE8; font-size: 13px; font-weight: 500; color: #534AB7; cursor: pointer; text-align: center; transition: all .15s; }
+  .topic-btn:hover { border-color: #AFA9EC; background: #EEEDFE; color: #3C3489; }
+  .topic-btn.selected { border-color: #7F77DD; background: #EEEDFE; color: #3C3489; }
+
+  /* Form fields */
+  .field { margin-bottom: 18px; }
+  .field label { display: block; font-size: 13px; font-weight: 500; color: #26215C; margin-bottom: 6px; }
+  .field input, .field textarea, .field select {
+    width: 100%; padding: 11px 14px;
+    background: #F1EFE8; border: 1px solid #D3D1C7;
+    border-radius: 9px; font-size: 14px; color: #26215C;
+    font-family: inherit; transition: border-color .15s, background .15s;
+    outline: none;
+  }
+  .field input:focus, .field textarea:focus, .field select:focus { border-color: #7F77DD; background: #fff; box-shadow: 0 0 0 3px rgba(127,119,221,.12); }
+  .field input::placeholder, .field textarea::placeholder { color: #B4B2A9; }
+  .field textarea { resize: vertical; min-height: 120px; line-height: 1.6; }
+  .field select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23888780' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; cursor: pointer; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  .form-divider { border: none; border-top: 1px solid #F1EFE8; margin: 20px 0; }
+
+  /* Hidden field for topic */
+  #topic-hidden { display: none; }
+
+  /* Submit */
+  .submit-btn { width: 100%; padding: 14px; background: #7F77DD; color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 500; cursor: pointer; transition: background .15s, transform .1s; font-family: inherit; }
+  .submit-btn:hover { background: #534AB7; transform: translateY(-1px); }
+  .submit-btn:active { transform: translateY(0); }
+  .submit-btn:disabled { background: #AFA9EC; cursor: not-allowed; transform: none; }
+
+  .form-note { font-size: 12px; color: #888780; text-align: center; margin-top: 12px; line-height: 1.5; }
+
+  /* Success state */
+  .success-state { display: none; text-align: center; padding: 40px 20px; }
+  .success-icon { width: 56px; height: 56px; border-radius: 50%; background: #E1F5EE; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; }
+  .success-icon svg { width: 26px; height: 26px; }
+  .success-state h3 { font-size: 20px; font-weight: 500; color: #26215C; margin: 0 0 10px; }
+  .success-state p { font-size: 15px; color: #534AB7; line-height: 1.65; max-width: 360px; margin: 0 auto; }
+
+  /* Footer */
+  footer { background: #26215C; border-top: 1px solid rgba(255,255,255,.08); padding: 56px 24px 32px; }
+  .footer-inner { max-width: 1100px; margin: 0 auto; }
+  .footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+  .footer-brand p { font-size: 14px; color: rgba(255,255,255,.45); margin-top: 12px; max-width: 260px; line-height: 1.6; }
+  .footer-logo { display: flex; align-items: center; gap: 8px; }
+  .footer-logo-mark { width: 30px; height: 30px; border-radius: 8px; background: #7F77DD; display: flex; align-items: center; justify-content: center; }
+  .footer-logo-mark svg { width: 14px; height: 14px; fill: none; stroke: #fff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .footer-wordmark { font-size: 16px; font-weight: 500; color: #fff; }
+  .footer-wordmark span { color: #AFA9EC; }
+  .footer-col h4 { font-size: 12px; font-weight: 500; color: rgba(255,255,255,.35); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 14px; }
+  .footer-col a { display: block; font-size: 14px; color: rgba(255,255,255,.55); text-decoration: none; margin-bottom: 9px; transition: color .15s; }
+  .footer-col a:hover { color: #fff; }
+  .footer-bottom { border-top: 1px solid rgba(255,255,255,.08); padding-top: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+  .footer-copy { font-size: 13px; color: rgba(255,255,255,.28); }
+  .footer-legal { display: flex; gap: 20px; }
+  .footer-legal a { font-size: 13px; color: rgba(255,255,255,.28); text-decoration: none; }
+  .footer-legal a:hover { color: rgba(255,255,255,.6); }
+
+  @media (max-width: 768px) {
+    .contact-grid { grid-template-columns: 1fr; gap: 40px; padding: 48px 24px; }
+    .field-row { grid-template-columns: 1fr; }
+    .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+    .nav-links { display: none; }
+    .form-card { padding: 28px 22px; }
+    .topic-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="index.html">
+      <div class="nav-logomark"><svg viewBox="0 0 24 24"><path d="M6 8c0-2.2 1.8-4 4-4h4a4 4 0 0 1 0 8h-4a4 4 0 0 0 0 8h4a4 4 0 0 0 4-4"/></svg></div>
+      <span class="nav-wordmark">Tidy<span>Folds</span></span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html#how-it-works">How it works</a>
+      <a href="index.html#pricing">Pricing</a>
+      <a href="index.html#business">For business</a>
+      <a href="about.html">About</a>
+      <a href="index.html#schedule" class="nav-cta">Schedule pickup</a>
+    </div>
+  </div>
+</nav>
+
+<div class="page-hero">
+  <div class="page-hero-inner">
+    <p class="page-eyebrow">Get in touch</p>
+    <h1>We actually read these.</h1>
+    <p>Questions, partnership inquiries, feedback, or just want to say hi — pick the right channel below and we'll get back to you fast.</p>
+  </div>
+</div>
+
+<div class="contact-grid">
+
+  <!-- Left: channels + info -->
+  <div>
+    <p class="channels-title" style="margin-bottom:16px;">Direct channels</p>
+
+    <a class="channel-card" href="mailto:hello@tidyfolds.com">
+      <div class="ch-icon" style="background:#EEEDFE;">
+        <svg fill="none" stroke="#534AB7" stroke-width="1.8" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      </div>
+      <div>
+        <p class="ch-label">Email</p>
+        <p class="ch-title">hello@tidyfolds.com</p>
+        <p class="ch-desc">General questions, order issues, feedback</p>
+      </div>
+      <span class="ch-arrow">→</span>
+    </a>
+
+    <a class="channel-card" href="mailto:biz@tidyfolds.com" style="margin-top:10px;">
+      <div class="ch-icon" style="background:#E1F5EE;">
+        <svg fill="none" stroke="#0F6E56" stroke-width="1.8" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+      </div>
+      <div>
+        <p class="ch-label">Business sales</p>
+        <p class="ch-title">biz@tidyfolds.com</p>
+        <p class="ch-desc">Hotels, gyms, Airbnb hosts, corporate accounts</p>
+      </div>
+      <span class="ch-arrow">→</span>
+    </a>
+
+    <a class="channel-card" href="mailto:partners@tidyfolds.com" style="margin-top:10px;">
+      <div class="ch-icon" style="background:#FAEEDA;">
+        <svg fill="none" stroke="#854F0B" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 13h4"/></svg>
+      </div>
+      <div>
+        <p class="ch-label">Laundromat partners</p>
+        <p class="ch-title">partners@tidyfolds.com</p>
+        <p class="ch-desc">Apply to become a partner laundromat</p>
+      </div>
+      <span class="ch-arrow">→</span>
+    </a>
+
+    <a class="channel-card" href="mailto:drivers@tidyfolds.com" style="margin-top:10px;">
+      <div class="ch-icon" style="background:#FAECE7;">
+        <svg fill="none" stroke="#993C1D" stroke-width="1.8" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+      </div>
+      <div>
+        <p class="ch-label">Driver applications</p>
+        <p class="ch-title">drivers@tidyfolds.com</p>
+        <p class="ch-desc">Apply to drive, driver support</p>
+      </div>
+      <span class="ch-arrow">→</span>
+    </a>
+
+    <div class="resp-note" style="margin-top:16px;">
+      <p><strong>Response time:</strong> We reply to all messages within 2 business hours during support hours. For urgent order issues, text us directly at <strong>(405) 555-0192</strong> — someone is always watching that line.</p>
+    </div>
+
+    <div class="hours-card" style="margin-top:16px;">
+      <p class="hours-title">Support hours</p>
+      <div class="hours-row"><span>Monday – Friday</span><span>7 AM – 9 PM CT</span></div>
+      <div class="hours-row"><span>Saturday</span><span>8 AM – 8 PM CT</span></div>
+      <div class="hours-row"><span>Sunday</span><span>9 AM – 6 PM CT</span></div>
+    </div>
+  </div>
+
+  <!-- Right: form -->
+  <div>
+    <div class="form-card">
+      <div id="form-area">
+        <p class="form-title">Send us a message</p>
+        <p class="form-sub">Pick what this is about and we'll route it to the right person.</p>
+
+        <!-- Topic buttons -->
+        <div class="topic-grid">
+          <button type="button" class="topic-btn" onclick="selectTopic(this, 'General question')">General question</button>
+          <button type="button" class="topic-btn" onclick="selectTopic(this, 'Order issue')">Order issue</button>
+          <button type="button" class="topic-btn" onclick="selectTopic(this, 'Business inquiry')">Business inquiry</button>
+          <button type="button" class="topic-btn" onclick="selectTopic(this, 'Partner application')">Partner application</button>
+          <button type="button" class="topic-btn" onclick="selectTopic(this, 'Drive with us')">Drive with us</button>
+          <button type="button" class="topic-btn" onclick="selectTopic(this, 'Feedback')">Feedback</button>
+        </div>
+
+        <!--
+          HOW TO ACTIVATE THIS FORM:
+          1. Go to formspree.io and create a free account
+          2. Create a new form — you'll get a form ID like "xpzgkdvw"
+          3. Replace YOUR_FORM_ID below with your actual ID
+          4. The form will send emails directly to your inbox. Free plan: 50 submissions/month.
+        -->
+        <form id="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST" onsubmit="handleSubmit(event)">
+          <input type="hidden" name="topic" id="topic-hidden" value="">
+          <input type="hidden" name="_subject" id="email-subject" value="New TidyFolds message">
+
+          <hr class="form-divider">
+
+          <div class="field-row">
+            <div class="field">
+              <label for="first-name">First name</label>
+              <input type="text" id="first-name" name="first_name" placeholder="Jamie" required>
+            </div>
+            <div class="field">
+              <label for="last-name">Last name</label>
+              <input type="text" id="last-name" name="last_name" placeholder="Rivera">
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="email">Email address</label>
+            <input type="email" id="email" name="email" placeholder="jamie@example.com" required>
+          </div>
+
+          <div class="field" id="phone-field" style="display:none;">
+            <label for="phone">Phone number <span style="color:#888780; font-weight:400;">(optional)</span></label>
+            <input type="tel" id="phone" name="phone" placeholder="(405) 555-0100">
+          </div>
+
+          <div class="field" id="order-field" style="display:none;">
+            <label for="order-num">Order number <span style="color:#888780; font-weight:400;">(if applicable)</span></label>
+            <input type="text" id="order-num" name="order_number" placeholder="TF-0000">
+          </div>
+
+          <div class="field">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" placeholder="Tell us what's on your mind..." required></textarea>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submit-btn">Send message</button>
+          <p class="form-note">We typically reply within 2 business hours. No spam, ever.</p>
+        </form>
+      </div>
+
+      <!-- Success state (shown after submit) -->
+      <div class="success-state" id="success-state">
+        <div class="success-icon">
+          <svg fill="none" stroke="#0F6E56" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        </div>
+        <h3>Message sent.</h3>
+        <p>We got it and we'll reply to your email within 2 business hours. If it's urgent, text us at (405) 555-0192.</p>
+        <button onclick="resetForm()" style="margin-top:24px; background:none; border:1.5px solid #D3D1C7; border-radius:9px; padding:10px 22px; font-size:14px; color:#534AB7; cursor:pointer; font-family:inherit;">Send another message</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <div class="footer-logo-mark"><svg viewBox="0 0 24 24"><path d="M6 8c0-2.2 1.8-4 4-4h4a4 4 0 0 1 0 8h-4a4 4 0 0 0 0 8h4a4 4 0 0 0 4-4"/></svg></div>
+          <span class="footer-wordmark">Tidy<span>Folds</span></span>
+        </div>
+        <p>Laundry pickup and delivery connecting customers to local laundromats in Edmond and Oklahoma City.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Customers</h4>
+        <a href="index.html#how-it-works">How it works</a>
+        <a href="index.html#pricing">Pricing</a>
+        <a href="index.html#faq">FAQ</a>
+        <a href="index.html#schedule">Schedule pickup</a>
+      </div>
+      <div class="footer-col">
+        <h4>Business</h4>
+        <a href="index.html#business">Business accounts</a>
+        <a href="index.html#partners">Laundromat partners</a>
+        <a href="index.html#drive">Drive with us</a>
+        <a href="mailto:biz@tidyfolds.com">Contact sales</a>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <a href="about.html">About</a>
+        <a href="contact.html">Contact</a>
+        <a href="#">Careers</a>
+        <a href="#">Blog</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2025 TidyFolds Inc. · Edmond, Oklahoma</p>
+      <div class="footer-legal"><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Accessibility</a></div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function selectTopic(btn, topic) {
+    document.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    document.getElementById('topic-hidden').value = topic;
+    document.getElementById('email-subject').value = 'TidyFolds: ' + topic;
+
+    // Show/hide contextual fields
+    var isOrder = topic === 'Order issue';
+    var isBiz = topic === 'Business inquiry' || topic === 'Partner application' || topic === 'Drive with us';
+    document.getElementById('order-field').style.display = isOrder ? 'block' : 'none';
+    document.getElementById('phone-field').style.display = isBiz ? 'block' : 'none';
+
+    // Update placeholder
+    var placeholders = {
+      'General question': 'What would you like to know?',
+      'Order issue': 'Describe what happened with your order...',
+      'Business inquiry': 'Tell us about your business and what you need...',
+      'Partner application': 'Tell us about your laundromat — location, capacity, hours...',
+      'Drive with us': 'Tell us about yourself and your vehicle...',
+      'Feedback': 'What could we do better?'
+    };
+    document.getElementById('message').placeholder = placeholders[topic] || 'Tell us what\'s on your mind...';
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    var btn = document.getElementById('submit-btn');
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+
+    var form = document.getElementById('contact-form');
+    var data = new FormData(form);
+
+    try {
+      var response = await fetch(form.action, {
+        method: 'POST',
+        body: data,
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (response.ok) {
+        document.getElementById('form-area').style.display = 'none';
+        document.getElementById('success-state').style.display = 'block';
+      } else {
+        btn.disabled = false;
+        btn.textContent = 'Send message';
+        alert('Something went wrong. Please email us directly at hello@tidyfolds.com');
+      }
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = 'Send message';
+      alert('Could not send — please email us at hello@tidyfolds.com');
+    }
+  }
+
+  function resetForm() {
+    document.getElementById('contact-form').reset();
+    document.querySelectorAll('.topic-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('topic-hidden').value = '';
+    document.getElementById('order-field').style.display = 'none';
+    document.getElementById('phone-field').style.display = 'none';
+    document.getElementById('submit-btn').disabled = false;
+    document.getElementById('submit-btn').textContent = 'Send message';
+    document.getElementById('form-area').style.display = 'block';
+    document.getElementById('success-state').style.display = 'none';
+  }
+</script>
+</body>
+</html>

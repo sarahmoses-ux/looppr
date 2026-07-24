@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import Input from '../Input'
 import Select from '../Select'
+import FoldStylePicker from '../FoldStylePicker'
 import Button from '../Button'
 import { createBusinessPickup } from '../../services/businessDashboardApi'
 
@@ -14,6 +15,7 @@ const EMPTY = {
   window: 'morning',
   deliveryWindow: 'afternoon',
   loadSize: 'medium',
+  foldStyle: 'standard',
   notes: '',
 }
 
@@ -75,6 +77,7 @@ export default function RequestPickupModal({ open, onClose, onCreated }) {
         window: form.window,
         deliveryWindow: form.deliveryWindow,
         loadSize: form.loadSize,
+        foldStyle: form.foldStyle,
         notes: form.notes.trim(),
       })
       onCreated?.(pickup)
@@ -144,14 +147,15 @@ export default function RequestPickupModal({ open, onClose, onCreated }) {
           </div>
           <div>
             <Select id="loadSize" name="loadSize" label="Load size" value={form.loadSize} onChange={handleChange}>
-              <option value="small">Small (~10 lbs)</option>
-              <option value="medium">Medium (~20 lbs)</option>
-              <option value="large">Large (~35 lbs)</option>
+              <option value="small">Small (10–15 lbs)</option>
+              <option value="medium">Medium (16–25 lbs)</option>
+              <option value="large">Large (26–35 lbs)</option>
             </Select>
             <p className="mt-2 text-xs font-medium text-ink/50">
               Minimum order is 10 lbs (Small) — the least we take per pickup.
             </p>
           </div>
+          <FoldStylePicker name="foldStyle" value={form.foldStyle} onChange={handleChange} />
           <Input id="notes" name="notes" label="Notes (optional)" value={form.notes} onChange={handleChange} placeholder="Gate code, linen specs, etc." />
 
           {formError && (

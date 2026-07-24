@@ -1,0 +1,1772 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body { margin:0; background:#ECEAF6; }
+a { color:#5A52C5; } a:hover { color:#1E1B4B; }
+@keyframes lp-spin { to { transform:rotate(360deg); } }
+@keyframes lp-pulse { 0% { box-shadow:0 0 0 0 rgba(124,115,230,.45);} 70% { box-shadow:0 0 0 10px rgba(124,115,230,0);} 100% { box-shadow:0 0 0 0 rgba(124,115,230,0);} }
+@keyframes lp-up { from { opacity:0; transform:translateY(10px);} to { opacity:1; transform:none;} }
+@keyframes lp-dash { to { stroke-dashoffset:-14; } }
+</style>
+</helmet>
+<div style="font-family:'Hanken Grotesk',system-ui,sans-serif; color:#1E1B4B; min-height:100vh; display:flex; flex-direction:column;">
+
+  <!-- ===== TOP SWITCHER BAR ===== -->
+  <div style="background:#1E1B4B; display:flex; align-items:center; gap:16px; padding:10px 18px; position:sticky; top:0; z-index:50;">
+    <div style="display:flex; align-items:center; gap:9px;">
+      <img src="assets/looppr-mark-dark.png" alt="Looppr" style="width:24px; height:24px; object-fit:contain;">
+      <span style="font-family:'Bricolage Grotesque',sans-serif; font-weight:700; font-size:17px; color:#fff; letter-spacing:-.01em;">Looppr</span>
+      <span style="font-size:11px; font-weight:600; color:#AFA9EC; border:1px solid rgba(255,255,255,.22); border-radius:20px; padding:2px 9px;">getlooppr.com</span>
+    </div>
+    <div style="display:flex; background:rgba(255,255,255,.1); border-radius:10px; padding:3px; gap:3px; margin-left:auto;">
+      <sc-for list="{{ modeSwitch }}" as="m" hint-placeholder-count="5">
+      <button onClick="{{ m.pick }}" style="border:none; cursor:pointer; font-family:'Hanken Grotesk',sans-serif; font-size:12.5px; font-weight:600; padding:7px 14px; border-radius:8px; background:{{ m.bg }}; color:{{ m.c }}; transition:background .15s; white-space:nowrap;">{{ m.label }}</button>
+      </sc-for>
+    </div>
+  </div>
+
+  <!-- ================= CUSTOMER APP ================= -->
+  <sc-if value="{{ isClient }}" hint-placeholder-val="{{ true }}">
+  <div style="flex:1; display:flex; justify-content:center; padding:26px 16px 40px; background:radial-gradient(ellipse 70% 45% at 50% 0%, #DDD9F5 0%, #ECEAF6 60%);">
+    <div style="width:100%; max-width:440px; background:#F8F7FF; border:1px solid #E0DCF5; border-radius:26px; box-shadow:0 30px 70px rgba(30,27,75,.16); overflow:hidden; display:flex; flex-direction:column; min-height:780px; position:relative;">
+
+      <!-- app header -->
+      <div style="display:flex; align-items:center; gap:10px; padding:18px 20px 12px;">
+        <img src="assets/looppr-mark.png" alt="" style="width:26px; height:26px; object-fit:contain;">
+        <div style="flex:1;">
+          <p style="margin:0; font-size:15px; font-weight:700; font-family:'Bricolage Grotesque',sans-serif;">{{ headerTitle }}</p>
+          <p style="margin:0; font-size:11.5px; color:#8885A0;">Edmond, OK · Sunday, Jul 19</p>
+        </div>
+        <button onClick="{{ goNotifs }}" style="position:relative; width:38px; height:38px; border-radius:11px; background:#fff; border:1px solid #E8E6F4; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+          <svg width="17" height="17" fill="none" stroke="#1E1B4B" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          <sc-if value="{{ hasUnread }}" hint-placeholder-val="{{ true }}"><span style="position:absolute; top:-4px; right:-4px; background:#D64550; color:#fff; font-size:9.5px; font-weight:700; width:16px; height:16px; border-radius:50%; display:flex; align-items:center; justify-content:center;">3</span></sc-if>
+        </button>
+      </div>
+
+      <div data-lp-scroll="1" style="flex:1; overflow-y:auto; padding:6px 20px 90px;">
+
+      <!-- ===== HOME ===== -->
+      <sc-if value="{{ csHome }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:lp-up .3s ease;">
+        <div style="background:#1E1B4B; border-radius:18px; padding:18px; color:#fff; margin-bottom:14px;">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:10px;">
+            <span style="width:8px; height:8px; border-radius:50%; background:#7CE6B8;"></span>
+            <span style="font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#AFA9EC;">Order {{ activeId }} · {{ activeState }}</span>
+          </div>
+          <p style="margin:0 0 4px; font-family:'Bricolage Grotesque',sans-serif; font-size:19px; font-weight:600;">{{ activeHeadline }}</p>
+          <p style="margin:0 0 14px; font-size:12.5px; color:#CFCBF2;">{{ activeSub }}</p>
+          <div style="display:flex; gap:5px; margin-bottom:14px;">
+            <sc-for list="{{ progressSegs }}" as="s" hint-placeholder-count="5"><div style="flex:1; height:5px; border-radius:3px; background:{{ s.bg }};"></div></sc-for>
+          </div>
+          <button onClick="{{ goTrack }}" style="width:100%; background:#7C73E6; border:none; color:#fff; font-family:'Hanken Grotesk',sans-serif; font-size:13.5px; font-weight:700; padding:12px; border-radius:11px; cursor:pointer;" style-hover="background:#6A61DB;">Track live →</button>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+          <button onClick="{{ goBook }}" style="background:#fff; border:1px solid #E8E6F4; border-radius:15px; padding:15px 14px; cursor:pointer; text-align:left; font-family:'Hanken Grotesk',sans-serif;" style-hover="border-color:#AFA9EC;">
+            <span style="width:32px; height:32px; border-radius:9px; background:#EEEDFE; display:flex; align-items:center; justify-content:center; margin-bottom:9px;"><svg width="16" height="16" fill="none" stroke="#5A52C5" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>
+            <span style="display:block; font-size:13.5px; font-weight:700; color:#1E1B4B;">Schedule pickup</span>
+            <span style="font-size:11.5px; color:#8885A0;">Next window today 4 PM</span>
+          </button>
+          <button onClick="{{ reorderLast }}" style="background:#fff; border:1px solid #E8E6F4; border-radius:15px; padding:15px 14px; cursor:pointer; text-align:left; font-family:'Hanken Grotesk',sans-serif;" style-hover="border-color:#AFA9EC;">
+            <span style="width:32px; height:32px; border-radius:9px; background:#E1F5EE; display:flex; align-items:center; justify-content:center; margin-bottom:9px;"><svg width="16" height="16" fill="none" stroke="#0B7B5C" stroke-width="2.2" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"/></svg></span>
+            <span style="display:block; font-size:13.5px; font-weight:700; color:#1E1B4B;">Reorder last</span>
+            <span style="font-size:11.5px; color:#8885A0;">Wash &amp; fold · $38.25</span>
+          </button>
+        </div>
+        <div style="background:#fff; border:1px solid #E8E6F4; border-radius:15px; padding:14px 15px; display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+          <span style="width:36px; height:36px; border-radius:10px; background:#EEEDFE; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="17" height="17" fill="none" stroke="#5A52C5" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg></span>
+          <div style="flex:1;">
+            <p style="margin:0; font-size:13px; font-weight:700;">Weekly pickup</p>
+            <p style="margin:0; font-size:11.5px; color:#8885A0;">{{ recurringLabel }}</p>
+          </div>
+          <button onClick="{{ toggleRecurring }}" style="width:44px; height:25px; border-radius:20px; border:none; cursor:pointer; background:{{ recBg }}; position:relative; transition:background .15s;"><span style="position:absolute; top:3px; left:{{ recLeft }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .15s; box-shadow:0 1px 3px rgba(0,0,0,.2);"></span></button>
+        </div>
+        <div style="background:linear-gradient(120deg,#7C73E6,#5A52C5); border-radius:15px; padding:15px 16px; color:#fff; margin-bottom:10px; display:flex; align-items:center; gap:12px;">
+          <div style="flex:1;">
+            <p style="margin:0 0 2px; font-size:13.5px; font-weight:700;">Give $20, get $20</p>
+            <p style="margin:0; font-size:11.5px; color:#DDD9FB;">Friends get $20 off their first order — you get $20 credit.</p>
+          </div>
+          <button onClick="{{ copyCode }}" style="background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.3); color:#fff; font-family:'Hanken Grotesk',sans-serif; font-size:12px; font-weight:700; padding:9px 13px; border-radius:9px; cursor:pointer; white-space:nowrap;">{{ codeLabel }}</button>
+        </div>
+        <sc-if value="{{ showBiz }}" hint-placeholder-val="{{ true }}">
+        <div style="background:#fff; border:1px dashed #C8C2EE; border-radius:15px; padding:14px 15px; display:flex; align-items:center; gap:12px;">
+          <span style="width:36px; height:36px; border-radius:10px; background:#FAEEDA; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><svg width="16" height="16" fill="none" stroke="#9A6A1B" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h1m4 0h1M9 13h1m4 0h1M9 17h1m4 0h1"/></svg></span>
+          <div style="flex:1;">
+            <p style="margin:0; font-size:13px; font-weight:700;">Looppr for Business</p>
+            <p style="margin:0; font-size:11.5px; color:#8885A0;">Airbnbs, gyms, salons — commercial rates &amp; invoicing.</p>
+          </div>
+          <span style="font-size:12px; font-weight:700; color:#5A52C5;">Learn →</span>
+        </div>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <!-- ===== BOOK FLOW ===== -->
+      <sc-if value="{{ csBook }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:lp-up .3s ease;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+          <sc-if value="{{ bookCanBack }}" hint-placeholder-val="{{ false }}"><button onClick="{{ bookBack }}" style="width:32px; height:32px; border-radius:10px; background:#fff; border:1px solid #E8E6F4; cursor:pointer; display:flex; align-items:center; justify-content:center;"><svg width="15" height="15" fill="none" stroke="#1E1B4B" stroke-width="2.2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button></sc-if>
+          <div style="flex:1;">
+            <p style="margin:0; font-family:'Bricolage Grotesque',sans-serif; font-size:18px; font-weight:600;">{{ bookTitle }}</p>
+            <p style="margin:0; font-size:11.5px; color:#8885A0;">{{ bookStepLabel }}</p>
+          </div>
+        </div>
+        <div style="display:flex; gap:5px; margin-bottom:18px;">
+          <sc-for list="{{ bookSegs }}" as="s" hint-placeholder-count="4"><div style="flex:1; height:4px; border-radius:3px; background:{{ s.bg }};"></div></sc-for>
+        </div>
+
+        <sc-if value="{{ bs1 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; flex-direction:column; gap:10px; animation:lp-up .25s ease;">
+          <sc-for list="{{ vendors }}" as="v" hint-placeholder-count="3">
+          <button onClick="{{ v.pick }}" style="text-align:left; font-family:'Hanken Grotesk',sans-serif; background:#fff; border:2px solid {{ v.border }}; border-radius:16px; padding:15px 16px; cursor:pointer; transition:border-color .15s;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <span style="width:42px; height:42px; border-radius:12px; background:{{ v.tileBg }}; display:flex; align-items:center; justify-content:center; font-family:'Bricolage Grotesque',sans-serif; font-weight:700; font-size:15px; color:{{ v.tileC }}; flex-shrink:0;">{{ v.initials }}</span>
+              <div style="flex:1; min-width:0;">
+                <div style="display:flex; align-items:center; gap:7px;"><span style="font-size:14.5px; font-weight:700; color:#1E1B4B;">{{ v.name }}</span><sc-if value="{{ v.badge }}" hint-placeholder-val="{{ false }}"><span style="font-size:9.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; background:#E1F5EE; color:#0B7B5C; padding:2px 7px; border-radius:20px;">{{ v.badge }}</span></sc-if></div>
+                <p style="margin:2px 0 0; font-size:11.5px; color:#8885A0;">{{ v.meta }}</p>
+              </div>
+              <div style="text-align:right; flex-shrink:0;">
+                <p style="margin:0; font-size:14px; font-weight:700; color:#1E1B4B;">{{ v.rate }}</p>
+                <p style="margin:0; font-size:10.5px; color:#8885A0;">{{ v.unit }}</p>
+              </div>
+            </div>
+          </button>
+          </sc-for>
+          <button onClick="{{ bookNext }}" style="margin-top:6px; background:#1E1B4B; border:none; color:#fff; font-family:'Hanken Grotesk',sans-serif; font-size:14px; font-weight:700; padding:14px; border-radius:12px; cursor:pointer;" style-hover="background:#332AB8;">Continue with {{ selVendorName }}</button>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ bs2 }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex; flex-direction:column; gap:10px; animation:lp-up .25s ease;">
+          <sc-for list="{{ services }}" as="s" hint-placeholder-count="4">
+          <div style="background:#fff; border:1px solid #E8E6F4; border-radius:15px; padding:13px 15px; display:flex; align-items:center; gap:12px; opacity:{{ s.op }};">
+            <div style="flex:1; min-width:0;">
+              <p style="margin:0; font-size:13.5px; font-weight:700;">{{ s.name }}</p>
+              <p style="margin:1px 0 0; font-size:11.5px; color:#8885A0;">{{ s.desc }}</p>
+            </div>
+            <span style="font-size:13px; font-weight:700; color:#5A52C5; flex-shrink:0;">{{ s.price }}</span>
+            <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+              <button onClick="{{ s.dec }}" style="width:27px; height:27px; border-radius:8px; border:1px solid #E0DCF5; background:#F8F7FF; cursor:pointer; font-size:15px; color:#5A52C5; font-weight:700; line-height:1;">−</button>
+              <span style="font-size:14px; font-weight:700; min-width:14px; text-align:center;">{{ s.qty }}</span>
+              <button onClick="{{ s.inc }}" style="width:27px; height:27px; border-radius:8px; border:1px solid #E0DCF5; background:#F8F7FF; cursor:pointer; font-size:15px; color:#5A52C5; font-weight:700; line-height:1;">＋</button>
+            </div>
+          </div>
+          </sc-for>
+          <div style="display:flex; justify-content:space-between; padding:4px 4px 0;"><span style="font-size:12.5px; color:#8885A0;">Estimated subtotal</span><span style="font-size:14px; font-weight:700;">{{ subtotal }}</span></div>
+          <button onClick="{{ bookNext }}" style="background:#1E1B4B; border:none; color:#fff; font-family:'Hanken Grotesk',sans-serif; font-size:14px; font-weight:700; padding:14px; border-radius:12px; cursor:pointer;" style-hover="background:#332AB8;">Choose pickup time</button>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ bs3 }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:lp-up .25s ease;">
+          <div style="background:#fff; border:1px solid #E8E6F4; border-radius:15px; padding:13px 15px; display:flex; gap:11px; align-items:center; margin-bottom:14px;">
+            <span style="width:34px; height:34px; border-radius:10px; background:#EEEDFE; display:flex; align-items:center; justify-content:center;"><svg width="15" height="15" fill="none" stroke="#5A52C5" stroke-width="2" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg></span>
+            <div style="flex:1;"><p style="margin:0; font-size:13px; font-weight:700;">1408 Hazel Ct, Edmond OK</p><p style="margin:0; font-size:11.5px; color:#8885A0;">Leave at door · gate code 4412</p></div>
+            <span style="font-size:12px; font-weight:700; color:#5A52C5; cursor:pointer;">Edit</span>
+          </div>
+          <p style="margin:0 0 9px; font-size:12px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#8885A0;">Pickup window</p>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:9px; margin-bottom:16px;">
+            <sc-for list="{{ windows }}" as="w" hint-placeholder-count="4">
+            <button onClick="{{ w.pick }}" style="font-family:'Hanken Grotesk',sans-serif; background:{{ w.bg }}; border:2px solid {{ w.border }}; border-radius:13px; padding:12px; cursor:pointer; text-align:left;">
+              <span style="display:block; font-size:12px; font-weight:700; color:{{ w.dayC }};">{{ w.day }}</span>
+              <span style="font-size:13.5px; font-weight:700; color:{{ w.timeC }};">{{ w.time }}</span>
+              <span style="display:block; font-size:10.5px; color:#8885A0; margin-top:2px;">{{ w.cap }}</span>
+            </button>
+            </sc-for>
+          </div>
+          <div style="background:#fff; border:1px solid #E8E6F4; border-radius:15px; padding:13px 15px; display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+            <div style="flex:1;"><p style="margin:0; font-size:13px; font-weight:700;">Repeat weekly</p><p style="margin:0; font-size:11.5px; color:#8885A0;">Same window every week · skip anytime</p></div>
+            <button onClick="{{ toggleRecurring }}" style="width:44px; height:25px; border-radius:20px; border:none; cursor:pointer; background:{{ recBg }}; position:relative; transition:background .15s;"><span style="position:absolute; top:3px; left:{{ recLeft }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .15s; box-shadow:0 1px 3px rgba(0,0,0,.2);"></span></button>
+          </div>
+          <button onClick="{{ bookNext }}" style="width:100%; background:#1E1B4B; border:none; color:#fff; font-family:'Hanken Grotesk',sans-serif; font-size:14px; font-weight:700; padding:14px; border-radius:12px; cursor:pointer;" style-hover="background:#332AB8;">Review &amp; pay</button>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ bs4 }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:lp-up .25s ease;">
+          <div style="background:#fff; border:1px solid #E8E6F4; border-radius:16px; padding:16px; margin-bottom:12px;">
+            <p style="margin:0 0 11px; font-size:12px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#8885A0;">Order summary</p>
+            <sc-for list="{{ summaryLines }}" as="l" hint-placeholder-count="4">
+            <div style="display:flex; justify-content:space-between; margin-bottom:7px;"><span style="font-size:13px; color:{{ l.c }};">{{ l.label }}</span><span style="font-size:13px; font-weight:600; color:{{ l.c }};">{{ l.val }}</span></div>
+            </sc-for>
+            <div style="border-top:1px solid #EDEBFA; margin-top:10px; padding-top:10px; display:flex; justify-content:space-between;"><span style="font-size:14.5px; font-weight:700;">Total</span><span style="font-size:16px; font-weight:700;">{{ total }}</span></div>
+          </div>
+          <div style="background:#fff; border:1px solid #E8E6F4; border-radius:15px; padding:13px 15px; display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+            <span style="width:36px; height:25px; border-radius:5px; background:#1E1B4B; color:#fff; font-size:8.5px; font-weight:700; display:flex; align-items:center; justify-content:center; letter-spacing:.04em;">VISA</span>
+            <div style="flex:1;"><p style="margin:0; font-size:13px; font-weight:700;">Visa ·· 4242</p><p style="margin:0; font-size:11.5px; color:#8885A0;">Charged after weigh-in — never before</p></div>
+            <span style="font-size:12px; font-weight:700; color:#5A52C5; cursor:pointer;">Change</span>
+          </div>
+          <div style="background:#E1F5EE; border-radius:13px; padding:11px 14px; display:flex; gap:9px; align-items:center; margin-bottom:14px;">
+            <svg width="15" height="15" fill="none" stroke="#0B7B5C" stroke-width="2.4" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg>
+            <span style="font-size:12px; font-weight:600; color:#0B7B5C;">LOOP10 applied — $10 off your first order</span>
+          </div>
+          <button onClick="{{ confirmOrder }}" style="width:100%; background:#7C73E6; border:none; color:#fff; font-family:'Hanken Grotesk',sans-serif; font-size:14.5px; font-weight:700; padding:15px; border-radius:12px; cursor:pointer; animation:lp-pulse 2.4s infinite;" style-hover="background:#6A61DB;">Confirm pickup · {{ total }}</button>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ bs5 }}" hint-placeholder-val="{{ false }}">
+        <div style="text-align:center; padding:26px 6px; animation:lp-up .25s ease;">
+          <span style="width:64px; height:64px; border-radius:50%; background:#E1F5EE; display:inline-flex; align-items:center; justify-content:center; margin-bottom:16px;"><svg width="28" height="28" fill="none" stroke="#0B7B5C" stroke-width="2.6" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></span>
+          <p style="margin:0 0 6px; font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:600;">Pickup booked</p>
+          <p style="margin:0 0 4px; font-size:13.5px; color:#5A52C5; font-weight:600;">Order {{ newOrderId }} · {{ selVendorName }}</p>
+          <p style="margin:0 0 22px; font-size:12.5px; color:#8885A0;">{{ newOrderWindow }} · leave the bag at your door</p>
+          <button onClick="{{ addToCalendar }}" style="width:100%; display:flex; align-items:center; justify-content:center; gap:8px; background:#fff; border:1.5px solid #E0DCF5; color:#1E1B4B; font-family:'Hanken Grotesk',sans-serif; font-size:13.5px; font-weight:700; padding:13px; border-radius:12px; cursor:pointer; margin-bottom:10px;" style-hover="border-color:#AFA9EC;"><svg width="15" height="15" fill="none" stroke="#5A52C5" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>Add to Google Calendar</button>
+          <button onClick="{{ trackNewOrder }}" style="width:100%; background:#1E1B4B; border:none; color:#fff; font-family:'Hanken Grotesk',sans-serif; font-size:14px; font-weight:700; padding:14px; border-radius:12px; cursor:pointer; margin-bottom:10px;">Track this order</button>
+          <button onClick="{{ goHome }}" style="width:100%; background:#fff; border:1.5px solid #E0DCF5; color:#5A52C5; font-family:'Hanken Grotesk',sans-serif; font-size:14px; font-weight:700; padding:13px; border-radius:12px; cursor:pointer;">Back home</button>
+        </div>
+        </sc-if>
+      </div>
+      </sc-if>
+
+      <!-- ===== TRACK ===== -->
+      <sc-if value="{{ csTrack }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:lp-up .3s ease;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+          <button onClick="{{ goHome }}" style="width:32px; height:32px; border-radius:10px; background:#fff; border:1px solid #E8E6F4; cursor:pointer; display:flex; align-items:center; justify-content:center;"><svg width="15" height="15" fill="none" stroke="#1E1B4B" stroke-width="2.2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <div style="flex:1;">
+            <p style="margin:0; font-family:'Bricolage Grotesque',sans-serif; font-size:18px; font-weight:600;">Order {{ trackId }}</p>
+            <p style="margin:0; font-size:11.5px; color:#8885A0;">{{ trackVendor }} · est. delivery {{ trackEta }}</p>
+          </div>
+          <span style="font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; background:#EEEDFE; color:#5A52C5; padding:4px 10px; border-radius:20px;">{{ trackStatus }}</span>
+        </div>
+        <div style="background:#fff; border:1px solid #E8E6F4; border-radius:16px; overflow:hidden; margin-bottom:14px;">
+          <svg viewBox="0 0 400 170" style="display:block; width:100%;">
+            <rect width="400" height="170" fill="#EEF0F8"/>
+            <g stroke="#DFE2F0" stroke-width="6"><path d="M0 40 H400"/><path d="M0 105 H400"/><path d="M70 0 V170"/><path d="M180 0 V170"/><path d="M300 0 V170"/></g>
+            <g stroke="#fff" stroke-width="2"><path d="M0 40 H400"/><path d="M0 105 H400"/><path d="M70 0 V170"/><path d="M180 0 V170"/><path d="M300 0 V170"/></g>
+            <path id="lproute" d="M70 140 V105 H180 V40 H300 V28" fill="none" stroke="#7C73E6" stroke-width="3.5" stroke-dasharray="8 6" stroke-linecap="round" style="animation:lp-dash 1s linear infinite;"/>
+            <circle cx="70" cy="140" r="7" fill="#1E1B4B"/><text x="70" y="163" text-anchor="middle" font-size="10" font-weight="700" fill="#1E1B4B" font-family="Hanken Grotesk,sans-serif">Home</text>
+            <circle cx="300" cy="28" r="7" fill="#7C73E6"/><text x="300" y="16" text-anchor="middle" font-size="10" font-weight="700" fill="#5A52C5" font-family="Hanken Grotesk,sans-serif">{{ trackVendorShort }}</text>
+            <circle r="6" fill="#fff" stroke="#7C73E6" stroke-width="3"><animateMotion dur="6s" repeatCount="indefinite"><mpath href="#lproute"/></animateMotion></circle>
+          </svg>
+        </div>
+        <div style="background:#fff; border:1px solid #E8E6F4; border-radius:16px; padding:16px 16px 8px; margin-bottom:12px;">
+          <sc-for list="{{ trackSteps }}" as="t" hint-placeholder-count="5">
+          <div style="display:flex; gap:12px;">
+            <div style="display:flex; flex-direction:column; align-items:center;">
+              <span style="width:24px; height:24px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:{{ t.dotBg }}; border:{{ t.dotBorder }};">
+                <sc-if value="{{ t.done }}" hint-placeholder-val="{{ false }}"><svg width="11" height="11" fill="none" stroke="#fff" stroke-width="3" viewBox="0 0 24 24"><path d="M5 12l5 5L20 7"/></svg></sc-if>
+                <sc-if value="{{ t.current }}" hint-placeholder-val="{{ false }}"><span style="width:12px; height:12px; border-radius:50%; border:2.5px solid #DDD9FB; border-top-color:#fff; animation:lp-spin 1s linear infinite;"></span></sc-if>
+              </span>
+              <sc-if value="{{ t.line }}" hint-placeholder-val="{{ true }}"><span style="width:2px; flex:1; min-height:22px; background:{{ t.lineBg }};"></span></sc-if>
+            </div>
+            <div style="padding-bottom:16px;">
+              <p style="margin:0; font-size:13.5px; font-weight:700; color:{{ t.titleC }};">{{ t.title }}</p>
+              <p style="margin:1px 0 0; font-size:11.5px; color:#8885A0;">{{ t.sub }}</p>
+            </div>
+          </div>
+          </sc-for>
+        </div>
+        <div style="background:#fff; border:1px solid #E8E6F4; border-radius:15px; padding:13px 15px; display:flex; align-items:center; gap:12px;">
+          <span style="width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,#7C73E6,#5A52C5); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px;">JA</span>
+          <div style="flex:1;"><p style="margin:0; font-size:13px; font-weight:700;">Jeffrey — your Looppr driver</p><p style="margin:0; font-size:11.5px; color:#8885A0;">Founder-operated route · Edmond</p></div>
+          <button style="width:36px; height:36px; border-radius:10px; border:1px solid #E0DCF5; background:#F8F7FF; cursor:pointer; display:flex; align-items:center; justify-content:center;"><svg width="15" height="15" fill="none" stroke="#5A52C5" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></button>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===== ORDERS ===== -->
+      <sc-if value="{{ csOrders }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:lp-up .3s ease;">
+        <p style="margin:2px 0 14px; font-family:'Bricolage Grotesque',sans-serif; font-size:20px; font-weight:600;">Orders</p>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <sc-for list="{{ orderList }}" as="o" hint-placeholder-count="4">
+          <div style="background:#fff; border:1px solid #E8E6F4; border-radius:15px; padding:14px 15px;">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+              <div style="flex:1;"><p style="margin:0; font-size:13.5px; font-weight:700;">{{ o.id }} · {{ o.vendor }}</p><p style="margin:0; font-size:11.5px; color:#8885A0;">{{ o.meta }}</p></div>
+              <span style="font-size:10.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; background:{{ o.pillBg }}; color:{{ o.pillC }}; padding:3px 9px; border-radius:20px;">{{ o.status }}</span>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+              <span style="font-size:14px; font-weight:700; margin-right:auto;">{{ o.total }}</span>
+              <sc-if value="{{ o.canTrack }}" hint-placeholder-val="{{ false }}"><button onClick="{{ goTrack }}" style="background:#1E1B4B; color:#fff; border:none; font-family:'Hanken Grotesk',sans-serif; font-size:11.5px; font-weight:700; padding:8px 13px; border-radius:9px; cursor:pointer;">Track</button></sc-if>
+              <sc-if value="{{ o.canRate }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex; gap:3px; align-items:center;">
+                  <sc-for list="{{ o.stars }}" as="st" hint-placeholder-count="5"><button onClick="{{ st.set }}" style="background:none; border:none; cursor:pointer; padding:1px; font-size:17px; color:{{ st.c }}; line-height:1;">★</button></sc-for>
+                </div>
+              </sc-if>
+              <sc-if value="{{ o.ratedLabel }}" hint-placeholder-val="{{ false }}"><span style="font-size:12px; font-weight:700; color:#E8A23D;">{{ o.ratedLabel }}</span></sc-if>
+              <sc-if value="{{ o.canReorder }}" hint-placeholder-val="{{ false }}"><button onClick="{{ reorderLast }}" style="background:#fff; border:1.5px solid #E0DCF5; color:#5A52C5; font-family:'Hanken Grotesk',sans-serif; font-size:11.5px; font-weight:700; padding:7px 13px; border-radius:9px; cursor:pointer;" style-hover="border-color:#AFA9EC;">Reorder</button></sc-if>
+            </div>
+          </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===== PROFILE ===== -->
+      <sc-if value="{{ csProfile }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:lp-up .3s ease;">
+        <div style="display:flex; align-items:center; gap:13px; margin-bottom:18px;">
+          <span style="width:52px; height:52px; border-radius:50%; background:linear-gradient(135deg,#7C73E6,#5A52C5); color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Bricolage Grotesque',sans-serif; font-weight:700; font-size:19px;">MT</span>
+          <div><p style="margin:0; font-family:'Bricolage Grotesque',sans-serif; font-size:19px; font-weight:600;">Maya Thompson</p><p style="margin:0; font-size:12px; color:#8885A0;">1408 Hazel Ct, Edmond OK · member since July 2026</p></div>
+        </div>
+        <p style="margin:0 0 9px; font-size:12px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#8885A0;">Fold style</p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
+          <sc-for list="{{ foldOpts }}" as="f" hint-placeholder-count="3"><button onClick="{{ f.pick }}" style="font-family:'Hanken Grotesk',sans-serif; font-size:12.5px; font-weight:700; padding:9px 15px; border-radius:20px; cursor:pointer; background:{{ f.bg }}; color:{{ f.c }}; border:1.5px solid {{ f.border }};">{{ f.label }}</button></sc-for>
+        </div>
+        <p style="margin:0 0 9px; font-size:12px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#8885A0;">Detergent</p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
+          <sc-for list="{{ detOpts }}" as="f" hint-placeholder-count="3"><button onClick="{{ f.pick }}" style="font-family:'Hanken Grotesk',sans-serif; font-size:12.5px; font-weight:700; padding:9px 15px; border-radius:20px; cursor:pointer; background:{{ f.bg }}; color:{{ f.c }}; border:1.5px solid {{ f.border }};">{{ f.label }}</button></sc-for>
+        </div>
+        <p style="margin:0 0 9px; font-size:12px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#8885A0;">Water temp</p>
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
+          <sc-for list="{{ tempOpts }}" as="f" hint-placeholder-count="3"><button onClick="{{ f.pick }}" style="font-family:'Hanken Grotesk',sans-serif; font-size:12.5px; font-weight:700; padding:9px 15px; border-radius:20px; cursor:pointer; background:{{ f.bg }}; color:{{ f.c }}; border:1.5px solid {{ f.border }};">{{ f.label }}</button></sc-for>
+        </div>
+        <div style="background:#fff; border:1px solid #E8E6F4; border-radius:15px; padding:13px 15px; display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+          <div style="flex:1;"><p style="margin:0; font-size:13px; font-weight:700;">Fabric softener</p><p style="margin:0; font-size:11.5px; color:#8885A0;">Applied to every order</p></div>
+          <button onClick="{{ toggleSoftener }}" style="width:44px; height:25px; border-radius:20px; border:none; cursor:pointer; background:{{ softBg }}; position:relative; transition:background .15s;"><span style="position:absolute; top:3px; left:{{ softLeft }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .15s; box-shadow:0 1px 3px rgba(0,0,0,.2);"></span></button>
+        </div>
+        <div style="background:#fff; border:1px solid #E8E6F4; border-radius:15px; padding:13px 15px; display:flex; align-items:center; gap:12px; margin-bottom:10px;">
+          <div style="flex:1;"><p style="margin:0; font-size:13px; font-weight:700;">Weekly pickup — Tuesdays 4–6 PM</p><p style="margin:0; font-size:11.5px; color:#8885A0;">{{ recurringLabel }}</p></div>
+          <button onClick="{{ toggleRecurring }}" style="width:44px; height:25px; border-radius:20px; border:none; cursor:pointer; background:{{ recBg }}; position:relative; transition:background .15s;"><span style="position:absolute; top:3px; left:{{ recLeft }}; width:19px; height:19px; border-radius:50%; background:#fff; transition:left .15s; box-shadow:0 1px 3px rgba(0,0,0,.2);"></span></button>
+        </div>
+        <div style="background:#fff; border:1px solid #E8E6F4; border-radius:15px; padding:13px 15px; display:flex; align-items:center; gap:12px;">
+          <div style="flex:1;"><p style="margin:0; font-size:13px; font-weight:700;">Referral code</p><p style="margin:0; font-size:11.5px; color:#8885A0;">$20 credit per friend · 2 referred so far</p></div>
+          <button onClick="{{ copyCode }}" style="background:#EEEDFE; border:none; color:#5A52C5; font-family:'Hanken Grotesk',sans-serif; font-size:12px; font-weight:700; padding:9px 13px; border-radius:9px; cursor:pointer;">{{ codeLabel }}</button>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ===== NOTIFICATIONS ===== -->
+      <sc-if value="{{ csNotifs }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:lp-up .3s ease;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+          <button onClick="{{ goHome }}" style="width:32px; height:32px; border-radius:10px; background:#fff; border:1px solid #E8E6F4; cursor:pointer; display:flex; align-items:center; justify-content:center;"><svg width="15" height="15" fill="none" stroke="#1E1B4B" stroke-width="2.2" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+          <p style="margin:0; flex:1; font-family:'Bricolage Grotesque',sans-serif; font-size:18px; font-weight:600;">Notifications</p>
+          <button onClick="{{ markRead }}" style="background:none; border:none; font-family:'Hanken Grotesk',sans-serif; font-size:12px; font-weight:700; color:#5A52C5; cursor:pointer;">Mark all read</button>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:9px;">
+          <sc-for list="{{ notifs }}" as="n" hint-placeholder-count="4">
+          <div style="background:{{ n.bg }}; border:1px solid #E8E6F4; border-radius:14px; padding:13px 15px; display:flex; gap:12px;">
+            <span style="width:34px; height:34px; border-radius:10px; background:{{ n.iconBg }}; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:15px;">{{ n.icon }}</span>
+            <div style="flex:1;"><p style="margin:0; font-size:13px; font-weight:700;">{{ n.title }}</p><p style="margin:1px 0 0; font-size:11.5px; color:#8885A0; line-height:1.45;">{{ n.body }}</p></div>
+            <span style="font-size:10.5px; color:#B4B2C9; flex-shrink:0;">{{ n.time }}</span>
+          </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+      </div>
+
+      <!-- toast -->
+      <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; bottom:86px; left:50%; transform:translateX(-50%); background:#1E1B4B; color:#fff; font-size:12.5px; font-weight:600; padding:10px 18px; border-radius:24px; box-shadow:0 10px 30px rgba(30,27,75,.3); white-space:nowrap; animation:lp-up .25s ease; z-index:5;">{{ toast }}</div>
+      </sc-if>
+
+      <!-- bottom tabs -->
+      <div style="position:absolute; bottom:0; left:0; right:0; background:rgba(255,255,255,.94); backdrop-filter:blur(8px); border-top:1px solid #E8E6F4; display:flex; padding:8px 10px 12px;">
+        <button onClick="{{ goHome }}" style="flex:1; background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px; font-family:'Hanken Grotesk',sans-serif;">
+          <svg width="19" height="19" fill="none" stroke="{{ tabHomeC }}" stroke-width="2.1" viewBox="0 0 24 24"><path d="M3 10l9-7 9 7v10a1.8 1.8 0 0 1-1.8 1.8H4.8A1.8 1.8 0 0 1 3 20z"/></svg>
+          <span style="font-size:10px; font-weight:700; color:{{ tabHomeC }};">Home</span>
+        </button>
+        <button onClick="{{ goBook }}" style="flex:1; background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px; font-family:'Hanken Grotesk',sans-serif;">
+          <svg width="19" height="19" fill="none" stroke="{{ tabBookC }}" stroke-width="2.1" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+          <span style="font-size:10px; font-weight:700; color:{{ tabBookC }};">Book</span>
+        </button>
+        <button onClick="{{ goOrders }}" style="flex:1; background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px; font-family:'Hanken Grotesk',sans-serif;">
+          <svg width="19" height="19" fill="none" stroke="{{ tabOrdersC }}" stroke-width="2.1" viewBox="0 0 24 24"><path d="M3 7h18M3 7l2 13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2l2-13M9 7V5a3 3 0 0 1 6 0v2"/></svg>
+          <span style="font-size:10px; font-weight:700; color:{{ tabOrdersC }};">Orders</span>
+        </button>
+        <button onClick="{{ goProfile }}" style="flex:1; background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px; font-family:'Hanken Grotesk',sans-serif;">
+          <svg width="19" height="19" fill="none" stroke="{{ tabProfileC }}" stroke-width="2.1" viewBox="0 0 24 24"><circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c.8-3.6 3.9-6 7.5-6s6.7 2.4 7.5 6"/></svg>
+          <span style="font-size:10px; font-weight:700; color:{{ tabProfileC }};">Account</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ================= DRIVER APP ================= -->
+  <sc-if value="{{ isDriver }}" hint-placeholder-val="{{ false }}">
+  <div style="flex:1; display:flex; justify-content:center; padding:26px 16px 40px; background:radial-gradient(ellipse 70% 45% at 50% 0%, #DDD9F5 0%, #ECEAF6 60%);">
+    <div style="width:100%; max-width:440px; background:#F8F7FF; border:1px solid #E0DCF5; border-radius:26px; box-shadow:0 30px 70px rgba(30,27,75,.16); overflow:hidden; display:flex; flex-direction:column; min-height:780px; position:relative;">
+      <div style="display:flex; align-items:center; gap:10px; padding:18px 20px 12px;">
+        <img src="assets/looppr-mark.png" alt="" style="width:26px; height:26px; object-fit:contain;">
+        <div style="flex:1;">
+          <p style="margin:0; font-size:15px; font-weight:700; font-family:'Bricolage Grotesque',sans-serif;">Looppr Driver</p>
+          <p style="margin:0; font-size:11.5px; color:#8885A0;">Marcus Hill · Sunday route · OKC Metro</p>
+        </div>
+        <span style="display:flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:#0B7B5C; background:#E1F5EE; padding:5px 11px; border-radius:20px;"><span style="width:6px; height:6px; border-radius:50%; background:#0B7B5C;"></span>On shift</span>
+      </div>
+      <div data-lp-scroll="1" style="flex:1; overflow-y:auto; padding:6px 20px 90px;">
+        <sc-if value="{{ drRoute }}" hint-placeholder-val="{{ true }}">
+        <div style="animation:lp-up .3s ease;">
+          <div style="background:#1E1B4B; border-radius:18px; padding:18px; color:#fff; margin-bottom:14px;">
+            <p style="margin:0 0 3px; font-size:11.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#AFA9EC;">Next stop</p>
+            <p style="margin:0 0 3px; font-family:'Bricolage Grotesque',sans-serif; font-size:19px; font-weight:600;">{{ drNextWho }}</p>
+            <p style="margin:0 0 13px; font-size:12.5px; color:#CFCBF2;">{{ drNextWhat }}</p>
+            <div style="height:6px; border-radius:4px; background:rgba(255,255,255,.16); margin-bottom:13px;"><div style="height:100%; border-radius:4px; background:#7CE6B8; width:{{ drProgress }}; transition:width .3s;"></div></div>
+            <div style="display:flex; gap:9px;">
+              <button onClick="{{ drNavigate }}" style="flex:1; background:rgba(255,255,255,.13); border:1px solid rgba(255,255,255,.28); color:#fff; font-family:'Hanken Grotesk',sans-serif; font-size:13px; font-weight:700; padding:12px; border-radius:11px; cursor:pointer;">Navigate ▸ Maps</button>
+              <sc-if value="{{ drCompleteNext }}" hint-placeholder-val="{{ false }}"><button onClick="{{ drCompleteNext }}" style="flex:1; background:#7C73E6; border:none; color:#fff; font-family:'Hanken Grotesk',sans-serif; font-size:13px; font-weight:700; padding:12px; border-radius:11px; cursor:pointer;" style-hover="background:#6A61DB;">Mark complete ✓</button></sc-if>
+            </div>
+          </div>
+          <div style="background:#fff; border:1px solid #E8E6F4; border-radius:16px; padding:14px 16px 6px;">
+            <p style="margin:0 0 8px; font-size:12px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#8885A0;">Today's stops</p>
+            <sc-for list="{{ drStops }}" as="r" hint-placeholder-count="6">
+            <div onClick="{{ r.click }}" style="display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid #F1EFFA; cursor:{{ r.cursor }};">
+              <span style="width:26px; height:26px; border-radius:8px; background:{{ r.numBg }}; color:{{ r.numC }}; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;">{{ r.n }}</span>
+              <div style="flex:1; min-width:0;"><p style="margin:0; font-size:13px; font-weight:700;">{{ r.who }}</p><p style="margin:0; font-size:11px; color:#8885A0;">{{ r.what }}</p></div>
+              <span style="font-size:10px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; background:{{ r.pillBg }}; color:{{ r.pillC }}; padding:3px 8px; border-radius:20px; flex-shrink:0;">{{ r.status }}</span>
+            </div>
+            </sc-for>
+          </div>
+        </div>
+        </sc-if>
+        <sc-if value="{{ drScan }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:lp-up .3s ease;">
+          <p style="margin:2px 0 14px; font-family:'Bricolage Grotesque',sans-serif; font-size:20px; font-weight:600;">Weigh-in · LP-4821</p>
+          <div style="background:#fff; border:1px solid #E8E6F4; border-radius:18px; padding:22px; text-align:center; margin-bottom:12px;">
+            <p style="margin:0 0 12px; font-size:12px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#8885A0;">Bag weight</p>
+            <div style="display:flex; align-items:center; justify-content:center; gap:18px; margin-bottom:12px;">
+              <button onClick="{{ scanDec }}" style="width:44px; height:44px; border-radius:12px; border:1px solid #E0DCF5; background:#F8F7FF; cursor:pointer; font-size:20px; color:#5A52C5; font-weight:700;">−</button>
+              <span style="font-family:'Bricolage Grotesque',sans-serif; font-size:40px; font-weight:600; min-width:120px;">{{ scanLbs }}</span>
+              <button onClick="{{ scanInc }}" style="width:44px; height:44px; border-radius:12px; border:1px solid #E0DCF5; background:#F8F7FF; cursor:pointer; font-size:20px; color:#5A52C5; font-weight:700;">＋</button>
+            </div>
+            <p style="margin:0; font-size:12.5px; color:#8885A0;">$1.75/lb → customer pays <b style="color:#1E1B4B;">{{ scanEst }}</b> · charged after weigh-in, never before</p>
+          </div>
+          <button onClick="{{ logWeight }}" style="width:100%; background:#1E1B4B; border:none; color:#fff; font-family:'Hanken Grotesk',sans-serif; font-size:14px; font-weight:700; padding:14px; border-radius:12px; cursor:pointer; margin-bottom:10px;" style-hover="background:#332AB8;">Log weight &amp; charge</button>
+          <button onClick="{{ scanPhoto }}" style="width:100%; background:#fff; border:1.5px solid #E0DCF5; color:#5A52C5; font-family:'Hanken Grotesk',sans-serif; font-size:14px; font-weight:700; padding:13px; border-radius:12px; cursor:pointer;" style-hover="border-color:#AFA9EC;">📷 Photo confirmation</button>
+        </div>
+        </sc-if>
+        <sc-if value="{{ drEarn }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:lp-up .3s ease;">
+          <p style="margin:2px 0 14px; font-family:'Bricolage Grotesque',sans-serif; font-size:20px; font-weight:600;">Today's earnings</p>
+          <div style="background:#1E1B4B; border-radius:18px; padding:20px; color:#fff; text-align:center; margin-bottom:12px;">
+            <p style="margin:0 0 4px; font-size:11.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#AFA9EC;">Shift total</p>
+            <p style="margin:0; font-family:'Bricolage Grotesque',sans-serif; font-size:38px; font-weight:600;">{{ drTotal }}</p>
+            <p style="margin:4px 0 0; font-size:12px; color:#CFCBF2;">Paid out weekly via Stripe · Fridays</p>
+          </div>
+          <div style="background:#fff; border:1px solid #E8E6F4; border-radius:16px; padding:8px 16px;">
+            <sc-for list="{{ drEarnRows }}" as="e" hint-placeholder-count="4">
+            <div style="display:flex; align-items:center; padding:11px 0; border-bottom:1px solid #F1EFFA;">
+              <span style="flex:1; font-size:12.5px; font-weight:600; color:#8885A0;">{{ e.label }}</span>
+              <span style="font-size:13.5px; font-weight:700;">{{ e.val }}</span>
+            </div>
+            </sc-for>
+          </div>
+        </div>
+        </sc-if>
+      </div>
+      <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; bottom:86px; left:50%; transform:translateX(-50%); background:#1E1B4B; color:#fff; font-size:12.5px; font-weight:600; padding:10px 18px; border-radius:24px; box-shadow:0 10px 30px rgba(30,27,75,.3); white-space:nowrap; animation:lp-up .25s ease; z-index:5;">{{ toast }}</div>
+      </sc-if>
+      <div style="position:absolute; bottom:0; left:0; right:0; background:rgba(255,255,255,.94); backdrop-filter:blur(8px); border-top:1px solid #E8E6F4; display:flex; padding:8px 10px 12px;">
+        <button onClick="{{ drTabRoute.go }}" style="flex:1; background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px; font-family:'Hanken Grotesk',sans-serif;">
+          <svg width="19" height="19" fill="none" stroke="{{ drTabRoute.c }}" stroke-width="2.1" viewBox="0 0 24 24"><path d="M9 20l-5.5-2.5v-13L9 7l6-2.5 5.5 2.5v13L15 17.5zM9 7v13M15 4.5v13"/></svg>
+          <span style="font-size:10px; font-weight:700; color:{{ drTabRoute.c }};">Route</span>
+        </button>
+        <button onClick="{{ drTabScan.go }}" style="flex:1; background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px; font-family:'Hanken Grotesk',sans-serif;">
+          <svg width="19" height="19" fill="none" stroke="{{ drTabScan.c }}" stroke-width="2.1" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10"/></svg>
+          <span style="font-size:10px; font-weight:700; color:{{ drTabScan.c }};">Weigh-in</span>
+        </button>
+        <button onClick="{{ drTabEarn.go }}" style="flex:1; background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px; font-family:'Hanken Grotesk',sans-serif;">
+          <svg width="19" height="19" fill="none" stroke="{{ drTabEarn.c }}" stroke-width="2.1" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M15 9.5c0-1.4-1.3-2.5-3-2.5s-3 1-3 2.2c0 3.2 6 1.6 6 4.6 0 1.2-1.3 2.2-3 2.2s-3-1.1-3-2.5"/></svg>
+          <span style="font-size:10px; font-weight:700; color:{{ drTabEarn.c }};">Earnings</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ================= PARTNER APP ================= -->
+  <sc-if value="{{ isPartner }}" hint-placeholder-val="{{ false }}">
+  <div style="flex:1; display:flex; justify-content:center; padding:26px 16px 40px; background:radial-gradient(ellipse 70% 45% at 50% 0%, #CFEEE1 0%, #EAF4EF 60%);">
+    <div style="width:100%; max-width:440px; background:#F8F7FF; border:1px solid #CDEADF; border-radius:26px; box-shadow:0 30px 70px rgba(30,27,75,.16); overflow:hidden; display:flex; flex-direction:column; min-height:780px; position:relative;">
+      <div style="display:flex; align-items:center; gap:10px; padding:18px 20px 12px;">
+        <img src="assets/looppr-mark.png" alt="" style="width:26px; height:26px; object-fit:contain;">
+        <div style="flex:1;">
+          <p style="margin:0; font-size:15px; font-weight:700; font-family:'Bricolage Grotesque',sans-serif;">Looppr Partner</p>
+          <p style="margin:0; font-size:11.5px; color:#8885A0;">Suds &amp; Fold · Edmond wash facility</p>
+        </div>
+        <span style="display:flex; align-items:center; gap:6px; font-size:11px; font-weight:700; color:#0B7B5C; background:#E1F5EE; padding:5px 11px; border-radius:20px;"><span style="width:6px; height:6px; border-radius:50%; background:#0B7B5C;"></span>Accepting</span>
+      </div>
+      <div data-lp-scroll="1" style="flex:1; overflow-y:auto; padding:6px 20px 90px;">
+        <sc-if value="{{ paQueue }}" hint-placeholder-val="{{ true }}">
+        <div style="animation:lp-up .3s ease;">
+          <div style="background:#fff; border:1px solid #E8E6F4; border-radius:15px; padding:13px 15px; margin-bottom:12px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:7px;"><span style="font-size:12.5px; font-weight:700;">{{ paBagsLabel }}</span></div>
+            <div style="height:8px; border-radius:5px; background:#E1F5EE;"><div style="height:100%; border-radius:5px; background:linear-gradient(90deg,#2FBE8F,#0B7B5C); width:{{ paCapW }};"></div></div>
+          </div>
+          <p style="margin:0 0 10px; font-size:11.5px; color:#8885A0;">Tap a bag to advance it — updates the customer's live tracker and Looppr OS instantly.</p>
+          <sc-for list="{{ paCols }}" as="col" hint-placeholder-count="3">
+          <div style="margin-bottom:14px;">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:7px;">
+              <span style="width:8px; height:8px; border-radius:50%; background:{{ col.dot }};"></span>
+              <p style="margin:0; font-size:11.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:#0B7B5C; flex:1;">{{ col.title }}</p>
+              <span style="font-size:11px; font-weight:700; color:#8885A0;">{{ col.count }}</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:7px;">
+              <sc-for list="{{ col.cards }}" as="j" hint-placeholder-count="2">
+              <div onClick="{{ j.advance }}" style="background:#fff; border:1px solid #E8E6F4; border-radius:12px; padding:11px 13px; cursor:pointer; display:flex; align-items:center; gap:10px;" style-hover="border-color:#7CD4B4;">
+                <div style="flex:1; min-width:0;"><p style="margin:0; font-size:13px; font-weight:700;">{{ j.id }} · {{ j.who }}</p><p style="margin:0; font-size:11px; color:#8885A0;">{{ j.meta }}</p></div>
+                <span style="font-size:10px; font-weight:700; background:{{ j.tagBg }}; color:{{ j.tagC }}; padding:2px 8px; border-radius:10px; flex-shrink:0;">{{ j.tag }}</span>
+              </div>
+              </sc-for>
+            </div>
+          </div>
+          </sc-for>
+        </div>
+        </sc-if>
+        <sc-if value="{{ paPay }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:lp-up .3s ease;">
+          <p style="margin:2px 0 14px; font-family:'Bricolage Grotesque',sans-serif; font-size:20px; font-weight:600;">Payouts</p>
+          <div style="background:#0A3B2E; border-radius:18px; padding:20px; color:#fff; text-align:center; margin-bottom:12px;">
+            <p style="margin:0 0 4px; font-size:11.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#7CE6B8;">Pending payout</p>
+            <p style="margin:0; font-family:'Bricolage Grotesque',sans-serif; font-size:38px; font-weight:600;">$612.40</p>
+            <p style="margin:4px 0 0; font-size:12px; color:#BFE8D8;">Deposits every Friday via Stripe</p>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:9px;">
+            <sc-for list="{{ paPayouts }}" as="p" hint-placeholder-count="3">
+            <div style="background:#fff; border:1px solid #E8E6F4; border-radius:14px; padding:13px 15px; display:flex; align-items:center; gap:11px;">
+              <div style="flex:1; min-width:0;"><p style="margin:0; font-size:12.5px; font-weight:700;">{{ p.val }}</p><p style="margin:0; font-size:11px; color:#8885A0;">{{ p.label }}</p></div>
+              <span style="font-size:10px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; background:{{ p.pillBg }}; color:{{ p.pillC }}; padding:3px 9px; border-radius:20px;">{{ p.status }}</span>
+            </div>
+            </sc-for>
+          </div>
+        </div>
+        </sc-if>
+      </div>
+      <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; bottom:86px; left:50%; transform:translateX(-50%); background:#1E1B4B; color:#fff; font-size:12.5px; font-weight:600; padding:10px 18px; border-radius:24px; box-shadow:0 10px 30px rgba(30,27,75,.3); white-space:nowrap; animation:lp-up .25s ease; z-index:5;">{{ toast }}</div>
+      </sc-if>
+      <div style="position:absolute; bottom:0; left:0; right:0; background:rgba(255,255,255,.94); backdrop-filter:blur(8px); border-top:1px solid #E8E6F4; display:flex; padding:8px 10px 12px;">
+        <button onClick="{{ paTabQueue.go }}" style="flex:1; background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px; font-family:'Hanken Grotesk',sans-serif;">
+          <svg width="19" height="19" fill="none" stroke="{{ paTabQueue.c }}" stroke-width="2.1" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          <span style="font-size:10px; font-weight:700; color:{{ paTabQueue.c }};">Queue</span>
+        </button>
+        <button onClick="{{ paTabPay.go }}" style="flex:1; background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px; font-family:'Hanken Grotesk',sans-serif;">
+          <svg width="19" height="19" fill="none" stroke="{{ paTabPay.c }}" stroke-width="2.1" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20"/></svg>
+          <span style="font-size:10px; font-weight:700; color:{{ paTabPay.c }};">Payouts</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ================= BUSINESS APP ================= -->
+  <sc-if value="{{ isBiz }}" hint-placeholder-val="{{ false }}">
+  <div style="flex:1; display:flex; justify-content:center; padding:26px 16px 40px; background:radial-gradient(ellipse 70% 45% at 50% 0%, #F7E3C2 0%, #F6F0E4 60%);">
+    <div style="width:100%; max-width:440px; background:#F8F7FF; border:1px solid #F0DFC2; border-radius:26px; box-shadow:0 30px 70px rgba(30,27,75,.16); overflow:hidden; display:flex; flex-direction:column; min-height:780px; position:relative;">
+      <div style="display:flex; align-items:center; gap:10px; padding:18px 20px 12px;">
+        <img src="assets/looppr-mark.png" alt="" style="width:26px; height:26px; object-fit:contain;">
+        <div style="flex:1;">
+          <p style="margin:0; font-size:15px; font-weight:700; font-family:'Bricolage Grotesque',sans-serif;">Looppr for Business</p>
+          <p style="margin:0; font-size:11.5px; color:#9C8A6B;">Hazel St Airbnb · 3 properties · net-30</p>
+        </div>
+        <span style="font-size:10px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; background:#FAEEDA; color:#9A6A1B; padding:4px 10px; border-radius:20px;">Commercial</span>
+      </div>
+      <div data-lp-scroll="1" style="flex:1; overflow-y:auto; padding:6px 20px 90px;">
+        <sc-if value="{{ bzHome }}" hint-placeholder-val="{{ true }}">
+        <div style="animation:lp-up .3s ease;">
+          <div style="background:#4A3208; border-radius:18px; padding:18px; color:#fff; margin-bottom:14px;">
+            <p style="margin:0 0 3px; font-size:11.5px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#F2C87E;">Linen service plan</p>
+            <p style="margin:0 0 3px; font-family:'Bricolage Grotesque',sans-serif; font-size:19px; font-weight:600;">Turnover-synced · 2×/week</p>
+            <p style="margin:0 0 13px; font-size:12.5px; color:#EBD9B8;">Auto-books from your Airbnb calendar · commercial rate $1.40/lb</p>
+            <button onClick="{{ bzRequest }}" style="width:100%; background:#E8A23D; border:none; color:#3A2704; font-family:'Hanken Grotesk',sans-serif; font-size:13.5px; font-weight:700; padding:12px; border-radius:11px; cursor:pointer;" style-hover="background:#DD9526;">{{ bzReqLabel }}</button>
+          </div>
+          <p style="margin:0 0 9px; font-size:12px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#9C8A6B;">Properties</p>
+          <div style="display:flex; flex-direction:column; gap:9px;">
+            <sc-for list="{{ bzProps }}" as="p" hint-placeholder-count="3">
+            <div style="background:#fff; border:1px solid #E8E6F4; border-radius:14px; padding:13px 15px; display:flex; align-items:center; gap:11px;">
+              <div style="flex:1; min-width:0;"><p style="margin:0; font-size:13px; font-weight:700;">{{ p.name }}</p><p style="margin:0; font-size:11px; color:#9C8A6B;">{{ p.sub }}</p></div>
+              <span style="font-size:10px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; background:{{ p.pillBg }}; color:{{ p.pillC }}; padding:3px 9px; border-radius:20px;">{{ p.status }}</span>
+            </div>
+            </sc-for>
+          </div>
+        </div>
+        </sc-if>
+        <sc-if value="{{ bzInv }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:lp-up .3s ease;">
+          <p style="margin:2px 0 14px; font-family:'Bricolage Grotesque',sans-serif; font-size:20px; font-weight:600;">Invoices</p>
+          <div style="display:flex; flex-direction:column; gap:9px;">
+            <sc-for list="{{ bzInvoices }}" as="p" hint-placeholder-count="3">
+            <div style="background:#fff; border:1px solid #E8E6F4; border-radius:14px; padding:13px 15px; display:flex; align-items:center; gap:11px;">
+              <div style="flex:1; min-width:0;"><p style="margin:0; font-size:13px; font-weight:700;">{{ p.label }} · {{ p.val }}</p><p style="margin:0; font-size:11px; color:#9C8A6B;">{{ p.sub }}</p></div>
+              <span style="font-size:10px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; background:{{ p.pillBg }}; color:{{ p.pillC }}; padding:3px 9px; border-radius:20px;">{{ p.status }}</span>
+            </div>
+            </sc-for>
+          </div>
+        </div>
+        </sc-if>
+      </div>
+      <div style="position:absolute; bottom:0; left:0; right:0; background:rgba(255,255,255,.94); backdrop-filter:blur(8px); border-top:1px solid #E8E6F4; display:flex; padding:8px 10px 12px;">
+        <button onClick="{{ bzTabHome.go }}" style="flex:1; background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px; font-family:'Hanken Grotesk',sans-serif;">
+          <svg width="19" height="19" fill="none" stroke="{{ bzTabHome.c }}" stroke-width="2.1" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14"/></svg>
+          <span style="font-size:10px; font-weight:700; color:{{ bzTabHome.c }};">Properties</span>
+        </button>
+        <button onClick="{{ bzTabInv.go }}" style="flex:1; background:none; border:none; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:3px; font-family:'Hanken Grotesk',sans-serif;">
+          <svg width="19" height="19" fill="none" stroke="{{ bzTabInv.c }}" stroke-width="2.1" viewBox="0 0 24 24"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6"/></svg>
+          <span style="font-size:10px; font-weight:700; color:{{ bzTabInv.c }};">Invoices</span>
+        </button>
+      </div>
+      <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute; bottom:86px; left:50%; transform:translateX(-50%); background:#1E1B4B; color:#fff; font-size:12.5px; font-weight:600; padding:10px 18px; border-radius:24px; box-shadow:0 10px 30px rgba(30,27,75,.3); white-space:nowrap; animation:lp-up .25s ease; z-index:5;">{{ toast }}</div>
+      </sc-if>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ================= LOOPPR OS ================= -->
+  <sc-if value="{{ isOS }}" hint-placeholder-val="{{ false }}">
+  <div style="flex:1; display:flex; min-height:calc(100vh - 56px); background:#F8F7FF;">
+    <!-- sidebar -->
+    <div style="width:224px; flex-shrink:0; background:#1E1B4B; color:#DDD9FB; display:flex; flex-direction:column; padding:20px 14px;">
+      <div style="display:flex; align-items:center; gap:9px; padding:0 6px 18px; margin-bottom:12px; border-bottom:1px solid rgba(255,255,255,.12);">
+        <img src="assets/looppr-mark-dark.png" alt="" style="width:26px; height:26px; object-fit:contain;">
+        <div><span style="font-family:'Bricolage Grotesque',sans-serif; font-weight:700; font-size:16px; color:#fff;">Looppr <span style="color:#AFA9EC;">OS</span></span><span style="display:block; font-size:10px; color:#8885C9; letter-spacing:.03em;">Operations · CRM · Growth</span></div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:2px;">
+        <sc-for list="{{ osNav }}" as="n" hint-placeholder-count="8">
+        <div>
+          <sc-if value="{{ n.group }}" hint-placeholder-val="{{ false }}"><p style="margin:14px 10px 5px; font-size:10px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:#6D68A8;">{{ n.group }}</p></sc-if>
+          <button onClick="{{ n.go }}" style="display:flex; align-items:center; gap:10px; width:100%; text-align:left; font-family:'Hanken Grotesk',sans-serif; font-size:13px; font-weight:600; padding:9px 11px; border-radius:9px; border:none; cursor:pointer; background:{{ n.bg }}; color:{{ n.c }}; transition:background .15s;">
+            <span style="font-size:14px; width:18px; text-align:center;">{{ n.icon }}</span>{{ n.label }}
+            <sc-if value="{{ n.badge }}" hint-placeholder-val="{{ false }}"><span style="margin-left:auto; background:#D64550; color:#fff; font-size:9.5px; font-weight:700; padding:1px 7px; border-radius:10px;">{{ n.badge }}</span></sc-if>
+            <sc-if value="{{ n.lock }}" hint-placeholder-val="{{ false }}"><span style="margin-left:auto; font-size:10px; color:#565284;">🔒</span></sc-if>
+          </button>
+        </div>
+        </sc-for>
+      </div>
+      <div style="margin-top:auto; padding-top:12px; border-top:1px solid rgba(255,255,255,.12);">
+        <p style="margin:0 0 7px 4px; font-size:10px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:#6D68A8;">Team — switch role</p>
+        <div style="display:flex; gap:7px; margin-bottom:11px; padding-left:4px;">
+          <sc-for list="{{ teamSwitch }}" as="t" hint-placeholder-count="4">
+          <button onClick="{{ t.pick }}" title="{{ t.name }}" style="width:34px; height:34px; border-radius:50%; background:{{ t.bg }}; border:2px solid {{ t.border }}; color:#fff; font-weight:700; font-size:11.5px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-family:'Hanken Grotesk',sans-serif;">{{ t.initials }}</button>
+          </sc-for>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; padding-left:4px;">
+          <span style="width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#7C73E6,#5A52C5); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12.5px; flex-shrink:0;">{{ curInitials }}</span>
+          <div style="font-size:11.5px; line-height:1.35; min-width:0;"><b style="display:block; font-size:12.5px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">{{ curName }}</b><span style="color:#8885C9;">{{ curTitle }}</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- main -->
+    <div style="flex:1; min-width:0; display:flex; flex-direction:column;">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:14px; padding:17px 26px; border-bottom:1px solid #E8E6F4; background:#fff;">
+        <div>
+          <p style="margin:0; font-family:'Bricolage Grotesque',sans-serif; font-size:19px; font-weight:600;">{{ osTitle }}</p>
+          <p style="margin:1px 0 0; font-size:12px; color:#8885A0;">{{ osMeta }}</p>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <span style="display:flex; align-items:center; gap:7px; font-size:12px; font-weight:700; color:#0B7B5C; background:#E1F5EE; padding:7px 13px; border-radius:20px;"><span style="width:7px; height:7px; border-radius:50%; background:#0B7B5C;"></span>Live · OKC Metro</span>
+          <button style="background:#1E1B4B; color:#fff; border:none; font-family:'Hanken Grotesk',sans-serif; font-size:12.5px; font-weight:700; padding:10px 16px; border-radius:10px; cursor:pointer;" style-hover="background:#332AB8;">＋ New order</button>
+        </div>
+      </div>
+
+      <div data-lp-scroll="1" style="flex:1; overflow-y:auto; padding:22px 26px;">
+
+      <!-- DASHBOARD -->
+      <sc-if value="{{ ovDash }}" hint-placeholder-val="{{ true }}">
+      <div style="animation:lp-up .3s ease;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin-bottom:18px;">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+          <div style="background:#fff; border:1px solid #E8E6F4; border-radius:14px; padding:15px 17px;">
+            <p style="margin:0 0 6px; font-size:11.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:#8885A0;">{{ k.label }}</p>
+            <p style="margin:0; font-family:'Bricolage Grotesque',sans-serif; font-size:26px; font-weight:600; line-height:1;">{{ k.val }}</p>
+            <p style="margin:6px 0 0; font-size:11.5px; font-weight:700; color:{{ k.deltaC }};">{{ k.delta }}</p>
+          </div>
+          </sc-for>
+        </div>
+        <div style="display:grid; grid-template-columns:1.4fr 1fr; gap:14px;">
+          <div style="background:#fff; border:1px solid #E8E6F4; border-radius:16px; padding:18px;">
+            <div style="display:flex; align-items:center; margin-bottom:2px;"><p style="margin:0; font-size:14px; font-weight:700; flex:1; white-space:nowrap;">Today's route — Sunday, Jul 19</p><span style="font-size:11.5px; font-weight:700; color:#5A52C5; white-space:nowrap;">{{ routeLabel }}</span></div>
+            <div style="display:flex; align-items:center; gap:10px; margin:0 0 11px;">
+              <p style="margin:0; font-size:11px; color:#8885A0; flex:1;">Click the active stop to complete it</p>
+              <button onClick="{{ openMaps }}" style="display:flex; align-items:center; gap:6px; background:#fff; border:1px solid #E0DCF5; color:#5A52C5; font-family:'Hanken Grotesk',sans-serif; font-size:11px; font-weight:700; padding:6px 11px; border-radius:8px; cursor:pointer;" style-hover="border-color:#AFA9EC;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#5A52C5" stroke-width="2.4"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></svg>Open in Google Maps</button>
+            </div>
+            <div style="display:flex; flex-direction:column;">
+              <sc-for list="{{ routeStops }}" as="r" hint-placeholder-count="5">
+              <div onClick="{{ r.click }}" style="display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px solid #F1EFFA; cursor:{{ r.cursor }};">
+                <span style="width:26px; height:26px; border-radius:8px; background:{{ r.numBg }}; color:{{ r.numC }}; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;">{{ r.n }}</span>
+                <div style="flex:1; min-width:0;"><p style="margin:0; font-size:13px; font-weight:700;">{{ r.who }}</p><p style="margin:0; font-size:11.5px; color:#8885A0;">{{ r.what }}</p></div>
+                <span style="font-size:11.5px; color:#8885A0; flex-shrink:0;">{{ r.eta }}</span>
+                <span style="font-size:10px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; background:{{ r.pillBg }}; color:{{ r.pillC }}; padding:3px 8px; border-radius:20px; flex-shrink:0;">{{ r.status }}</span>
+              </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div style="background:#fff; border:1px solid #E8E6F4; border-radius:16px; padding:18px;">
+              <p style="margin:0 0 13px; font-size:14px; font-weight:700;">Orders this week</p>
+              <div style="display:flex; align-items:flex-end; gap:9px; height:110px;">
+                <sc-for list="{{ weekBars }}" as="b" hint-placeholder-count="7">
+                <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; height:100%; justify-content:flex-end;">
+                  <span style="font-size:10px; font-weight:700; color:#5A52C5;">{{ b.val }}</span>
+                  <div style="width:100%; border-radius:6px 6px 3px 3px; background:{{ b.bg }}; height:{{ b.h }};"></div>
+                  <span style="font-size:10px; color:#8885A0; font-weight:600;">{{ b.label }}</span>
+                </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="background:#1E1B4B; border-radius:16px; padding:18px; color:#fff;">
+              <p style="margin:0 0 10px; font-size:13px; font-weight:700; color:#AFA9EC;">Needs attention</p>
+              <sc-for list="{{ alerts }}" as="a" hint-placeholder-count="3">
+              <div style="display:flex; gap:9px; margin-bottom:9px; align-items:flex-start;">
+                <span style="width:7px; height:7px; border-radius:50%; background:{{ a.dot }}; margin-top:5px; flex-shrink:0;"></span>
+                <p style="margin:0; font-size:12.5px; line-height:1.45; color:#DDD9FB;">{{ a.text }}</p>
+              </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- BOOKINGS -->
+      <sc-if value="{{ ovBook }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:lp-up .3s ease;">
+        <div style="background:#fff; border:1px solid #E8E6F4; border-radius:14px; padding:14px 17px; display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+          <span style="width:36px; height:36px; border-radius:10px; background:#EEEDFE; display:flex; align-items:center; justify-content:center;">🔗</span>
+          <div style="flex:1;"><p style="margin:0; font-size:13.5px; font-weight:700;">Public booking page</p><p style="margin:0; font-size:12px; color:#8885A0;">getlooppr.com/book — Calendly-style windows, synced to route capacity</p></div>
+          <button style="background:#EEEDFE; border:none; color:#5A52C5; font-family:'Hanken Grotesk',sans-serif; font-size:12px; font-weight:700; padding:9px 14px; border-radius:9px; cursor:pointer;">Copy link</button>
+        </div>
+        <div style="background:linear-gradient(110deg,#1E1B4B,#5A52C5); border-radius:14px; padding:14px 18px; color:#fff; display:flex; align-items:center; gap:14px; margin-bottom:16px;">
+          <div style="flex:1;"><p style="margin:0; font-size:13.5px; font-weight:700;">Every booking type carries the launch offer</p><p style="margin:0; font-size:11.5px; color:#CFCBF2;">Applies automatically to a customer's first order</p></div>
+          <span style="background:#7CE6B8; color:#1E1B4B; font-weight:800; font-size:12.5px; padding:8px 14px; border-radius:9px; letter-spacing:.04em;">LOOP10 · $10 OFF</span>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:10px;">
+          <sc-for list="{{ weekDays }}" as="d" hint-placeholder-count="7">
+          <div style="background:#fff; border:1px solid {{ d.border }}; border-radius:14px; padding:12px 10px; min-height:220px;">
+            <p style="margin:0; font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:{{ d.dayC }};">{{ d.day }}</p>
+            <p style="margin:0 0 10px; font-family:'Bricolage Grotesque',sans-serif; font-size:19px; font-weight:600; color:{{ d.dateC }};">{{ d.date }}</p>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <sc-for list="{{ d.slots }}" as="s" hint-placeholder-count="2">
+              <div style="background:{{ s.bg }}; border-radius:8px; padding:7px 9px;">
+                <p style="margin:0; font-size:10.5px; font-weight:700; color:{{ s.c }};">{{ s.time }}</p>
+                <p style="margin:0; font-size:10px; color:{{ s.subC }};">{{ s.sub }}</p>
+              </div>
+              </sc-for>
+            </div>
+          </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- JOBS -->
+      <sc-if value="{{ ovJobs }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:lp-up .3s ease;">
+      <p style="margin:0 0 12px; font-size:12px; color:#8885A0;">Click a card to advance it to the next stage — delivering a card fires the review-request automation. New customer bookings land in the pickup queue automatically.</p>
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:12px; align-items:start;">
+        <sc-for list="{{ jobCols }}" as="col" hint-placeholder-count="4">
+        <div style="background:#F1EFFA; border-radius:14px; padding:11px;">
+          <div style="display:flex; align-items:center; gap:8px; padding:2px 5px 10px;">
+            <span style="width:8px; height:8px; border-radius:50%; background:{{ col.dot }};"></span>
+            <p style="margin:0; font-size:12px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; color:#5A52C5; flex:1;">{{ col.title }}</p>
+            <span style="font-size:11px; font-weight:700; color:#8885A0;">{{ col.count }}</span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <sc-for list="{{ col.cards }}" as="j" hint-placeholder-count="2">
+            <div onClick="{{ j.advance }}" style="background:#fff; border:1px solid #E8E6F4; border-radius:11px; padding:11px 12px; cursor:pointer;" style-hover="border-color:#AFA9EC;">
+              <div style="display:flex; align-items:center; gap:7px; margin-bottom:5px;"><span style="font-size:11px; font-weight:700; color:#5A52C5;">{{ j.id }}</span><span style="margin-left:auto; font-size:10px; font-weight:700; background:{{ j.tagBg }}; color:{{ j.tagC }}; padding:2px 7px; border-radius:10px;">{{ j.tag }}</span></div>
+              <p style="margin:0; font-size:13px; font-weight:700;">{{ j.who }}</p>
+              <p style="margin:2px 0 0; font-size:11px; color:#8885A0;">{{ j.meta }}</p>
+            </div>
+            </sc-for>
+          </div>
+        </div>
+        </sc-for>
+      </div>
+      </div>
+      </sc-if>
+
+      <!-- CRM -->
+      <sc-if value="{{ ovCrm }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:lp-up .3s ease;">
+        <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-bottom:18px;">
+          <sc-for list="{{ crmStages }}" as="st" hint-placeholder-count="5">
+          <div style="background:#fff; border-top:3px solid {{ st.bar }}; border-left:1px solid #E8E6F4; border-right:1px solid #E8E6F4; border-bottom:1px solid #E8E6F4; border-radius:12px; padding:12px 14px;">
+            <p style="margin:0; font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:#8885A0;">{{ st.label }}</p>
+            <p style="margin:4px 0 0; font-family:'Bricolage Grotesque',sans-serif; font-size:22px; font-weight:600;">{{ st.count }}</p>
+            <p style="margin:2px 0 0; font-size:11px; color:#8885A0;">{{ st.sub }}</p>
+          </div>
+          </sc-for>
+        </div>
+        <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:14px; align-items:start;">
+          <div style="background:#fff; border:1px solid #E8E6F4; border-radius:16px; overflow:hidden;">
+            <div style="padding:15px 18px 12px; display:flex; align-items:center;"><p style="margin:0; font-size:14px; font-weight:700; flex:1;">Customers</p><span style="font-size:11.5px; color:#8885A0;">247 total · sorted by LTV</span></div>
+            <div style="display:grid; grid-template-columns:1.6fr 1fr .7fr .9fr .8fr; padding:8px 18px; background:#F8F7FF; font-size:10.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#8885A0;"><span>Customer</span><span>Segment</span><span>Orders</span><span>LTV</span><span>Status</span></div>
+            <sc-for list="{{ customers }}" as="c" hint-placeholder-count="6">
+            <div style="display:grid; grid-template-columns:1.6fr 1fr .7fr .9fr .8fr; padding:11px 18px; border-top:1px solid #F1EFFA; align-items:center; font-size:12.5px;" style-hover="background:#FBFAFF;">
+              <span style="font-weight:700; display:flex; align-items:center; gap:9px;"><span style="width:26px; height:26px; border-radius:50%; background:{{ c.avBg }}; color:{{ c.avC }}; font-size:10.5px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;">{{ c.initials }}</span>{{ c.name }}</span>
+              <span style="color:#8885A0;">{{ c.segment }}</span>
+              <span style="font-weight:600;">{{ c.orders }}</span>
+              <span style="font-weight:700;">{{ c.ltv }}</span>
+              <span><span style="font-size:10px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; background:{{ c.pillBg }}; color:{{ c.pillC }}; padding:3px 8px; border-radius:20px;">{{ c.status }}</span></span>
+            </div>
+            </sc-for>
+          </div>
+          <div style="background:#fff; border:1px solid #E8E6F4; border-radius:16px; padding:16px 18px;">
+            <p style="margin:0 0 4px; font-size:14px; font-weight:700;">B2B pipeline</p>
+            <p style="margin:0 0 13px; font-size:11.5px; color:#8885A0;">Airbnbs, gyms, salons, daycares — $4.2k/mo potential</p>
+            <div style="display:flex; flex-direction:column; gap:9px;">
+              <sc-for list="{{ b2b }}" as="b" hint-placeholder-count="4">
+              <div style="border:1px solid #E8E6F4; border-radius:12px; padding:11px 13px;">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:3px;"><p style="margin:0; font-size:13px; font-weight:700; flex:1;">{{ b.name }}</p><span style="font-size:10px; font-weight:700; background:{{ b.pillBg }}; color:{{ b.pillC }}; padding:2px 8px; border-radius:10px;">{{ b.stage }}</span></div>
+                <p style="margin:0; font-size:11.5px; color:#8885A0;">{{ b.meta }}</p>
+              </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- GROWTH -->
+      <sc-if value="{{ ovGrowth }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:lp-up .3s ease;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin-bottom:18px;">
+          <sc-for list="{{ growthKpis }}" as="k" hint-placeholder-count="4">
+          <div style="background:#fff; border:1px solid #E8E6F4; border-radius:14px; padding:15px 17px;">
+            <p style="margin:0 0 6px; font-size:11.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:#8885A0;">{{ k.label }}</p>
+            <p style="margin:0; font-family:'Bricolage Grotesque',sans-serif; font-size:26px; font-weight:600; line-height:1;">{{ k.val }}</p>
+            <p style="margin:6px 0 0; font-size:11.5px; font-weight:700; color:{{ k.deltaC }};">{{ k.delta }}</p>
+          </div>
+          </sc-for>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; align-items:start;">
+          <div style="background:#fff; border:1px solid #E8E6F4; border-radius:16px; padding:17px 18px;">
+            <p style="margin:0 0 12px; font-size:14px; font-weight:700;">Content calendar — this week (@getlooppr)</p>
+            <div style="display:flex; flex-direction:column; gap:9px;">
+              <sc-for list="{{ posts }}" as="p" hint-placeholder-count="3">
+              <div style="border:1px solid #E8E6F4; border-radius:12px; padding:11px 13px; display:flex; gap:11px; align-items:center;">
+                <span style="width:40px; text-align:center; flex-shrink:0;"><span style="display:block; font-size:9.5px; font-weight:700; text-transform:uppercase; color:#8885A0;">{{ p.day }}</span><span style="font-family:'Bricolage Grotesque',sans-serif; font-size:17px; font-weight:600;">{{ p.date }}</span></span>
+                <div style="flex:1; min-width:0;"><p style="margin:0; font-size:12.5px; font-weight:700;">{{ p.title }}</p><p style="margin:0; font-size:11px; color:#8885A0;">{{ p.meta }}</p></div>
+                <span style="font-size:10px; font-weight:700; background:{{ p.pillBg }}; color:{{ p.pillC }}; padding:3px 8px; border-radius:10px; flex-shrink:0;">{{ p.status }}</span>
+              </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div style="background:#fff; border:1px solid #E8E6F4; border-radius:16px; padding:17px 18px;">
+              <p style="margin:0 0 12px; font-size:14px; font-weight:700;">Local search rankings</p>
+              <sc-for list="{{ keywords }}" as="kw" hint-placeholder-count="4">
+              <div style="display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid #F1EFFA;">
+                <span style="flex:1; font-size:12.5px; font-weight:600;">{{ kw.term }}</span>
+                <span style="font-size:12px; font-weight:700; color:#1E1B4B;">#{{ kw.pos }}</span>
+                <span style="font-size:11px; font-weight:700; color:{{ kw.deltaC }}; width:32px; text-align:right;">{{ kw.delta }}</span>
+              </div>
+              </sc-for>
+            </div>
+            <div style="background:#fff; border:1px solid #E8E6F4; border-radius:16px; padding:17px 18px;">
+              <p style="margin:0 0 12px; font-size:14px; font-weight:700;">Booking funnel — last 7 days</p>
+              <sc-for list="{{ funnel }}" as="f" hint-placeholder-count="4">
+              <div style="margin-bottom:9px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:4px;"><span style="font-size:11.5px; font-weight:600; color:#8885A0;">{{ f.label }}</span><span style="font-size:11.5px; font-weight:700;">{{ f.val }}</span></div>
+                <div style="height:8px; border-radius:5px; background:#F1EFFA;"><div style="height:100%; border-radius:5px; background:linear-gradient(90deg,#7C73E6,#5A52C5); width:{{ f.w }};"></div></div>
+              </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; align-items:start; margin-top:14px;">
+          <div style="background:#fff; border:1px solid #E8E6F4; border-radius:16px; padding:17px 18px;">
+            <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:8px;"><p style="margin:0; font-size:14px; font-weight:700; flex:1;">Local SEO &amp; Google Business Profile</p><span style="font-size:11px; color:#8885A0;">6 open items</span></div>
+            <sc-for list="{{ seoRows }}" as="r" hint-placeholder-count="5">
+            <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #F1EFFA;">
+              <div style="flex:1; min-width:0;"><p style="margin:0; font-size:12.5px; font-weight:700;">{{ r.who }}</p><sc-if value="{{ r.when }}" hint-placeholder-val="{{ false }}"><p style="margin:0; font-size:11px; color:#8885A0;">{{ r.when }}</p></sc-if></div>
+              <span style="font-size:10px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; background:{{ r.tagBg }}; color:{{ r.tagC }}; padding:3px 8px; border-radius:20px; flex-shrink:0;">{{ r.tagLabel }}</span>
+            </div>
+            </sc-for>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:14px;">
+            <div style="background:#fff; border:1px solid #E8E6F4; border-radius:16px; padding:17px 18px;">
+              <p style="margin:0 0 8px; font-size:14px; font-weight:700;">Local competitors</p>
+              <sc-for list="{{ compRows }}" as="r" hint-placeholder-count="4">
+              <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #F1EFFA;">
+                <div style="flex:1; min-width:0;"><p style="margin:0; font-size:12.5px; font-weight:700;">{{ r.who }}</p><p style="margin:0; font-size:11px; color:#8885A0;">{{ r.when }}</p></div>
+                <span style="font-size:10px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; background:{{ r.tagBg }}; color:{{ r.tagC }}; padding:3px 8px; border-radius:20px; flex-shrink:0;">{{ r.tagLabel }}</span>
+              </div>
+              </sc-for>
+            </div>
+            <div style="background:#fff; border:1px solid #E8E6F4; border-radius:16px; padding:17px 18px;">
+              <p style="margin:0 0 8px; font-size:14px; font-weight:700;">Conversion experiments</p>
+              <sc-for list="{{ expRows }}" as="r" hint-placeholder-count="3">
+              <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #F1EFFA;">
+                <div style="flex:1; min-width:0;"><p style="margin:0; font-size:12.5px; font-weight:700;">{{ r.who }}</p><p style="margin:0; font-size:11px; color:#8885A0;">{{ r.when }}</p></div>
+                <span style="font-size:10px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; background:{{ r.tagBg }}; color:{{ r.tagC }}; padding:3px 8px; border-radius:20px; flex-shrink:0;">{{ r.tagLabel }}</span>
+              </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- REVIEWS -->
+      <sc-if value="{{ ovRev }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:lp-up .3s ease; display:grid; grid-template-columns:280px 1fr; gap:14px; align-items:start;">
+        <div style="background:#1E1B4B; border-radius:16px; padding:20px; color:#fff; text-align:center;">
+          <p style="margin:0; font-family:'Bricolage Grotesque',sans-serif; font-size:46px; font-weight:600; line-height:1;">4.9</p>
+          <p style="margin:6px 0 2px; color:#E8A23D; font-size:16px; letter-spacing:2px;">★★★★★</p>
+          <p style="margin:0 0 14px; font-size:12px; color:#AFA9EC;">87 Google reviews · +12 this week</p>
+          <button style="width:100%; background:#7C73E6; border:none; color:#fff; font-family:'Hanken Grotesk',sans-serif; font-size:12.5px; font-weight:700; padding:11px; border-radius:10px; cursor:pointer;">Send review requests (8 eligible)</button>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <sc-for list="{{ reviews }}" as="r" hint-placeholder-count="4">
+          <div style="background:#fff; border:1px solid #E8E6F4; border-radius:14px; padding:14px 16px;">
+            <div style="display:flex; align-items:center; gap:9px; margin-bottom:6px;">
+              <span style="width:28px; height:28px; border-radius:50%; background:{{ r.avBg }}; color:{{ r.avC }}; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center;">{{ r.initials }}</span>
+              <span style="font-size:13px; font-weight:700; flex:1;">{{ r.name }}</span>
+              <span style="color:#E8A23D; font-size:13px; letter-spacing:1px;">{{ r.stars }}</span>
+              <span style="font-size:11px; color:#8885A0;">{{ r.when }}</span>
+            </div>
+            <p style="margin:0 0 9px; font-size:12.5px; line-height:1.55; color:#332F5C;">{{ r.text }}</p>
+            <sc-if value="{{ r.replied }}" hint-placeholder-val="{{ false }}"><p style="margin:0; font-size:11.5px; color:#0B7B5C; font-weight:700;">✓ Replied</p></sc-if>
+            <sc-if value="{{ r.needsReply }}" hint-placeholder-val="{{ false }}"><button onClick="{{ r.reply }}" style="background:#EEEDFE; border:none; color:#5A52C5; font-family:'Hanken Grotesk',sans-serif; font-size:11.5px; font-weight:700; padding:8px 13px; border-radius:9px; cursor:pointer;">Reply with AI draft</button></sc-if>
+          </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- REPORTS -->
+      <sc-if value="{{ ovRep }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:lp-up .3s ease;">
+        <div style="background:#fff; border:1px solid #E8E6F4; border-radius:16px; overflow:hidden; margin-bottom:16px;">
+          <div style="padding:15px 18px 12px; display:flex; align-items:center;"><p style="margin:0; font-size:14px; font-weight:700; flex:1;">Weekly scorecard — Jul 13–19</p><span style="font-size:11.5px; color:#8885A0;">fills itself in from live data</span></div>
+          <div style="display:grid; grid-template-columns:1.4fr .8fr .8fr .8fr; padding:8px 18px; background:#F8F7FF; font-size:10.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#8885A0;"><span>Metric</span><span>Goal</span><span>Actual</span><span>Status</span></div>
+          <sc-for list="{{ scorecard }}" as="s" hint-placeholder-count="6">
+          <div style="display:grid; grid-template-columns:1.4fr .8fr .8fr .8fr; padding:10px 18px; border-top:1px solid #F1EFFA; align-items:center; font-size:12.5px;">
+            <span style="font-weight:700;">{{ s.metric }}</span>
+            <span style="color:#8885A0;">{{ s.goal }}</span>
+            <span style="font-weight:700;">{{ s.actual }}</span>
+            <span><span style="font-size:10px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; background:{{ s.pillBg }}; color:{{ s.pillC }}; padding:3px 9px; border-radius:20px;">{{ s.status }}</span></span>
+          </div>
+          </sc-for>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+          <div style="background:#fff; border:1px solid #E8E6F4; border-radius:16px; padding:17px 18px;">
+            <p style="margin:0 0 13px; font-size:14px; font-weight:700;">Weekly revenue — last 6 weeks</p>
+            <div style="display:flex; align-items:flex-end; gap:10px; height:130px;">
+              <sc-for list="{{ revBars }}" as="b" hint-placeholder-count="6">
+              <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:5px; height:100%; justify-content:flex-end;">
+                <span style="font-size:10px; font-weight:700; color:#5A52C5;">{{ b.val }}</span>
+                <div style="width:100%; border-radius:6px 6px 3px 3px; background:{{ b.bg }}; height:{{ b.h }};"></div>
+                <span style="font-size:10px; color:#8885A0; font-weight:600;">{{ b.label }}</span>
+              </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="background:#fff; border:1px solid #E8E6F4; border-radius:16px; padding:17px 18px;">
+            <p style="margin:0 0 13px; font-size:14px; font-weight:700;">Retention &amp; unit economics</p>
+            <sc-for list="{{ unitStats }}" as="u" hint-placeholder-count="4">
+            <div style="display:flex; align-items:center; padding:9px 0; border-bottom:1px solid #F1EFFA;">
+              <span style="flex:1; font-size:12.5px; font-weight:600; color:#8885A0;">{{ u.label }}</span>
+              <span style="font-size:14px; font-weight:700;">{{ u.val }}</span>
+            </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- MARKETS -->
+      <sc-if value="{{ ovMarkets }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:lp-up .3s ease;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:14px; margin-bottom:14px;">
+          <sc-for list="{{ marketCards }}" as="m" hint-placeholder-count="3">
+          <div style="background:#fff; border:1px solid #E8E6F4; border-radius:16px; padding:16px 18px;">
+            <div style="display:flex; align-items:center; gap:9px;">
+              <span style="width:9px; height:9px; border-radius:50%; background:{{ m.dot }}; flex-shrink:0;"></span>
+              <p style="margin:0; font-size:14.5px; font-weight:700; flex:1;">{{ m.name }}</p>
+              <span style="font-size:10px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; background:{{ m.tagBg }}; color:{{ m.tagC }}; padding:3px 9px; border-radius:20px;">{{ m.tag }}</span>
+            </div>
+            <p style="margin:2px 0 8px 18px; font-size:11.5px; color:#8885A0;">{{ m.sub }}</p>
+            <sc-for list="{{ m.rows }}" as="r" hint-placeholder-count="3">
+            <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #F1EFFA;">
+              <span style="flex:1; font-size:12.5px; font-weight:700;">{{ r.who }}</span>
+              <span style="font-size:10px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; background:{{ r.tagBg }}; color:{{ r.tagC }}; padding:3px 8px; border-radius:20px;">{{ r.tagLabel }}</span>
+            </div>
+            </sc-for>
+          </div>
+          </sc-for>
+        </div>
+        <div style="background:#fff; border:1px solid #E8E6F4; border-radius:16px; padding:16px 18px;">
+          <p style="margin:0 0 6px; font-size:14px; font-weight:700;">Market comparison</p>
+          <sc-for list="{{ marketCompare }}" as="r" hint-placeholder-count="3">
+          <div style="display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid #F1EFFA;">
+            <div style="flex:1; min-width:0;"><p style="margin:0; font-size:12.5px; font-weight:700;">{{ r.who }}</p><p style="margin:0; font-size:11px; color:#8885A0;">{{ r.when }}</p></div>
+            <span style="font-size:10px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; background:{{ r.tagBg }}; color:{{ r.tagC }}; padding:3px 8px; border-radius:20px; flex-shrink:0;">{{ r.tagLabel }}</span>
+          </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- DRIVER VIEW (phone preview) -->
+      <sc-if value="{{ ovDriverView }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:lp-up .3s ease; display:flex; flex-direction:column; align-items:center;">
+        <p style="margin:0 0 16px; font-size:12px; color:#8885A0; max-width:520px; text-align:center;">Previewing Marcus's route as today's driver. This surface intentionally has no sidebar, no reports — a driver in the field needs today's stops and one button per stop, nothing else.</p>
+        <div style="width:340px; background:#1E1B4B; border-radius:32px; padding:10px; box-shadow:0 30px 70px rgba(30,27,75,.28);">
+          <div style="background:#F8F7FF; border-radius:24px; overflow:hidden; padding:18px 16px;">
+            <p style="margin:0; font-family:'Bricolage Grotesque',sans-serif; font-size:17px; font-weight:600;">Good afternoon, Marcus</p>
+            <p style="margin:0 0 12px; font-size:11.5px; color:#8885A0;">Sunday, Jul 19 · OKC Metro route</p>
+            <div style="display:flex; justify-content:space-between; margin-bottom:5px;"><span style="font-size:11.5px; font-weight:700;">{{ dvProgressLabel }}</span><span style="font-size:11.5px; font-weight:700; color:#5A52C5;">{{ drProgress }}</span></div>
+            <div style="height:7px; border-radius:4px; background:#EDEBFA; margin-bottom:14px;"><div style="height:100%; border-radius:4px; background:linear-gradient(90deg,#7C73E6,#5A52C5); width:{{ drProgress }}; transition:width .3s;"></div></div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <sc-for list="{{ drStops }}" as="r" hint-placeholder-count="5">
+              <div onClick="{{ r.click }}" style="background:#fff; border:1px solid #E8E6F4; border-left:3px solid {{ r.pillC }}; border-radius:11px; padding:10px 12px; cursor:{{ r.cursor }};">
+                <div style="display:flex; justify-content:space-between; gap:8px;"><span style="font-size:12.5px; font-weight:700;">{{ r.who }}</span><span style="font-size:10.5px; color:#8885A0; flex-shrink:0;">{{ r.eta }}</span></div>
+                <p style="margin:1px 0 0; font-size:11px; color:#8885A0;">{{ r.what }} · {{ r.status }}</p>
+              </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        <button onClick="{{ dvOpenDriver }}" style="margin-top:16px; background:#fff; border:1.5px solid #E0DCF5; color:#5A52C5; font-family:'Hanken Grotesk',sans-serif; font-size:12.5px; font-weight:700; padding:10px 18px; border-radius:10px; cursor:pointer;" style-hover="border-color:#AFA9EC;">Open the full Driver app →</button>
+      </div>
+      </sc-if>
+
+      <!-- GENERIC LIST VIEWS: requests / email / data / strategic / automations / system -->
+      <sc-if value="{{ ovGeneric }}" hint-placeholder-val="{{ false }}">
+      <div style="animation:lp-up .3s ease;">
+        <sc-if value="{{ genHasKpis }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:12px; margin-bottom:16px;">
+          <sc-for list="{{ genKpis }}" as="k" hint-placeholder-count="4">
+          <div style="background:#fff; border:1px solid #E8E6F4; border-radius:14px; padding:15px 17px;">
+            <p style="margin:0 0 6px; font-size:11.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:#8885A0;">{{ k.label }}</p>
+            <p style="margin:0; font-family:'Bricolage Grotesque',sans-serif; font-size:26px; font-weight:600; line-height:1;">{{ k.val }}</p>
+            <p style="margin:6px 0 0; font-size:11.5px; font-weight:700; color:{{ k.deltaC }};">{{ k.delta }}</p>
+          </div>
+          </sc-for>
+        </div>
+        </sc-if>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(380px,1fr)); gap:14px; align-items:start;">
+          <sc-for list="{{ genSections }}" as="sec" hint-placeholder-count="2">
+          <div style="background:#fff; border:1px solid #E8E6F4; border-radius:16px; padding:16px 18px;">
+            <div style="display:flex; align-items:baseline; gap:10px; margin-bottom:6px;"><p style="margin:0; font-size:14px; font-weight:700; flex:1;">{{ sec.title }}</p><span style="font-size:11px; color:#8885A0;">{{ sec.pill }}</span></div>
+            <sc-for list="{{ sec.rows }}" as="r" hint-placeholder-count="4">
+            <div style="display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid #F1EFFA;">
+              <div style="flex:1; min-width:0;"><p style="margin:0; font-size:12.5px; font-weight:700;">{{ r.who }}</p><sc-if value="{{ r.when }}" hint-placeholder-val="{{ false }}"><p style="margin:0; font-size:11px; color:#8885A0;">{{ r.when }}</p></sc-if></div>
+              <sc-if value="{{ r.tagLabel }}" hint-placeholder-val="{{ false }}"><span style="font-size:10px; font-weight:700; letter-spacing:.03em; text-transform:uppercase; background:{{ r.tagBg }}; color:{{ r.tagC }}; padding:3px 8px; border-radius:20px; flex-shrink:0;">{{ r.tagLabel }}</span></sc-if>
+              <sc-if value="{{ r.time }}" hint-placeholder-val="{{ false }}"><span style="font-size:10.5px; color:#B4B2C9; flex-shrink:0;">{{ r.time }}</span></sc-if>
+            </div>
+            </sc-for>
+          </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      </div>
+      <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+      <div style="position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#1E1B4B; color:#fff; font-size:12.5px; font-weight:600; padding:10px 18px; border-radius:24px; box-shadow:0 10px 30px rgba(30,27,75,.3); white-space:nowrap; animation:lp-up .25s ease; z-index:60;">{{ toast }}</div>
+      </sc-if>
+    </div>
+  </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;startMode&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;client&quot;,&quot;os&quot;],&quot;default&quot;:&quot;client&quot;,&quot;tsType&quot;:&quot;'client' | 'os'&quot;,&quot;section&quot;:&quot;App&quot;},&quot;showBizBanner&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;App&quot;},&quot;avgBagLbs&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:15,&quot;min&quot;:8,&quot;max&quot;:30,&quot;unit&quot;:&quot;lb&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Pricing&quot;}}">
+class Component extends DCLogic {
+  state = {
+    mode: 'client', cs: 'home', bs: 1,
+    vendorId: 1, qty: { wf: 1, comforter: 0, delicates: 0, hang: 0 }, winId: 2,
+    recurring: false, softener: true, copied: false,
+    fold: 'Standard', det: 'Free & Clear', temp: 'Cold',
+    ratings: {}, unread: true, confirmed: null, trackingNew: false,
+    osView: 'dashboard', osRole: 'founder', toast: '', repliedIds: {},
+    drTab: 'route', paTab: 'queue', bzTab: 'home', scanLbs: 16, bzRequested: false,
+    routeIdx: 2,
+    jobs: [
+      { id: 'LP-4907', who: 'Priya Nair', meta: 'Moore · 6:40 PM window', tag: 'Recurring', k: 'std', stage: 0 },
+      { id: 'LP-4908', who: 'Tom Reyes', meta: 'Edmond · tomorrow 8 AM', tag: 'One-time', k: 'std', stage: 0 },
+      { id: 'LP-4909', who: 'Hazel St Airbnb', meta: 'Linens · 4 sets', tag: 'B2B', k: 'b2b', stage: 0 },
+      { id: 'LP-4821', who: 'Maya Thompson', meta: '16 lb · Free & Clear, cold', tag: 'On time', k: 'pickup', stage: 1 },
+      { id: 'LP-4818', who: 'Bricktown Fitness', meta: 'Towels · 3 bags', tag: 'B2B', k: 'b2b', stage: 1 },
+      { id: 'LP-4816', who: 'Dana Cole', meta: '12 lb wash & fold', tag: 'On time', k: 'pickup', stage: 1 },
+      { id: 'LP-4812', who: 'Carlos Vega', meta: 'KonMari fold preset', tag: 'On time', k: 'pickup', stage: 2 },
+      { id: 'LP-4810', who: 'Jen Park', meta: 'Hang-dry add-on', tag: 'Rush', k: 'rush', stage: 2 },
+      { id: 'LP-4801', who: 'Carlos Vega', meta: 'Norman · ETA 5:45 PM', tag: 'Today', k: 'pickup', stage: 3 },
+      { id: 'LP-4788', who: 'Hazel St Airbnb', meta: 'Linens · ETA 6:15 PM', tag: 'B2B', k: 'b2b', stage: 3 }
+    ]
+  };
+  componentDidMount() { const m = this.props.startMode; if (m === 'os') this.setState({ mode: 'os' }); }
+  componentDidUpdate(prevProps, prevState) {
+    const S = this.state;
+    if (['mode', 'cs', 'bs', 'osView', 'drTab', 'paTab', 'bzTab'].some(k => prevState[k] !== S[k])) {
+      document.querySelectorAll('[data-lp-scroll]').forEach(el => { el.scrollTop = 0; });
+      window.scrollTo(0, 0);
+    }
+  }
+  showToast(t) { this.setState({ toast: t }); clearTimeout(this._tt); this._tt = setTimeout(() => this.setState({ toast: '' }), 2200); }
+  money(n) { return '$' + n.toFixed(2); }
+  renderVals() {
+    const S = this.state, set = (p) => this.setState(p);
+    const ink = '#1E1B4B', purple = '#7C73E6', muted = '#8885A0';
+    const lbs = this.props.avgBagLbs ?? 15;
+    const vendorsData = [
+      { id: 1, name: 'One-Time Pickup', initials: '1×', meta: 'Single wash & fold bag · back in ~24 hrs · no commitment', rateN: 1.75, disc: 1, badge: '', unit: 'per bag', tileBg: '#EEEDFE', tileC: '#5A52C5' },
+      { id: 2, name: 'Weekly Plan', initials: 'W', meta: 'Fixed day & window · skip anytime · save 10%', rateN: 1.75, disc: 0.9, badge: 'Most popular', unit: 'per bag', tileBg: '#E1F5EE', tileC: '#0B7B5C' },
+      { id: 3, name: 'Bi-Weekly Plan', initials: '2W', meta: 'Every other week · light-laundry households · save 5%', rateN: 1.75, disc: 0.95, badge: '', unit: 'per bag', tileBg: '#FAEEDA', tileC: '#9A6A1B' }
+    ];
+    const vend = vendorsData.find(v => v.id === S.vendorId);
+    const vendors = vendorsData.map(v => ({
+      ...v, rate: '$' + (v.rateN * lbs * v.disc).toFixed(0), border: v.id === S.vendorId ? purple : '#E8E6F4',
+      pick: () => set({ vendorId: v.id, recurring: v.id === 2 ? true : S.recurring })
+    }));
+    const svcDefs = [
+      { key: 'wf', name: 'Wash & Fold bag', desc: `Est. ${lbs} lb · $${vend.rateN.toFixed(2)}/lb · ${vend.name}`, unit: vend.rateN * lbs * vend.disc },
+      { key: 'comforter', name: 'Comforter / bulky', desc: 'Washed separately, bagged', unit: 22 },
+      { key: 'delicates', name: 'Delicates bag', desc: 'Cold wash, hang-dry', unit: 8 },
+      { key: 'hang', name: 'Hang-dry add-on', desc: 'Air-dried, on hangers', unit: 5 }
+    ];
+    let sub = 0;
+    const services = svcDefs.map(s => {
+      const q = S.qty[s.key]; sub += q * s.unit;
+      return {
+        name: s.name, desc: s.desc, price: this.money(s.unit), qty: q, op: q > 0 ? '1' : '.65',
+        inc: () => set({ qty: { ...S.qty, [s.key]: q + 1 } }),
+        dec: () => set({ qty: { ...S.qty, [s.key]: Math.max(0, q - 1) } })
+      };
+    });
+    const winDefs = [
+      { id: 1, day: 'Today', time: '4–6 PM', cap: '2 of 6 slots left' }, { id: 2, day: 'Today', time: '6–8 PM', cap: '4 of 6 slots left' },
+      { id: 3, day: 'Tomorrow', time: '8–10 AM', cap: '6 of 8 slots left' }, { id: 4, day: 'Tomorrow', time: '4–6 PM', cap: '5 of 8 slots left' }
+    ];
+    const win = winDefs.find(w => w.id === S.winId);
+    const windows = winDefs.map(w => {
+      const on = w.id === S.winId;
+      return { ...w, pick: () => set({ winId: w.id }), bg: on ? '#EEEDFE' : '#fff', border: on ? purple : '#E8E6F4', dayC: on ? '#5A52C5' : muted, timeC: ink };
+    });
+    const fee = 2.49, delivery = 4.99, credit = -10;
+    const totalN = sub + fee + delivery + credit;
+    const summaryLines = [
+      { label: `${vend.name} · services`, val: this.money(sub), c: ink },
+      { label: 'Service fee', val: this.money(fee), c: ink },
+      { label: 'Pickup & delivery', val: this.money(delivery), c: ink },
+      { label: 'LOOP10 — first order', val: '−$10.00', c: '#0B7B5C' }
+    ];
+    const stepTitles = { 1: 'Choose your plan', 2: 'What are we washing?', 3: 'Pickup details', 4: 'Review & pay', 5: 'Confirmed' };
+    // tracking
+    const tNew = S.trackingNew && S.confirmed;
+    const mkSteps = (defs, curIdx) => defs.map((d, i) => {
+      const done = i < curIdx, current = i === curIdx;
+      return {
+        title: d[0], sub: d[1], done, current,
+        dotBg: done ? '#0B7B5C' : current ? purple : '#F8F7FF',
+        dotBorder: done || current ? 'none' : '1.5px solid #E0DCF5',
+        titleC: done || current ? ink : '#B4B2C9',
+        line: i < defs.length - 1, lineBg: done ? '#0B7B5C' : '#E8E6F4'
+      };
+    });
+    const trackSteps = tNew
+      ? mkSteps([['Scheduled', 'Just now · ' + win.day + ' ' + win.time], ['Pickup', win.day + ' ' + win.time + ' · leave bag at door'], ['Washing', 'Looppr wash & fold — Edmond'], ['Folding & quality check', 'Your fold preset: ' + S.fold], ['Delivery', 'Back at your door · photo confirmation']], 1)
+      : mkSteps([['Scheduled', 'Yesterday, 8:41 PM'], ['Picked up', 'Today, 2:14 PM · on time'], ['Washing now', 'Looppr wash & fold · Free & Clear, cold'], ['Folding & quality check', 'Your fold preset: ' + S.fold], ['Out for delivery', 'Est. tomorrow 9:00 AM · photo confirmation']], 2);
+    const segCur = tNew ? 0 : 2;
+    const progressSegs = [0, 1, 2, 3, 4].map(i => ({ bg: i < segCur ? '#7CE6B8' : i === segCur ? purple : 'rgba(255,255,255,.18)' }));
+    const orders = [
+      { id: tNew ? S.confirmed.id : 'LP-4821', vendor: tNew ? vend.name : 'Weekly pickup', meta: tNew ? 'Scheduled · ' + win.day + ' ' + win.time : 'Today · washing now', status: tNew ? 'Scheduled' : 'In progress', total: tNew ? this.money(totalN) : '$38.25', live: true },
+      { id: 'LP-4770', vendor: 'Weekly pickup', meta: 'Delivered Jul 12 · 16 lb wash & fold', status: 'Delivered', total: '$38.25', rateKey: 'LP-4770' },
+      { id: 'LP-4712', vendor: 'One-time pickup', meta: 'Delivered Jul 5 · wash & fold + comforter', status: 'Delivered', total: '$41.10', rated: 5 },
+      { id: 'LP-4650', vendor: 'Weekly pickup', meta: 'Delivered Jun 28 · 14 lb wash & fold', status: 'Delivered', total: '$36.90', rated: 5 }
+    ];
+    const orderList = orders.map(o => {
+      const userRating = o.rateKey ? S.ratings[o.rateKey] : o.rated;
+      return {
+        ...o,
+        pillBg: o.live ? '#EEEDFE' : '#E1F5EE', pillC: o.live ? '#5A52C5' : '#0B7B5C',
+        canTrack: !!o.live, canReorder: !o.live && !!userRating,
+        canRate: !!o.rateKey && !S.ratings[o.rateKey],
+        ratedLabel: userRating && !o.live ? '★ ' + userRating + '.0' : '',
+        stars: o.rateKey ? [1, 2, 3, 4, 5].map(n => ({ c: '#DDD9FB', set: () => { set({ ratings: { ...S.ratings, [o.rateKey]: n } }); this.showToast('Thanks for rating ' + o.vendor + ' ' + n + '★'); } })) : []
+      };
+    });
+    const chip = (opts, cur, key) => opts.map(label => {
+      const on = label === cur;
+      return { label, pick: () => set({ [key]: label }), bg: on ? ink : '#fff', c: on ? '#fff' : '#5A52C5', border: on ? ink : '#E0DCF5' };
+    });
+    const notifs = [
+      { icon: '🧺', title: 'Order LP-4821 picked up', body: 'Jeffrey grabbed your bag at 2:14 PM — headed to Suds & Fold.', time: '2:14 PM', bg: '#fff', iconBg: '#EEEDFE' },
+      { icon: '💧', title: 'Washing started', body: 'Free & Clear detergent, cold wash — exactly your preset.', time: '3:05 PM', bg: '#fff', iconBg: '#E1F5EE' },
+      { icon: '🚚', title: 'Delivery window tomorrow', body: 'Your clean laundry is on track for 9:00 AM. We\u2019ll text when close.', time: '4:30 PM', bg: '#fff', iconBg: '#FAEEDA' },
+      { icon: '🎁', title: '$20 referral credit applied', body: 'Dana C. placed her first order with your code. Credit is live.', time: 'Yesterday', bg: '#F3F2FF', iconBg: '#EEEDFE' }
+    ];
+    // ===== OS =====
+    const navDefs = [
+      { id: 'dashboard', label: 'Dashboard', icon: '▦', group: 'Overview' },
+      { id: 'markets', label: 'Markets', icon: '◎' },
+      { id: 'bookings', label: 'Bookings', icon: '🗓', group: 'Operations' },
+      { id: 'jobs', label: 'Jobs & Routes', icon: '🧺' },
+      { id: 'driverview', label: 'Driver View', icon: '📱' },
+      { id: 'requests', label: 'Customer Care', icon: '✉', badge: '3' },
+      { id: 'crm', label: 'CRM & Pipeline', icon: '👥', group: 'Sales Hub' },
+      { id: 'strategic', label: 'Strategic Accounts', icon: '🏬' },
+      { id: 'email', label: 'Email Marketing', icon: '📨', group: 'Marketing Hub' },
+      { id: 'growth', label: 'Growth & Visibility', icon: '📈' },
+      { id: 'data', label: 'Data Collection', icon: '▥' },
+      { id: 'reviews', label: 'Reviews', icon: '★', group: 'Service Hub', badge: '3' },
+      { id: 'reports', label: 'Reports & Scorecard', icon: '▤', group: 'Reports' },
+      { id: 'insights', label: 'Insights & Reports', icon: '📊' },
+      { id: 'system', label: 'Activity & Performance', icon: '⏱', group: 'System' },
+      { id: 'automations', label: 'Automations', icon: '⚙' },
+      { id: 'integrations', label: 'Integrations', icon: '🔌' }
+    ];
+    const rolesDef = {
+      founder: { name: 'Jeffrey Azuatalam', first: 'Jeffrey', title: 'Founder / CEO · full access', initials: 'JA', meta: 'Sunday, July 19 · launch week − 3 days · OKC Metro', views: null },
+      ops: { name: 'Alex Ruiz', first: 'Alex', title: 'Operations', initials: 'AR', meta: 'Operations — bookings, routes, drivers & customer care', views: ['dashboard', 'markets', 'bookings', 'jobs', 'driverview', 'requests', 'reviews'] },
+      admin: { name: 'Dana Whitfield', first: 'Dana', title: 'Admin', initials: 'DW', meta: 'Admin — accounts, billing, integrations & system health', views: ['dashboard', 'crm', 'strategic', 'data', 'reports', 'system', 'automations', 'integrations'] },
+      marketing: { name: 'Maudlin Carter', first: 'Maudlin', title: 'Marketing & Growth', initials: 'MC', meta: 'Marketing — content, email, reviews & growth', views: ['dashboard', 'email', 'growth', 'data', 'reviews', 'reports', 'insights'] }
+    };
+    const role = rolesDef[S.osRole];
+    const canSee = (id) => !role.views || role.views.includes(id);
+    const osNav = navDefs.map(n => {
+      const lock = !canSee(n.id);
+      return {
+        ...n, lock, badge: lock ? '' : n.badge,
+        go: lock ? () => this.showToast('🔒 ' + n.label + ' requires Founder access') : () => set({ osView: n.id }),
+        bg: S.osView === n.id ? '#7C73E6' : 'transparent',
+        c: lock ? '#565284' : S.osView === n.id ? '#fff' : '#C9C5F0'
+      };
+    });
+    const teamSwitch = Object.keys(rolesDef).map(k => {
+      const r = rolesDef[k], on = k === S.osRole;
+      return {
+        initials: r.initials, name: r.name + ' — ' + r.title, on,
+        bg: on ? 'linear-gradient(135deg,#7C73E6,#5A52C5)' : 'rgba(255,255,255,.1)', border: on ? '#AFA9EC' : 'transparent',
+        pick: () => { set({ osRole: k, osView: (!r.views || r.views.includes(S.osView)) ? S.osView : 'dashboard' }); this.showToast('Signed in as ' + r.name + ' · ' + r.title); }
+      };
+    });
+    const osTitles = {
+      dashboard: ['Good afternoon, Jeffrey', 'Sunday, July 19 · launch week − 3 days · OKC Metro'],
+      markets: ['Markets', 'Operating footprint — where Looppr runs today, and where it\u2019s headed'],
+      bookings: ['Bookings', 'Public scheduling windows, synced to route capacity — replaces the Google Form'],
+      jobs: ['Jobs & Routes', 'Every bag tracked pickup → wash → fold → delivery'],
+      requests: ['Customer Care', 'Every reschedule, complaint, and review request — one place, not two'],
+      driverview: ['Driver View', 'What an in-house driver actually sees — a phone, not a dashboard'],
+      insights: ['Insights & Reports', 'The trends behind the weekly scorecard'],
+      crm: ['CRM & Pipeline', 'B2C customers & local B2B — Airbnbs, gyms, salons, daycares'],
+      strategic: ['Strategic Accounts', 'Regional & national retail partnerships · multi-stakeholder deals'],
+      email: ['Email Marketing', 'Automated sequences and one-off sends — no separate tool needed'],
+      growth: ['Growth & Visibility', 'Local SEO, @getlooppr content, and the getlooppr.com booking funnel'],
+      data: ['Data Collection', 'Every intake point — what\u2019s captured and how well it converts'],
+      reviews: ['Reviews', 'Requests, responses, and your Google rating in one place'],
+      reports: ['Reports & Scorecard', 'The weekly scorecard now fills itself in'],
+      system: ['Activity & Performance', 'Audit trail + platform health — uptime, integrations, automations'],
+      automations: ['Automations', 'Every trigger-based rule running across the platform, in one index'],
+      integrations: ['Integrations', 'Google Maps, Gmail, Calendar, Stripe, Twilio & more — one connected stack']
+    };
+    const pill = { done: ['#E1F5EE', '#0B7B5C'], active: ['#EEEDFE', '#5A52C5'], warn: ['#FAEEDA', '#9A6A1B'], red: ['#FBE4E6', '#B03340'], muted: ['#F1EFFA', '#8885A0'] };
+    const kpisByRole = {
+      founder: [
+        { label: 'Orders today', val: '12', delta: '▲ 3 vs last Sunday', deltaC: '#0B7B5C' },
+        { label: 'Revenue this week', val: '$1,842', delta: '▲ 18% WoW', deltaC: '#0B7B5C' },
+        { label: 'New customers', val: '9', delta: '4 from referrals', deltaC: '#5A52C5' },
+        { label: 'Avg rating', val: '4.9★', delta: '87 Google reviews', deltaC: '#5A52C5' }
+      ],
+      ops: [
+        { label: 'Stops today', val: '7', delta: '2 done · 1 en route', deltaC: '#5A52C5' },
+        { label: 'Open requests', val: '3', delta: '2 new · 1 in progress', deltaC: '#B03340' },
+        { label: 'On-time rate', val: '97%', delta: '▲ this week', deltaC: '#0B7B5C' },
+        { label: 'Avg turnaround', val: '22 hr', delta: 'Target under 24 hr', deltaC: '#0B7B5C' }
+      ],
+      admin: [
+        { label: 'Open invoices', val: '$486', delta: 'Hazel St Airbnb · net-30', deltaC: '#9A6A1B' },
+        { label: 'Integrations', val: '7', delta: '2 pending setup', deltaC: '#9A6A1B' },
+        { label: 'Automation success', val: '100%', delta: '0 failures in 7 days', deltaC: '#0B7B5C' },
+        { label: 'Data quality flags', val: '3', delta: 'Missing phones · unverified', deltaC: '#B03340' }
+      ],
+      marketing: [
+        { label: 'Site visits (7d)', val: '2,418', delta: '▲ 31% WoW', deltaC: '#0B7B5C' },
+        { label: 'IG followers', val: '1,846', delta: '+214 this week', deltaC: '#5A52C5' },
+        { label: 'Posts scheduled', val: '3', delta: 'Launch-day video in draft', deltaC: '#9A6A1B' },
+        { label: 'Reviews to reply', val: '3', delta: 'Reply < 24h affects ranking', deltaC: '#B03340' }
+      ]
+    };
+    const kpis = kpisByRole[S.osRole];
+    const stopDefs = [
+      { who: 'Maya Thompson', what: 'Pickup · Edmond · 1 bag + comforter', eta: '4:10 PM' },
+      { who: 'Bricktown Fitness', what: 'Pickup · B2B towels · 3 bags', eta: '4:40 PM' },
+      { who: 'Deliver → wash facility', what: 'Drop 4 bags for wash', eta: '5:05 PM' },
+      { who: 'Carlos Vega', what: 'Delivery · Norman · LP-4801', eta: '5:45 PM' },
+      { who: 'Hazel St Airbnb', what: 'Delivery · linens · LP-4788', eta: '6:15 PM' },
+      { who: 'Priya Nair', what: 'Pickup · Moore · recurring weekly', eta: '6:40 PM' }
+    ];
+    if (S.confirmed) stopDefs.push({ who: 'Maya Thompson', what: 'Pickup · ' + (S.confirmed.plan || 'Wash & fold') + ' · new booking', eta: win.time });
+    const routeStops = stopDefs.map((r, i) => {
+      const k = i < S.routeIdx ? 'done' : i === S.routeIdx ? 'active' : 'warn';
+      return { ...r, n: String(i + 1),
+        status: k === 'done' ? 'Done' : k === 'active' ? 'En route' : 'Queued',
+        pillBg: pill[k][0], pillC: pill[k][1],
+        numBg: k === 'active' ? '#7C73E6' : '#F1EFFA', numC: k === 'active' ? '#fff' : '#5A52C5',
+        cursor: k === 'active' ? 'pointer' : 'default',
+        click: k === 'active' ? () => { this.setState({ routeIdx: S.routeIdx + 1 }); this.showToast('Stop ' + (i + 1) + ' complete — ' + r.who); } : null
+      };
+    });
+    const routeLabel = stopDefs.length + ' stops · 14.2 mi';
+    const mkBars = (arr, labels, fmt) => { const mx = Math.max(...arr); return arr.map((v, i) => ({ val: fmt ? fmt(v) : String(v), label: labels[i], h: Math.round((v / mx) * 78) + 'px', bg: i === arr.length - 1 ? 'linear-gradient(180deg,#7C73E6,#5A52C5)' : '#DDD9FB' })); };
+    const weekBars = mkBars([8, 11, 9, 14, 12, 16, 12], ['M', 'T', 'W', 'T', 'F', 'S', 'S']);
+    const alertsByRole = {
+      founder: [
+        { dot: '#E8A23D', text: 'Tue 4–6 PM window is at 90% capacity — open an overflow window or cap bookings.' },
+        { dot: '#D64550', text: '3 reviews awaiting a reply — response time affects local ranking.' },
+        { dot: '#7CE6B8', text: 'Bricktown Fitness trial ends Friday — send the commercial contract.' }
+      ],
+      ops: [
+        { dot: '#D64550', text: 'LP-4810 is a rush order — due back by 3 PM.' },
+        { dot: '#E8A23D', text: 'Tue 4–6 PM window is at 90% capacity — open an overflow window.' },
+        { dot: '#7CE6B8', text: 'M. Alvarez reschedule request is unanswered — 2 hrs old.' }
+      ],
+      admin: [
+        { dot: '#D64550', text: 'Google Business Profile still not connected — blocks the review automation.' },
+        { dot: '#E8A23D', text: 'Stripe setup at 80% — finish before retiring Venmo.' },
+        { dot: '#7CE6B8', text: 'July invoice for Hazel St Airbnb is ready to send.' }
+      ],
+      marketing: [
+        { dot: '#D64550', text: 'Launch-day founder video still in draft — needed by Wed 7 AM.' },
+        { dot: '#E8A23D', text: '3 Google reviews await replies — AI drafts are ready in Reviews.' },
+        { dot: '#7CE6B8', text: 'LOOP10 reminder email sends via Gmail at 6 PM today.' }
+      ]
+    };
+    const alerts = alertsByRole[S.osRole];
+    const slotK = { open: ['#F1EFFA', '#5A52C5', '#8885A0'], busy: ['#EEEDFE', '#5A52C5', '#8885A0'], full: ['#1E1B4B', '#fff', '#AFA9EC'] };
+    const mkSlot = (time, booked, cap) => { const k = booked >= cap ? 'full' : booked > 0 ? 'busy' : 'open'; return { time, sub: booked >= cap ? 'Full' : booked + '/' + cap + ' booked', bg: slotK[k][0], c: slotK[k][1], subC: slotK[k][2] }; };
+    const weekDays = [
+      { day: 'Mon', date: '20', slots: [mkSlot('8–10 AM', 2, 6), mkSlot('4–6 PM', 4, 6), mkSlot('6–8 PM', 1, 6)] },
+      { day: 'Tue', date: '21', slots: [mkSlot('8–10 AM', 3, 6), mkSlot('4–6 PM', 5, 6), mkSlot('6–8 PM', 6, 6)] },
+      { day: 'Wed', date: '22', launch: true, slots: [mkSlot('8–10 AM', 6, 8), mkSlot('4–6 PM', 7, 8), mkSlot('6–8 PM', 8, 8)] },
+      { day: 'Thu', date: '23', slots: [mkSlot('8–10 AM', 4, 8), mkSlot('4–6 PM', 5, 8), mkSlot('6–8 PM', 3, 8)] },
+      { day: 'Fri', date: '24', slots: [mkSlot('8–10 AM', 2, 8), mkSlot('4–6 PM', 6, 8), mkSlot('6–8 PM', 4, 8)] },
+      { day: 'Sat', date: '25', slots: [mkSlot('10–12 AM', 3, 6), mkSlot('2–4 PM', 2, 6)] },
+      { day: 'Sun', date: '26', slots: [mkSlot('2–4 PM', 1, 4)] }
+    ].map(d => ({ ...d, border: d.launch ? '#7C73E6' : '#E8E6F4', dayC: d.launch ? '#5A52C5' : '#8885A0', dateC: d.launch ? '#5A52C5' : '#1E1B4B' }));
+    const tag = { pickup: ['#EEEDFE', '#5A52C5'], b2b: ['#FAEEDA', '#9A6A1B'], rush: ['#FBE4E6', '#B03340'], std: ['#F1EFFA', '#8885A0'] };
+    const stageNames = ['Pickup queue', 'Washing', 'Folding & QC', 'Out for delivery'];
+    const stageDots = ['#E8A23D', '#7C73E6', '#5B8DEF', '#0B7B5C'];
+    const jobCols = stageNames.map((title, si) => {
+      const cards = S.jobs.filter(j => j.stage === si).map(j => ({
+        ...j, tagBg: tag[j.k][0], tagC: tag[j.k][1],
+        advance: () => {
+          if (si === 3) { this.setState({ jobs: S.jobs.filter(x => x.id !== j.id) }); this.showToast(j.id + ' delivered ✓ — review request queued'); }
+          else { this.setState({ jobs: S.jobs.map(x => x.id === j.id ? { ...x, stage: si + 1 } : x) }); this.showToast(j.id + ' → ' + stageNames[si + 1]); }
+        }
+      }));
+      return { title, dot: stageDots[si], count: String(cards.length), cards };
+    });
+    const crmStages = [
+      { label: 'Leads', count: '38', sub: 'waitlist + IG DMs', bar: '#B4B2C9' },
+      { label: 'Contacted', count: '17', sub: 'follow-up sequence', bar: '#E8A23D' },
+      { label: 'Trial booked', count: '9', sub: 'first pickup scheduled', bar: '#7C73E6' },
+      { label: 'Active', count: '164', sub: 'ordered in last 30d', bar: '#0B7B5C' },
+      { label: 'At risk', count: '11', sub: 'no order in 21+ days', bar: '#D64550' }
+    ];
+    const av = [['#EEEDFE', '#5A52C5'], ['#E1F5EE', '#0B7B5C'], ['#FAEEDA', '#9A6A1B'], ['#FBE4E6', '#B03340']];
+    const custK = { active: ['#E1F5EE', '#0B7B5C'], risk: ['#FBE4E6', '#B03340'], vip: ['#EEEDFE', '#5A52C5'] };
+    const customers = [
+      { name: 'Hazel St Airbnb', segment: 'B2B · Short-term rental', orders: '22', ltv: '$1,208', status: 'VIP', k: 'vip' },
+      { name: 'Bricktown Fitness', segment: 'B2B · Gym', orders: '18', ltv: '$964', status: 'VIP', k: 'vip' },
+      { name: 'Maya Thompson', segment: 'B2C · Weekly recurring', orders: '14', ltv: '$531', status: 'Active', k: 'active' },
+      { name: 'Carlos Vega', segment: 'B2C · Family plan', orders: '11', ltv: '$472', status: 'Active', k: 'active' },
+      { name: 'Priya Nair', segment: 'B2C · Weekly recurring', orders: '9', ltv: '$338', status: 'Active', k: 'active' },
+      { name: 'Jen Park', segment: 'B2C · Occasional', orders: '3', ltv: '$104', status: 'At risk', k: 'risk' }
+    ].map((c, i) => ({ ...c, initials: c.name.split(' ').map(w => w[0]).slice(0, 2).join(''), avBg: av[i % 4][0], avC: av[i % 4][1], pillBg: custK[c.k][0], pillC: custK[c.k][1] }));
+    const b2b = [
+      { name: 'Redbud Salon & Spa', stage: 'Proposal', meta: 'Towels 2×/wk · ~$380/mo', k: 'active' },
+      { name: 'Little Sprouts Daycare', stage: 'Contacted', meta: 'Nap linens weekly · ~$240/mo', k: 'warn' },
+      { name: 'OKC Loft Collective', stage: 'Trial', meta: '6 Airbnb units · ~$720/mo', k: 'done' },
+      { name: 'Norman BBQ Co.', stage: 'Lead', meta: 'Aprons + rags · ~$180/mo', k: 'red' }
+    ].map(b => ({ ...b, pillBg: pill[b.k][0], pillC: pill[b.k][1] }));
+    const growthKpis = [
+      { label: 'Site visits (7d)', val: '2,418', delta: '▲ 31% WoW', deltaC: '#0B7B5C' },
+      { label: 'Booking conversion', val: '4.7%', delta: '▲ 0.8 pt after new hero', deltaC: '#0B7B5C' },
+      { label: 'GBP profile views', val: '1,102', delta: '▲ 22% WoW', deltaC: '#0B7B5C' },
+      { label: 'IG followers', val: '1,846', delta: '+214 this week', deltaC: '#5A52C5' }
+    ];
+    const posts = [
+      { day: 'Mon', date: '20', title: 'Countdown: 2 days — behind-the-scenes route prep', meta: 'IG Reel + TikTok · 7 AM CT', status: 'Scheduled', k: 'active' },
+      { day: 'Tue', date: '21', title: '"Tomorrow, laundry day gets cancelled" teaser', meta: 'All platforms · 6 PM CT', status: 'Scheduled', k: 'active' },
+      { day: 'Wed', date: '22', title: 'LAUNCH DAY — founder video + first-order promo', meta: 'IG, TikTok, FB, X · 7 AM CT', status: 'Draft', k: 'warn' },
+      { day: 'Thu', date: '23', title: 'First customer unboxing / fold reveal', meta: 'IG Reel · needs footage', status: 'Idea', k: 'red' }
+    ].map(p => ({ ...p, pillBg: pill[p.k][0], pillC: pill[p.k][1] }));
+    const keywords = [
+      { term: 'laundry pickup okc', pos: 3, delta: '▲2', deltaC: '#0B7B5C' },
+      { term: 'wash and fold edmond', pos: 1, delta: '▲1', deltaC: '#0B7B5C' },
+      { term: 'laundry service norman ok', pos: 5, delta: '—', deltaC: '#8885A0' },
+      { term: 'laundry delivery moore ok', pos: 2, delta: '▲4', deltaC: '#0B7B5C' },
+      { term: 'airbnb linen service okc', pos: 8, delta: '▼1', deltaC: '#B03340' }
+    ];
+    const funnel = [
+      { label: 'Site visits', val: '2,418', w: '100%' },
+      { label: 'Booking page', val: '689', w: '58%' },
+      { label: 'Window selected', val: '212', w: '32%' },
+      { label: 'Paid bookings', val: '114', w: '18%' }
+    ];
+    const reviews = [
+      { name: 'Dana Cole', initials: 'DC', stars: '★★★★★', when: '2h ago', text: 'Folded better than I ever have in my life. Bag was back on my porch before I finished my coffee. OKC needed this.', needsReply: true },
+      { name: 'Marcus Webb', initials: 'MW', stars: '★★★★★', when: '1d ago', text: 'Used the referral code, first pickup was free. The live tracking is a nice touch — felt like watching a pizza order.', needsReply: true },
+      { name: 'Alyssa Grant', initials: 'AG', stars: '★★★★☆', when: '2d ago', text: 'Great service, one shirt came back slightly damp. Support credited me $10 within the hour though.', needsReply: true },
+      { name: 'Tom Reyes', initials: 'TR', stars: '★★★★★', when: '4d ago', text: 'Weekly pickup on Tuesdays has genuinely changed our household. Kids\u2019 sports laundry, handled.', replied: true }
+    ].map((r, i) => ({ ...r, avBg: av[i % 4][0], avC: av[i % 4][1], needsReply: r.needsReply && !S.repliedIds[r.name], replied: r.replied || !!S.repliedIds[r.name], reply: () => { set({ repliedIds: { ...S.repliedIds, [r.name]: true } }); } }));
+    const scorecard = [
+      { metric: 'Orders completed', goal: '70', actual: '82', k: 'done', status: 'On track' },
+      { metric: 'Revenue', goal: '$1,600', actual: '$1,842', k: 'done', status: 'On track' },
+      { metric: 'New customers', goal: '10', actual: '9', k: 'warn', status: 'Close' },
+      { metric: 'On-time rate', goal: '95%', actual: '97.2%', k: 'done', status: 'On track' },
+      { metric: 'Review replies < 24h', goal: '100%', actual: '72%', k: 'red', status: 'Behind' },
+      { metric: 'B2B proposals sent', goal: '3', actual: '2', k: 'warn', status: 'Close' }
+    ].map(s => ({ ...s, pillBg: pill[s.k][0], pillC: pill[s.k][1] }));
+    const revBars = mkBars([610, 840, 1120, 1290, 1560, 1842], ['W1', 'W2', 'W3', 'W4', 'W5', 'W6'], v => '$' + (v / 1000).toFixed(1) + 'k');
+    const unitStats = [
+      { label: 'Avg order value', val: '$34.60' }, { label: '30-day repeat rate', val: '61%' },
+      { label: 'Recurring subscribers', val: '48' }, { label: 'CAC (blended)', val: '$11.20' },
+      { label: 'Gross margin / order', val: '38%' }
+    ];
+    const nt = (who, when, k, label, time) => ({ who, when: when || '', tagLabel: label || '', tagBg: k ? pill[k][0] : '', tagC: k ? pill[k][1] : '', time: time || '' });
+    const genericViews = {
+      requests: {
+        kpis: [
+          { label: 'Open requests', val: '3', delta: '2 new · 1 in progress', deltaC: '#B03340' },
+          { label: 'Avg response time', val: '38 min', delta: 'Target < 1 hr', deltaC: '#0B7B5C' },
+          { label: 'Resolved this week', val: '6', delta: 'Across all channels', deltaC: '#5A52C5' },
+          { label: 'Top channel', val: 'Booking', delta: 'Most requests arrive here', deltaC: '#8885A0' }
+        ],
+        sections: [{ title: 'Inbox', pill: 'booking page · SMS · email · social DMs', rows: [
+          nt('Reschedule pickup', 'M. Alvarez · Booking page', 'red', 'New', 'Jul 19'),
+          nt('Special instructions — cold wash only', 'R. Chen · SMS', 'warn', 'In progress', 'Jul 18'),
+          nt('Partnership inquiry', 'Glow Studio Salon · Contact form', 'red', 'New', 'Jul 17'),
+          nt('Pricing question', 'Instagram DM · Social', 'done', 'Resolved', 'Jul 16')
+        ]},
+        { title: 'Review request queue', pill: 'sends after delivery', rows: [
+          nt('M. Alvarez', 'First pickup pending — fires on delivery', 'active', 'Queued'),
+          nt('R. Chen', 'First pickup pending — fires on delivery', 'active', 'Queued'),
+          nt('T. Nguyen', 'First pickup pending — fires on delivery', 'active', 'Queued'),
+          nt('J. Patel', 'Delivered Jul 19 — request sent', 'warn', 'Awaiting response')
+        ]}]
+      },
+      insights: {
+        kpis: [
+          { label: 'Stops per hour', val: '3.2', delta: 'Jeffrey solo route', deltaC: '#5A52C5' },
+          { label: 'Miles per stop', val: '2.8', delta: 'Route-optimized via Maps', deltaC: '#5A52C5' },
+          { label: 'Driver utilization', val: '71%', delta: 'Target 80%+', deltaC: '#9A6A1B' },
+          { label: 'Idle time / route', val: '18 min', delta: 'Mostly folding wait', deltaC: '#8885A0' }
+        ],
+        sections: [
+          { title: 'Revenue by segment', pill: '$3,000/wk sample', rows: [
+            nt('B2C Recurring', 'Weekly & bi-weekly plans', 'done', '$1,860 · 62%'),
+            nt('Local B2B', 'Airbnbs, gyms, salons, daycares', 'active', '$720 · 24%'),
+            nt('Grocery Chain Accounts', 'Kiosk pilot revenue', 'warn', '$420 · 14%')
+          ]},
+          { title: 'Acquisition funnel', pill: 'lead → repeat', rows: [
+            nt('Leads', '', 'muted', '184'),
+            nt('Booked first pickup', '', 'active', '61 · 33%'),
+            nt('Completed first order', '', 'done', '58 · 95%'),
+            nt('Became repeat customer', '', 'done', '39 · 67%'),
+            nt('Organic social 44% · Referral 28% · Search 18% · Direct 10%', 'By channel')
+          ]}
+        ]
+      },
+      email: {
+        kpis: [
+          { label: 'Active sequences', val: '2', delta: 'Welcome · Review request', deltaC: '#5A52C5' },
+          { label: 'Emails sent (30d)', val: '362', delta: 'Mostly build-in-public updates', deltaC: '#5A52C5' },
+          { label: 'Avg open rate', val: '41%', delta: '▲ vs 25–30% industry norm', deltaC: '#0B7B5C' },
+          { label: 'Avg click rate', val: '8.4%', delta: 'Mostly LOOP10 clicks', deltaC: '#5A52C5' }
+        ],
+        sections: [
+          { title: 'Sequences', pill: 'automated', rows: [
+            nt('Welcome Series', '3 steps · triggers on first booking', 'done', 'Live'),
+            nt('Review Request', '1 step · triggers after delivery', 'done', 'Live'),
+            nt('B2B Pilot Follow-up', '4 steps · triggers on trial start', 'warn', 'Draft'),
+            nt('Win-back / re-engagement', '2 steps · triggers after 30 days idle', 'warn', 'Draft')
+          ]},
+          { title: 'Recent & scheduled sends', pill: 'one-off campaigns', rows: [
+            nt('Launch Countdown — Day 3', 'All leads', 'active', 'Scheduled', 'Jul 19'),
+            nt('We\u2019re live! Book now', 'All leads', 'active', 'Scheduled', 'Jul 22'),
+            nt('Build-in-Public Update #6', '340 sent · 38% open · 6% click', 'done', 'Sent'),
+            nt('LOOP10 Reminder', '22 sent · 51% open · 19% click', 'done', 'Sent')
+          ]}
+        ]
+      },
+      data: {
+        kpis: [
+          { label: 'Intake points', val: '5', delta: '1 still external (Google Form)', deltaC: '#B03340' },
+          { label: 'Submissions (30d)', val: '410', delta: 'All intake points combined', deltaC: '#5A52C5' },
+          { label: 'Best completion', val: '96%', delta: 'Newsletter signup', deltaC: '#0B7B5C' },
+          { label: 'Data quality flags', val: '3', delta: 'Missing phones · unverified emails', deltaC: '#9A6A1B' }
+        ],
+        sections: [
+          { title: 'Intake points', pill: 'what\u2019s captured & how it converts', rows: [
+            nt('Booking form', 'Google Form linked from site · 61 submissions · 74% completion', 'red', 'External today'),
+            nt('B2B partnership inquiry', 'Website contact form · 6 submissions · 88%', 'done', 'Healthy'),
+            nt('Newsletter signup', 'Footer + social bio links · 340 · 96%', 'done', 'Healthy'),
+            nt('Grocery pilot interest', 'Strategic Accounts outreach · 3 · 100%', 'done', 'Healthy'),
+            nt('Review request', 'Post-delivery email/SMS · fires after first deliveries', 'warn', 'Armed')
+          ]},
+          { title: 'Data quality', pill: 'CRM hygiene', rows: [
+            nt('Contacts missing a phone number', '', 'warn', '1 of 5'),
+            nt('Possible duplicate contacts', '', 'done', '0 flagged'),
+            nt('Unverified emails', '', 'warn', '2 of 5')
+          ]}
+        ]
+      },
+      strategic: {
+        kpis: [
+          { label: 'Open opportunities', val: '3', delta: 'Homeland · Crest Foods · Uptown', deltaC: '#5A52C5' },
+          { label: 'Weighted pipeline', val: '$830/mo', delta: 'Probability-adjusted', deltaC: '#5A52C5' },
+          { label: 'Stakeholders mapped', val: '5', delta: 'Across 3 accounts', deltaC: '#5A52C5' },
+          { label: 'Pilots signed', val: '0', delta: 'First pilot targeted after Week 8', deltaC: '#9A6A1B' }
+        ],
+        sections: [
+          { title: 'Opportunity stages', pill: 'grocery-chain retail pilots', rows: [
+            nt('Uptown Grocery', 'Prospecting · researching regional buyer · $600/mo potential', 'warn', '10%'),
+            nt('Homeland (HQ)', 'Prospecting · cold outreach sent to 2 stores · $1,400/mo potential', 'warn', '10%'),
+            nt('Crest Foods', 'Discovery · Store Ops Manager engaged · scoping 4 sq ft kiosk pilot', 'active', '25%')
+          ]},
+          { title: 'Account 360 — Crest Foods', pill: 'example', rows: [
+            nt('Stage', 'Multi-stakeholder deal · owner: Jeffrey', 'warn', 'Discovery'),
+            nt('Pilot scope', '4 sq ft drop-off kiosk near entrance — zero cost or labor to the store'),
+            nt('Chain-wide potential', 'If rolled out across locations', 'done', '~$1,400/mo'),
+            nt('Store Ops Manager', 'Champion · engaged weekly', 'done', 'Engaged'),
+            nt('Regional Category Buyer', 'Economic buyer', 'red', 'Not contacted')
+          ]},
+          { title: 'Weighted forecast', pill: 'this quarter', rows: [
+            nt('Prospecting', '2 accounts · $2,000/mo · 10% probability', 'muted', '$200/mo'),
+            nt('Discovery', '1 account · $1,400/mo · 25% probability', 'muted', '$350/mo'),
+            nt('Rolls up separately from the B2C scorecard', 'Different revenue line, pilot terms & store-count math')
+          ]}
+        ]
+      },
+      automations: {
+        kpis: [],
+        sections: [
+          { title: 'Active & draft rules', pill: 'every trigger-based rule, one index', rows: [
+            nt('Customer books first pickup → send Welcome Series (3 emails)', 'Lives in Email Marketing', 'done', 'Live'),
+            nt('Job marked "Delivered" → send review request', 'Lives in Reviews', 'done', 'Live'),
+            nt('Pickup slot unassigned 24 hrs out → flag on Dashboard', 'Lives in Jobs & Routes', 'done', 'Live'),
+            nt('B2B account enters "Trial" → start 4-step follow-up', 'Lives in Email Marketing', 'warn', 'Draft'),
+            nt('Customer idle 30+ days → send win-back offer', 'Lives in Email Marketing', 'warn', 'Draft'),
+            nt('New review under 4★ → alert Jeffrey + draft a response', 'Lives in Reviews', 'warn', 'Draft')
+          ]},
+          { title: 'Run log', pill: 'last 7 days', rows: [
+            nt('Welcome Series', '100% success · 0 failures', 'done', 'OK', 'Jul 19, 9:02 AM'),
+            nt('Review Request', '100% success · 0 failures', 'done', 'OK', 'Jul 19, 7:30 AM'),
+            nt('Unassigned-pickup alert', '100% success · 0 failures', 'done', 'OK', 'Jul 19, 6:00 AM')
+          ]}
+        ]
+      },
+      integrations: {
+        kpis: [
+          { label: 'Connected apps', val: '7', delta: '2 pending setup', deltaC: '#9A6A1B' },
+          { label: 'Synced today', val: '142', delta: 'Events across all apps', deltaC: '#5A52C5' },
+          { label: 'Sync errors (7d)', val: '0', delta: 'All webhooks healthy', deltaC: '#0B7B5C' },
+          { label: 'API quota used', val: '12%', delta: 'Google Maps · heaviest', deltaC: '#5A52C5' }
+        ],
+        sections: [
+          { title: 'Google Workspace', pill: 'maps · gmail · calendar · business profile', rows: [
+            nt('Google Maps', 'Route optimization + live driver ETA · one-tap navigation per stop', 'done', 'Connected'),
+            nt('Gmail', 'Welcome, review & LOOP10 sequences send from hello@getlooppr.com', 'done', 'Connected'),
+            nt('Google Calendar', 'Pickup windows sync to Jeffrey & Marcus\u2019s calendars', 'done', 'Connected'),
+            nt('Google Business Profile', 'Reviews & local posts sync — blocks the review automation', 'red', 'Not connected')
+          ]},
+          { title: 'Payments & messaging', pill: 'money in, messages out', rows: [
+            nt('Stripe', 'Card payments + weekly plan billing · replaces Venmo', 'warn', 'Setup 80%'),
+            nt('Venmo', 'Legacy — retire after Stripe go-live', 'muted', 'Phasing out'),
+            nt('Twilio SMS', 'Pickup reminders, driver-arriving texts, photo confirmations', 'done', 'Connected'),
+            nt('Instagram & TikTok', '@getlooppr — auto-publishes the 30-day launch calendar', 'done', 'Connected'),
+            nt('QuickBooks', 'Bookkeeping export — revenue & payout sync', 'red', 'Not connected')
+          ]}
+        ]
+      },
+      system: {
+        kpis: [
+          { label: 'Uptime (30d)', val: '99.9%', delta: 'Booking page & site', deltaC: '#0B7B5C' },
+          { label: 'Booking page response', val: '3.4s', delta: 'Target under 2.5s', deltaC: '#B03340' },
+          { label: 'Automation success', val: '100%', delta: '0 failures in 7 days', deltaC: '#0B7B5C' },
+          { label: 'Integration errors (7d)', val: '0', delta: 'Email + SMS delivery', deltaC: '#0B7B5C' }
+        ],
+        sections: [
+          { title: 'System status', pill: 'platform health', rows: [
+            nt('Site hosting — Vercel', '', 'done', 'Operational'),
+            nt('Server-side rendering / prerendering', 'Root cause of the crawler + indexing issue', 'red', 'Not configured'),
+            nt('Booking page — getlooppr.com/book', '', 'done', 'Operational'),
+            nt('Email delivery', '', 'done', 'Operational'),
+            nt('SMS delivery', '', 'done', 'Operational'),
+            nt('Payments — Venmo → moving to Stripe', '', 'warn', 'Manual'),
+            nt('Google Business Profile sync', '', 'red', 'Not connected')
+          ]},
+          { title: 'Activity log', pill: 'audit trail — every action & automation', rows: [
+            nt('Welcome Series email sent to M. Alvarez', 'Automation · Email Marketing', '', '', 'Jul 19, 9:02 AM'),
+            nt('Jeffrey moved Crest Foods to "Discovery"', 'Jeffrey · Strategic Accounts', '', '', 'Jul 19, 8:40 AM'),
+            nt('Review request sent to J. Patel', 'Automation · Reviews', '', '', 'Jul 19, 7:30 AM'),
+            nt('Unassigned-pickup alert triggered for Jul 22', 'Automation · Jobs & Routes', '', '', 'Jul 19, 6:00 AM'),
+            nt('New booking: R. Chen, weekly plan', 'System · Bookings', '', '', 'Jul 18, 4:15 PM'),
+            nt('Meta description updated on getlooppr.com', 'Jeffrey · Growth & Visibility', '', '', 'Jul 17, 11:20 AM')
+          ]}
+        ]
+      }
+    };
+    const gen = genericViews[S.osView];
+    const ovGeneric = !!gen, genKpis = gen ? gen.kpis : [], genSections = gen ? gen.sections : [], genHasKpis = !!(gen && gen.kpis.length);
+    const marketCards = [
+      { name: 'OKC Metro', sub: 'Edmond, OKC, Norman & Moore', dot: '#2FBE8F', tag: 'Live', k: 'done', rows: [nt('Launch', '', 'done', 'Jul 22, 2026'), nt('Team', '', 'active', 'Jeffrey (solo)'), nt('Week-13 target', '', 'active', '40–50 cust · $5K/mo')] },
+      { name: 'Dallas–Fort Worth', sub: 'TX metro · ~7.6M population', dot: '#E8A23D', tag: 'Planned', k: 'warn', rows: [nt('Target launch', '', 'active', 'After OKC Wk-13 gate'), nt('Team', '', 'warn', 'Not yet assigned'), nt('Watch-outs', '', 'red', 'Poplin · HappyNest')] },
+      { name: 'Atlanta', sub: 'GA metro · ~6.3M population', dot: '#E8A23D', tag: 'Planned', k: 'warn', rows: [nt('Target launch', '', 'active', 'Evaluated after DFW'), nt('Team', '', 'warn', 'Not yet assigned'), nt('Watch-outs', '', 'muted', 'Denser multifamily')] }
+    ].map(m => ({ ...m, tagBg: pill[m.k][0], tagC: pill[m.k][1] }));
+    const marketCompare = [
+      nt('OKC Metro — founder-run positioning is the wedge', 'B2B: Airbnb, gyms, salons, daycares, restaurants · low–moderate competition', 'done', 'Live'),
+      nt('Dallas–Fort Worth — needs differentiation beyond "local"', 'B2B: Airbnb, gyms, multifamily · high competition (Poplin, HappyNest)', 'warn', 'Planned'),
+      nt('Atlanta — higher order value, denser routes', 'B2B: Airbnb, salons, restaurants · moderate–high competition', 'warn', 'Planned')
+    ];
+    const seoRows = [
+      nt('Claim & verify Google Business Profile', '', 'warn', 'Not started'),
+      nt('Add "Edmond" & "OKC" to title & meta description', 'Current title has zero location terms', 'red', 'Missing'),
+      nt('Server-render content for crawlers', 'Crawler sees only title + meta description today', 'red', 'Broken'),
+      nt('Site indexed by Google', 'Zero results — even for brand name + city', 'red', 'Not indexed'),
+      nt('NAP consistency across directories', '', 'warn', 'Not started'),
+      nt('LOOP10 offer live on GBP', '', 'warn', 'Not started')
+    ];
+    const compRows = [
+      nt('Simply Tilly Laundry Co. — Edmond', 'Wash & fold · same founder-story positioning', 'red', 'Direct overlap'),
+      nt('King\u2019s Green Cleaning (KingSpin)', 'Wash & fold pickup/delivery · same coverage area', 'red', 'Direct overlap'),
+      nt('"Laundry Loop" — GA/NM/MN (unrelated)', 'Dominates generic "laundry loop" search results', 'warn', 'Name collision'),
+      nt('Lapels Cleaners · Tide Cleaners', 'National chains, dry-cleaning-led', 'muted', 'Monitor')
+    ];
+    const expRows = [
+      nt('Booking page hero', 'Control vs "LOOP10 ends soon" urgency · B +12%, 68% confidence', 'active', 'Running'),
+      nt('Primary CTA copy', '"Book a pickup" vs "Get $10 off my first order"', 'active', 'Running'),
+      nt('B2B intro form length', 'Full form vs name + email only', 'warn', 'Queued')
+    ];
+    const off = 'rgba(255,255,255,.55)';
+    const modeSwitch = [['client', 'Customer'], ['driver', 'Driver'], ['partner', 'Partner'], ['biz', 'Business'], ['os', 'Looppr OS']].map(([id, label]) => ({
+      label, pick: () => set({ mode: id }),
+      bg: S.mode === id ? '#fff' : 'transparent', c: S.mode === id ? ink : off
+    }));
+    // driver app
+    const drNextStop = stopDefs[S.routeIdx];
+    const drEarnRows = [
+      { label: 'Stops completed', val: S.routeIdx + ' of ' + stopDefs.length },
+      { label: 'Base — $6 per stop', val: '$' + (S.routeIdx * 6).toFixed(2) },
+      { label: 'Mileage — 14.2 mi', val: '$9.94' },
+      { label: 'Tips (so far)', val: '$11.00' }
+    ];
+    const drTotal = '$' + (S.routeIdx * 6 + 9.94 + 11).toFixed(2);
+    const mkTab = (cur, key, id, onC) => ({ on: cur === id, c: cur === id ? (onC || '#5A52C5') : '#B4B2C9', go: () => set({ [key]: id }) });
+    // partner app: facility stages from shared jobs state
+    const paCols = jobCols.slice(1).map((c, i) => ({ ...c, title: i === 2 ? 'Ready for pickup' : c.title }));
+    const paBags = S.jobs.filter(j => j.stage > 0).length;
+    const paPayouts = [
+      { label: 'Week of Jul 13 — 41 bags · $1.10/lb avg', val: '$612.40', k: 'active', status: 'Pending' },
+      { label: 'Week of Jul 6 — 36 bags', val: '$548.10', k: 'done', status: 'Paid' },
+      { label: 'Week of Jun 29 — 33 bags', val: '$501.75', k: 'done', status: 'Paid' }
+    ].map(p => ({ ...p, pillBg: pill[p.k][0], pillC: pill[p.k][1] }));
+    // business app
+    const bzProps = [
+      { name: 'Hazel Ct — Unit A', sub: 'Next linen service: Tue, Jul 21 · 2 sets', k: 'active', status: 'Scheduled' },
+      { name: 'Hazel Ct — Unit B', sub: 'Guest checkout Thu — auto-books same day', k: 'warn', status: 'Auto' },
+      { name: 'Downtown Loft', sub: 'Delivered Jul 17 · 3 sets · photo confirmed', k: 'done', status: 'Done' }
+    ].map(p => ({ ...p, pillBg: pill[p.k][0], pillC: pill[p.k][1] }));
+    const bzInvoices = [
+      { label: 'July 2026 — month to date', sub: '14 orders · net-30 terms', val: '$486.20', k: 'active', status: 'Open' },
+      { label: 'June 2026', sub: '22 orders · paid Jul 2 via Stripe', val: '$742.80', k: 'done', status: 'Paid' },
+      { label: 'May 2026', sub: '19 orders · paid Jun 3 via Stripe', val: '$688.15', k: 'done', status: 'Paid' }
+    ].map(p => ({ ...p, pillBg: pill[p.k][0], pillC: pill[p.k][1] }));
+    return {
+      isClient: S.mode === 'client', isOS: S.mode === 'os',
+      isDriver: S.mode === 'driver', isPartner: S.mode === 'partner', isBiz: S.mode === 'biz',
+      modeSwitch,
+      // driver
+      drRoute: S.drTab === 'route', drScan: S.drTab === 'scan', drEarn: S.drTab === 'earn',
+      drTabRoute: mkTab(S.drTab, 'drTab', 'route'), drTabScan: mkTab(S.drTab, 'drTab', 'scan'), drTabEarn: mkTab(S.drTab, 'drTab', 'earn'),
+      drStops: routeStops, drDone: S.routeIdx >= stopDefs.length,
+      drNextWho: drNextStop ? drNextStop.who : 'Route complete', drNextWhat: drNextStop ? drNextStop.what + ' · ETA ' + drNextStop.eta : 'All stops done — head home',
+      drProgress: Math.round((S.routeIdx / stopDefs.length) * 100) + '%',
+      drCompleteNext: drNextStop ? () => { set({ routeIdx: S.routeIdx + 1 }); this.showToast('Stop complete — ' + drNextStop.who); } : null,
+      drNavigate: () => this.showToast('Opening Google Maps — ' + (drNextStop ? drNextStop.who : 'route')),
+      scanLbs: S.scanLbs + ' lb', scanInc: () => set({ scanLbs: S.scanLbs + 1 }), scanDec: () => set({ scanLbs: Math.max(1, S.scanLbs - 1) }),
+      scanEst: this.money(S.scanLbs * 1.75),
+      logWeight: () => this.showToast('LP-4821 weighed ' + S.scanLbs + ' lb — customer charged ' + this.money(S.scanLbs * 1.75)),
+      scanPhoto: () => this.showToast('Photo captured — sent to Maya via SMS'),
+      drEarnRows, drTotal,
+      // partner
+      paQueue: S.paTab === 'queue', paPay: S.paTab === 'payout',
+      paTabQueue: mkTab(S.paTab, 'paTab', 'queue', '#0B7B5C'), paTabPay: mkTab(S.paTab, 'paTab', 'payout', '#0B7B5C'),
+      paCols, paBagsLabel: paBags + ' bags in facility · capacity 40/day',
+      paCapW: Math.round((paBags / 40) * 100) + '%',
+      paPayouts,
+      // business
+      bzHome: S.bzTab === 'home', bzInv: S.bzTab === 'invoices',
+      bzTabHome: mkTab(S.bzTab, 'bzTab', 'home', '#B07417'), bzTabInv: mkTab(S.bzTab, 'bzTab', 'invoices', '#B07417'),
+      bzProps, bzInvoices,
+      bzReqLabel: S.bzRequested ? 'Pickup requested ✓' : 'Request extra pickup',
+      bzRequest: () => { if (S.bzRequested) return; set({ bzRequested: true, jobs: [{ id: 'LP-4913', who: 'Hazel St Airbnb', meta: 'Extra pickup · linens · today', tag: 'B2B', k: 'b2b', stage: 0 }, ...S.jobs] }); this.showToast('Extra pickup booked — added to today\u2019s route'); },
+      // client nav
+      csHome: S.cs === 'home', csBook: S.cs === 'book', csTrack: S.cs === 'track', csOrders: S.cs === 'orders', csProfile: S.cs === 'profile', csNotifs: S.cs === 'notifs',
+      goHome: () => set({ cs: 'home' }), goBook: () => set({ cs: 'book', bs: 1 }), goOrders: () => set({ cs: 'orders' }), goProfile: () => set({ cs: 'profile' }),
+      goTrack: () => set({ cs: 'track' }), goNotifs: () => set({ cs: 'notifs' }),
+      markRead: () => { set({ unread: false }); this.showToast('All caught up'); },
+      hasUnread: S.unread,
+      headerTitle: S.cs === 'home' ? 'Good afternoon, Maya' : 'Looppr',
+      tabHomeC: S.cs === 'home' ? '#5A52C5' : '#B4B2C9', tabBookC: S.cs === 'book' ? '#5A52C5' : '#B4B2C9',
+      tabOrdersC: S.cs === 'orders' ? '#5A52C5' : '#B4B2C9', tabProfileC: S.cs === 'profile' ? '#5A52C5' : '#B4B2C9',
+      // home
+      activeId: tNew ? S.confirmed.id : 'LP-4821',
+      activeState: tNew ? 'scheduled' : 'in progress',
+      activeHeadline: tNew ? 'Pickup scheduled' : 'Washing at Looppr — Edmond',
+      activeSub: tNew ? win.day + ' ' + win.time + ' · ' + vend.name : 'Picked up 2:14 PM · back tomorrow by 9:00 AM',
+      progressSegs,
+      recurringLabel: S.recurring ? 'On — Tuesdays 4–6 PM, skip anytime' : 'Off — never think about laundry again',
+      recBg: S.recurring ? '#7C73E6' : '#D9D6EC', recLeft: S.recurring ? '22px' : '3px',
+      toggleRecurring: () => { set({ recurring: !S.recurring }); this.showToast(!S.recurring ? 'Weekly pickup on — Tuesdays 4–6 PM' : 'Weekly pickup paused'); },
+      copyCode: () => { set({ copied: true }); this.showToast('Code MAYA20 copied'); setTimeout(() => this.setState({ copied: false }), 2000); },
+      codeLabel: S.copied ? 'Copied ✓' : 'MAYA20',
+      showBiz: this.props.showBizBanner ?? true,
+      reorderLast: () => { set({ cs: 'book', bs: 3, vendorId: 2 }); this.showToast('Last order loaded — pick a window'); },
+      // book
+      bs1: S.bs === 1, bs2: S.bs === 2, bs3: S.bs === 3, bs4: S.bs === 4, bs5: S.bs === 5,
+      bookTitle: stepTitles[S.bs], bookStepLabel: S.bs < 5 ? 'Step ' + S.bs + ' of 4' : vend.name,
+      bookCanBack: S.bs < 5,
+      bookBack: () => S.bs === 1 ? set({ cs: 'home' }) : set({ bs: S.bs - 1 }),
+      bookNext: () => set({ bs: Math.min(5, S.bs + 1) }),
+      bookSegs: [1, 2, 3, 4].map(i => ({ bg: i <= S.bs ? '#7C73E6' : '#E0DCF5' })),
+      vendors, selVendorName: vend.name, services, subtotal: this.money(sub),
+      windows, summaryLines, total: this.money(totalN),
+      confirmOrder: () => set({ bs: 5, trackingNew: true, confirmed: { id: 'LP-4912', plan: vend.name }, jobs: [{ id: 'LP-4912', who: 'Maya Thompson', meta: vend.name + ' · ' + win.day + ' ' + win.time, tag: 'New', k: 'pickup', stage: 0 }, ...S.jobs] }),
+      newOrderId: S.confirmed ? S.confirmed.id : 'LP-4912', newOrderWindow: win.day + ' ' + win.time,
+      trackNewOrder: () => set({ cs: 'track', trackingNew: true }),
+      // track
+      trackId: tNew ? S.confirmed.id : 'LP-4821',
+      trackVendor: tNew ? vend.name : 'Looppr — Edmond', trackVendorShort: 'Looppr',
+      trackEta: tNew ? 'tomorrow' : '9:00 AM', trackStatus: tNew ? 'Scheduled' : 'Washing',
+      trackSteps,
+      // orders / profile / notifs
+      orderList,
+      foldOpts: chip(['Standard', 'KonMari', 'On hangers'], S.fold, 'fold'),
+      detOpts: chip(['Free & Clear', 'Fresh scent', 'Eco'], S.det, 'det'),
+      tempOpts: chip(['Cold', 'Warm', 'Hot'], S.temp, 'temp'),
+      softBg: S.softener ? '#7C73E6' : '#D9D6EC', softLeft: S.softener ? '22px' : '3px',
+      toggleSoftener: () => set({ softener: !S.softener }),
+      notifs, toast: S.toast,
+      // OS
+      osNav, teamSwitch, curName: role.name, curTitle: role.title, curInitials: role.initials,
+      openMaps: () => this.showToast('Route sent to Google Maps — ' + stopDefs.length + ' stops optimized'),
+      addToCalendar: () => this.showToast('Pickup added to your Google Calendar'),
+      osTitle: S.osView === 'dashboard' ? 'Good afternoon, ' + role.first : osTitles[S.osView][0],
+      osMeta: S.osView === 'dashboard' ? role.meta : osTitles[S.osView][1],
+      ovDash: S.osView === 'dashboard', ovBook: S.osView === 'bookings', ovJobs: S.osView === 'jobs',
+      ovCrm: S.osView === 'crm', ovGrowth: S.osView === 'growth', ovRev: S.osView === 'reviews', ovRep: S.osView === 'reports',
+      kpis, routeStops, routeLabel, weekBars, alerts, weekDays, jobCols, crmStages, customers, b2b,
+      growthKpis, posts, keywords, funnel, reviews, scorecard, revBars, unitStats,
+      ovMarkets: S.osView === 'markets', marketCards, marketCompare,
+      ovDriverView: S.osView === 'driverview',
+      dvProgressLabel: S.routeIdx + ' of ' + stopDefs.length + ' stops complete',
+      dvOpenDriver: () => set({ mode: 'driver' }),
+      ovGeneric, genHasKpis, genKpis, genSections, seoRows, compRows, expRows
+    };
+  }
+}
+</script>
+</body>
+</html>

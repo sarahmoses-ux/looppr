@@ -45,7 +45,7 @@ describe('PickupCard receipt', () => {
     fireEvent.click(screen.getByText('View receipt'))
 
     expect(screen.getByText(/Order #/)).toBeInTheDocument()
-    expect(screen.getByText('Large load · 5+ bags')).toBeInTheDocument()
+    expect(screen.getByText('Large load · 26–35 lbs')).toBeInTheDocument()
     expect(screen.getByText('Free')).toBeInTheDocument()
     // Appears three times: the card's summary line, the receipt's line-item
     // subtotal, and the receipt's total row — free delivery means subtotal

@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Looppr OS — Platform Concept</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#073B4C;
+    --teal:#028090;
+    --mint:#02C39A;
+    --cloud:#F7FAFB;
+    --charcoal:#1F2A2E;
+    --line:#E3EAEC;
+    --card:#FFFFFF;
+    --amber:#E8A23D;
+    --red:#D64550;
+    --blue:#5B8DEF;
+    --purple:#8B5CF6;
+    --orange:#F2994A;
+    --radius:14px;
+    --radius-sm:8px;
+    --shadow-sm:0 1px 3px rgba(7,59,76,0.06), 0 1px 2px rgba(7,59,76,0.04);
+    --shadow-md:0 6px 18px rgba(7,59,76,0.10), 0 2px 6px rgba(7,59,76,0.06);
+    --shadow-lg:0 16px 40px rgba(7,59,76,0.16);
+    --ease:cubic-bezier(.2,.7,.3,1);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Inter',sans-serif;
+    background:var(--cloud);
+    color:var(--charcoal);
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,h4,.brand-word{font-family:'Poppins',sans-serif;}
+  .app{display:flex;min-height:100vh;}
+  button,input{font-family:inherit;}
+  button:focus-visible,input:focus-visible,.nav-item:focus-visible{
+    outline:2px solid var(--mint);outline-offset:2px;
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important;animation:none !important;}
+  }
+
+  /* ---------- SIDEBAR ---------- */
+  .sidebar{
+    width:230px;
+    flex-shrink:0;
+    background:var(--navy);
+    color:#EAF3F3;
+    display:flex;
+    flex-direction:column;
+    padding:22px 16px;
+    overflow-y:auto;
+  }
+  .logo{display:flex;align-items:center;gap:10px;padding:0 6px 22px 6px;margin-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.12);}
+  .loop-mark{width:30px;height:30px;flex-shrink:0;}
+  .brand-word{font-weight:800;font-size:19px;letter-spacing:0.2px;}
+  .brand-word span{color:var(--mint);}
+  .brand-sub{display:block;font-family:'Inter',sans-serif;font-size:10.5px;font-weight:500;color:#9FC6C4;letter-spacing:0.3px;margin-top:1px;}
+
+  .nav{display:flex;flex-direction:column;gap:3px;margin-top:6px;}
+  .nav-item{
+    display:flex;align-items:center;gap:11px;
+    padding:10px 12px;border-radius:10px;
+    color:#CFE3E1;font-size:14px;font-weight:500;
+    cursor:pointer;transition:background .15s ease,color .15s ease;
+    border:none;background:none;text-align:left;width:100%;font-family:'Inter',sans-serif;
+  }
+  .nav-item svg{width:18px;height:18px;opacity:0.85;flex-shrink:0;}
+  .nav-item:hover{background:rgba(255,255,255,0.06);color:#fff;}
+  .nav-item.active{background:var(--teal);color:#fff;}
+  .nav-item.active svg{opacity:1;}
+
+  .nav-group-label{font-size:10.5px;text-transform:uppercase;letter-spacing:0.8px;color:#6E9C99;font-weight:700;margin:18px 12px 6px 12px;}
+
+  .sidebar-footer{margin-top:auto;padding-top:16px;border-top:1px solid rgba(255,255,255,0.12);display:flex;align-items:center;gap:10px;}
+  .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--mint),var(--teal));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;box-shadow:var(--shadow-sm);}
+  .sidebar-footer .who{font-size:12.5px;line-height:1.35;}
+  .sidebar-footer .who b{display:block;font-size:13px;color:#fff;font-weight:600;}
+  .sidebar-footer .who span{color:#9FC6C4;}
+
+  /* ---------- MAIN ---------- */
+  .main{flex:1;display:flex;flex-direction:column;min-width:0;}
+
+  .global-bar{
+    display:flex;align-items:center;gap:14px;
+    padding:10px 30px;background:rgba(7,59,76,0.97);backdrop-filter:blur(8px);
+    border-bottom:1px solid rgba(255,255,255,0.08);
+    flex-shrink:0;position:sticky;top:0;z-index:10;
+  }
+  .market-switch{
+    position:relative;display:flex;align-items:center;gap:7px;
+    background:rgba(255,255,255,0.08);color:#EAF3F3;border:1px solid rgba(255,255,255,0.14);
+    padding:7px 12px;border-radius:9px;font-size:12.5px;font-weight:600;cursor:pointer;
+    font-family:'Inter',sans-serif;white-space:nowrap;
+  }
+  .market-switch svg{width:12px;height:12px;opacity:0.75;}
+  .market-menu{
+    position:absolute;top:calc(100% + 6px);left:0;background:#fff;border:1px solid var(--line);
+    border-radius:10px;box-shadow:0 10px 26px rgba(7,59,76,0.2);min-width:230px;
+    display:none;flex-direction:column;padding:6px;z-index:30;
+  }
+  .market-menu.open{display:flex;}
+  .market-menu button{
+    display:flex;align-items:center;justify-content:space-between;gap:8px;
+    background:none;border:none;text-align:left;padding:9px 10px;border-radius:7px;
+    font-size:12.5px;font-weight:600;color:var(--charcoal);cursor:pointer;font-family:'Inter',sans-serif;
+  }
+  .market-menu button:hover{background:var(--cloud);}
+  .search-box{
+    flex:1;max-width:420px;display:flex;align-items:center;gap:8px;
+    background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);
+    border-radius:9px;padding:7px 12px;color:#CFE3E1;
+  }
+  .search-box svg{width:14px;height:14px;opacity:0.7;flex-shrink:0;}
+  .search-box input{background:none;border:none;outline:none;color:#fff;font-size:13px;flex:1;font-family:'Inter',sans-serif;}
+  .search-box input::placeholder{color:#9FC6C4;}
+  .search-box .kbd{font-size:10.5px;color:#9FC6C4;border:1px solid rgba(255,255,255,0.22);padding:1px 6px;border-radius:5px;flex-shrink:0;}
+  .global-right{display:flex;align-items:center;gap:12px;margin-left:auto;}
+  .bell-btn{
+    position:relative;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);
+    color:#EAF3F3;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  }
+  .bell-btn svg{width:16px;height:16px;}
+  .bell-badge{
+    position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:9.5px;font-weight:700;
+    width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  }
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;}
+  .dot.live{background:var(--mint);}
+  .dot.planned{background:var(--amber);}
+  .status-pill{
+    display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);
+    color:#CFE3E1;font-size:12px;font-weight:600;padding:7px 12px;border-radius:9px;cursor:pointer;
+    font-family:'Inter',sans-serif;white-space:nowrap;
+  }
+  .status-pill:hover{background:rgba(255,255,255,0.14);}
+
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:20px 30px;border-bottom:1px solid var(--line);background:var(--card);
+  }
+  .topbar h1{font-size:21px;margin:0;color:var(--navy);}
+  .topbar .meta{font-size:12.5px;color:#5C7377;margin-top:2px;font-weight:500;}
+  .btn{
+    font-family:'Inter',sans-serif;font-weight:600;font-size:13px;
+    padding:9px 16px;border-radius:9px;border:none;cursor:pointer;
+    display:inline-flex;align-items:center;gap:7px;
+    transition:background .15s var(--ease),transform .1s var(--ease),box-shadow .15s var(--ease);
+  }
+  .btn-primary{background:var(--mint);color:var(--navy);box-shadow:var(--shadow-sm);}
+  .btn-primary:hover{background:#02b28c;transform:translateY(-1px);box-shadow:var(--shadow-md);}
+  .btn-primary:active{transform:translateY(0);}
+  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--navy);}
+  .btn-ghost:hover{background:var(--cloud);}
+
+  .view{display:none;padding:26px 30px 50px 30px;}
+  .view.active{display:block;}
+
+  .demo-note{
+    background:#FFF7E8;border:1px solid #F1DDA9;color:#7A5B12;
+    font-size:12px;padding:9px 13px;border-radius:9px;margin-bottom:20px;
+    display:flex;align-items:center;gap:8px;font-weight:500;
+  }
+
+  /* ---------- CARDS / GRID ---------- */
+  .grid{display:grid;gap:16px;}
+  .stat-row{grid-template-columns:repeat(4,1fr);margin-bottom:22px;}
+  .stat-card{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:18px 18px 16px 18px;position:relative;overflow:hidden;
+    box-shadow:var(--shadow-sm);transition:box-shadow .18s var(--ease),transform .18s var(--ease);
+  }
+  .stat-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);}
+  .stat-card .label{font-size:12px;font-weight:600;color:#5C7377;text-transform:uppercase;letter-spacing:0.4px;}
+  .stat-card .value{font-family:'Poppins',sans-serif;font-size:28px;font-weight:700;color:var(--navy);margin-top:6px;}
+  .stat-card .delta{font-size:12px;font-weight:600;margin-top:4px;}
+  .delta.up{color:var(--teal);}
+  .delta.flat{color:#8A9A9D;}
+  .stat-card .ring{position:absolute;right:14px;top:14px;width:36px;height:36px;}
+
+  .panel{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px;box-shadow:var(--shadow-sm);
+  }
+  .panel h3{margin:0 0 14px 0;font-size:15px;color:var(--navy);display:flex;align-items:center;justify-content:space-between;}
+  .panel h3 .pill{font-size:11px;background:var(--cloud);color:#5C7377;padding:3px 9px;border-radius:20px;font-weight:600;font-family:'Inter',sans-serif;}
+
+  .two-col{grid-template-columns:1.3fr 1fr;}
+
+  .list-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px;}
+  .list-row:last-child{border-bottom:none;}
+  .list-row .who{font-weight:600;color:var(--navy);}
+  .list-row .when{color:#5C7377;font-size:12px;}
+  .tag{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:0.2px;}
+  .tag.scheduled{background:#E7F1FA;color:#1E6091;}
+  .tag.alert{background:#FDECEC;color:var(--red);}
+  .tag.warn{background:#FCF3E3;color:#96660F;}
+  .tag.done{background:#E4F8F1;color:#04795E;}
+  .tag.mint{background:#E4F8F1;color:#04795E;}
+  .tag.b2b{background:#EEE7FA;color:#5B3A9E;}
+
+  .phase-track{margin-top:6px;}
+  .phase{margin-bottom:16px;}
+  .phase-head{display:flex;justify-content:space-between;font-size:13px;font-weight:600;color:var(--navy);margin-bottom:6px;}
+  .phase-head span.sub{font-weight:500;color:#5C7377;font-size:12px;}
+  .bar-track{height:8px;background:var(--cloud);border-radius:6px;overflow:hidden;border:1px solid var(--line);}
+  .bar-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--mint));border-radius:6px;}
+
+  /* ---------- BOOKINGS ---------- */
+  .booking-types{grid-template-columns:repeat(4,1fr);margin-bottom:22px;}
+  .btype{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px 16px 16px 18px;cursor:default;box-shadow:var(--shadow-sm);
+    transition:box-shadow .18s var(--ease),transform .18s var(--ease);
+    border-left:3px solid var(--type-color,var(--teal));
+  }
+  .btype:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);}
+  .btype .icon{width:34px;height:34px;border-radius:9px;background:var(--cloud);display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+  .btype .icon svg{width:18px;height:18px;color:var(--type-color,var(--teal));}
+  .btype h4{margin:0 0 4px 0;font-size:14px;color:var(--navy);}
+  .btype p{margin:0;font-size:12px;color:#5C7377;line-height:1.4;}
+  .btype .dur{margin-top:10px;font-size:11px;font-weight:700;color:var(--mint);}
+
+  .promo-banner{
+    background:linear-gradient(90deg,var(--navy),var(--teal));
+    color:#fff;border-radius:var(--radius);padding:16px 20px;
+    display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;
+  }
+  .promo-banner div b{font-family:'Poppins',sans-serif;font-size:15px;}
+  .promo-banner div span{display:block;font-size:12.5px;color:#CFE3E1;margin-top:2px;}
+  .promo-code{background:var(--mint);color:var(--navy);font-weight:800;font-size:13px;padding:8px 14px;border-radius:8px;letter-spacing:0.5px;}
+
+  .cal-wrap{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;}
+  .cal-grid{display:grid;grid-template-columns:70px repeat(6,1fr);gap:6px;margin-top:14px;}
+  .cal-head{font-size:11.5px;font-weight:700;color:#5C7377;text-align:center;padding:6px 0;}
+  .cal-time{font-size:11px;color:#8A9A9D;padding:10px 4px 0 0;text-align:right;}
+  .slot{height:36px;border-radius:7px;font-size:10.5px;display:flex;align-items:center;justify-content:center;font-weight:600;}
+  .slot.open{background:#E4F8F1;color:#04795E;border:1px dashed #9AD8C3;}
+  .slot.booked{background:var(--navy);color:#fff;}
+  .slot.b2b{background:#EEE7FA;color:#5B3A9E;}
+  .slot.blank{background:transparent;}
+
+  .link-bar{display:flex;align-items:center;gap:10px;background:var(--cloud);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-top:16px;font-size:13px;color:var(--navy);font-weight:600;}
+  .link-bar span.url{color:var(--teal);}
+
+  /* ---------- JOBS / KANBAN ---------- */
+  .view-toggle{display:flex;gap:6px;background:var(--cloud);border:1px solid var(--line);border-radius:9px;padding:3px;width:fit-content;margin-bottom:18px;}
+  .view-toggle button{border:none;background:none;padding:7px 14px;border-radius:7px;font-size:12.5px;font-weight:600;color:#5C7377;cursor:pointer;font-family:'Inter',sans-serif;}
+  .view-toggle button.active{background:#fff;color:var(--navy);box-shadow:0 1px 3px rgba(0,0,0,0.08);}
+
+  .kanban{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;}
+  .kcol{background:#EEF3F4;border-radius:12px;padding:10px;min-height:120px;border-top:4px solid var(--stage-color,var(--teal));}
+  .kcol-head{display:flex;justify-content:space-between;align-items:center;padding:4px 6px 10px 6px;}
+  .kcol-head b{font-size:12px;color:var(--navy);}
+  .kcol-head .n{font-size:11px;background:#fff;color:#5C7377;padding:1px 7px;border-radius:20px;font-weight:700;}
+  .job-card{
+    background:#fff;border-radius:9px;padding:10px 11px 10px 13px;margin-bottom:8px;border:1px solid var(--line);
+    border-left:3px solid var(--stage-color,var(--teal));font-size:12px;box-shadow:var(--shadow-sm);
+    transition:box-shadow .16s var(--ease),transform .16s var(--ease);
+  }
+  .job-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px);}
+  .job-card .name{font-weight:700;color:var(--navy);margin-bottom:3px;}
+  .job-card .addr{color:#5C7377;font-size:11px;margin-bottom:6px;}
+  .job-card .foot{display:flex;justify-content:space-between;align-items:center;}
+  .job-card .win{font-size:10.5px;color:#8A9A9D;font-weight:600;}
+
+  .route-wrap{display:grid;grid-template-columns:1fr 1.4fr;gap:16px;}
+  .stop-list .stop{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid var(--line);}
+  .stop-list .stop:last-child{border-bottom:none;}
+  .stop-num{width:24px;height:24px;border-radius:50%;background:var(--teal);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .stop-info b{font-size:13px;color:var(--navy);display:block;}
+  .stop-info span{font-size:11.5px;color:#5C7377;}
+  .route-map{background:var(--cloud);border-radius:12px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;padding:20px;min-height:260px;}
+
+  /* ---------- CRM ---------- */
+  .crm-tabs{display:flex;gap:6px;margin-bottom:18px;}
+  .crm-tabs button{border:1px solid var(--line);background:#fff;padding:8px 15px;border-radius:9px;font-size:12.5px;font-weight:600;color:#5C7377;cursor:pointer;font-family:'Inter',sans-serif;}
+  .crm-tabs button.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.4px;color:#5C7377;font-weight:700;padding:8px 10px;border-bottom:1px solid var(--line);}
+  td{padding:11px 10px;border-bottom:1px solid var(--line);color:var(--charcoal);}
+  tr:last-child td{border-bottom:none;}
+
+  .pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+  .pcol-head{font-size:12px;font-weight:700;color:var(--navy);margin-bottom:10px;display:flex;justify-content:space-between;}
+  .deal-card{background:#fff;border:1px solid var(--line);border-radius:9px;padding:11px;margin-bottom:8px;font-size:12px;box-shadow:var(--shadow-sm);transition:box-shadow .16s var(--ease),transform .16s var(--ease);}
+  .deal-card:hover{box-shadow:var(--shadow-md);transform:translateY(-1px);}
+  .deal-card .biz{font-weight:700;color:var(--navy);margin-bottom:4px;}
+  .deal-card .next{font-size:11px;color:#5C7377;margin-top:6px;border-top:1px dashed var(--line);padding-top:6px;}
+  .deal-card .stakeholder{font-size:11px;color:#5C7377;margin-top:4px;}
+  .pipe-6{grid-template-columns:repeat(6,1fr);gap:10px;}
+
+  /* ---------- SCORECARD ---------- */
+  .metric-table td:first-child, .metric-table th:first-child{padding-left:0;}
+  .metric-target{color:#8A9A9D;font-size:12px;}
+  .metric-status{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;}
+
+  .link-jump{
+    background:none;border:none;color:var(--teal);font-weight:700;font-size:12px;cursor:pointer;
+    font-family:'Inter',sans-serif;white-space:nowrap;padding:0;
+  }
+  .link-jump:hover{text-decoration:underline;}
+
+  .market-card .mc-head{display:flex;align-items:center;gap:8px;margin-bottom:4px;}
+  .market-card .mc-head h4{margin:0;font-size:15px;color:var(--navy);flex:1;}
+  .market-card .mc-sub{margin:0 0 12px 0;font-size:12px;color:#5C7377;}
+  .status-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+  .status-dot.live{background:var(--mint);}
+  .status-dot.planned{background:var(--amber);}
+
+  .nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:10px;flex-shrink:0;}
+
+  .timeline{margin-top:2px;}
+  .tl-item{display:flex;gap:10px;position:relative;padding-bottom:16px;}
+  .tl-item:last-child{padding-bottom:0;}
+  .tl-dot{width:9px;height:9px;border-radius:50%;background:var(--teal);margin-top:4px;flex-shrink:0;position:relative;z-index:1;}
+  .tl-item::before{content:"";position:absolute;left:4px;top:13px;bottom:-4px;width:1px;background:var(--line);}
+  .tl-item:last-child::before{display:none;}
+  .tl-content b{display:block;font-size:12.5px;color:var(--navy);font-weight:600;}
+  .tl-content span{font-size:11px;color:#5C7377;}
+  .new-badge{background:linear-gradient(90deg,var(--purple),var(--blue));color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:20px;letter-spacing:0.4px;margin-left:auto;}
+
+  footer.mockup-foot{padding:22px 30px 40px 30px;font-size:11.5px;color:#8A9A9D;border-top:1px solid var(--line);margin-top:10px;}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo">
+      <svg class="loop-mark" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="16" stroke="#02C39A" stroke-width="3.4" stroke-dasharray="6 5" fill="none"/>
+        <circle cx="20" cy="20" r="6" fill="#02C39A"/>
+      </svg>
+      <div>
+        <div class="brand-word">loop<span>pr</span></div>
+        <span class="brand-sub">OS · Edmond &amp; OKC</span>
+      </div>
+    </div>
+
+    <div class="nav">
+      <div class="nav-group-label" style="margin-top:0;">Overview</div>
+      <button class="nav-item active" data-view="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-item" data-view="markets">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h20M12 2c2.5 2.6 2.5 17.4 0 20M12 2c-2.5 2.6-2.5 17.4 0 20"/><circle cx="12" cy="12" r="10"/></svg>
+        Markets
+      </button>
+
+      <div class="nav-group-label">Operations</div>
+      <button class="nav-item" data-view="bookings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>
+        Bookings
+      </button>
+      <button class="nav-item" data-view="jobs">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+        Jobs &amp; Routes
+      </button>
+
+      <div class="nav-group-label">Sales Hub</div>
+      <button class="nav-item" data-view="crm">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="18" cy="8" r="2.4"/><path d="M15.5 14.2c2.6.3 4.5 2.6 4.5 5.3"/></svg>
+        CRM &amp; Pipeline
+      </button>
+      <button class="nav-item" data-view="strategic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="9" height="18" rx="1"/><rect x="15" y="8" width="6" height="13" rx="1"/><path d="M7 7h1M7 11h1M7 15h1M10 7h1M10 11h1M10 15h1M17.5 12h1M17.5 16h1"/></svg>
+        Strategic Accounts
+      </button>
+
+      <div class="nav-group-label">Marketing Hub</div>
+      <button class="nav-item" data-view="email">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        Email Marketing
+      </button>
+      <button class="nav-item" data-view="social">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 2.5 15.4 0 18M12 3c-2.5 2.6-2.5 15.4 0 18"/></svg>
+        Google &amp; Social
+      </button>
+      <button class="nav-item" data-view="optimize">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17 9 11l4 4 8-8"/><path d="M15 6h6v6"/></svg>
+        Digital Optimization
+        <span class="new-badge">NEW</span>
+      </button>
+      <button class="nav-item" data-view="datacollection">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16M4 12h16M4 19h10"/><circle cx="19" cy="19" r="2"/></svg>
+        Data Collection
+        <span class="new-badge">NEW</span>
+      </button>
+
+      <div class="nav-group-label">Service Hub</div>
+      <button class="nav-item" data-view="requests">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Requests
+        <span class="nav-badge">3</span>
+      </button>
+      <button class="nav-item" data-view="reviews">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 2 2.9 6.3 6.9.9-5 4.9 1.2 6.9L12 17.6l-6 3.4 1.2-6.9-5-4.9 6.9-.9z"/></svg>
+        Reviews
+      </button>
+
+      <div class="nav-group-label">Reports</div>
+      <button class="nav-item" data-view="scorecard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V10M12 19V5M20 19v-6"/></svg>
+        Scorecard
+      </button>
+      <button class="nav-item" data-view="insights">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m7 14 4-5 3 3 5-7"/></svg>
+        Insights &amp; Reports
+      </button>
+
+      <div class="nav-group-label">System</div>
+      <button class="nav-item" data-view="activitylog">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+        Activity Log
+      </button>
+      <button class="nav-item" data-view="performance">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg>
+        Performance
+      </button>
+      <button class="nav-item" data-view="automations">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>
+        Automations
+      </button>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="avatar">JA</div>
+      <div class="who">
+        <b>Jeffrey Azuatalam</b>
+        <span>Founder / CEO</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <div class="global-bar">
+      <div class="market-switch" id="marketSwitch">
+        <span class="dot live" id="marketDot"></span>
+        <span id="marketLabel">All Markets</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+        <div class="market-menu" id="marketMenu">
+          <button data-market="all">All Markets <span class="tag done">Rollup</span></button>
+          <button data-market="okc">OKC Metro <span class="tag done">Live</span></button>
+          <button data-market="dfw">Dallas–Fort Worth <span class="tag warn">Planned</span></button>
+          <button data-market="atl">Atlanta <span class="tag warn">Planned</span></button>
+        </div>
+      </div>
+
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" placeholder="Search customers, jobs, accounts…">
+        <span class="kbd">⌘K</span>
+      </div>
+
+      <div class="global-right">
+        <button class="status-pill" onclick="switchView('performance')" title="View system status">
+          <span class="dot live"></span> All systems operational
+        </button>
+        <button class="bell-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+          <span class="bell-badge">4</span>
+        </button>
+        <div class="avatar" style="width:30px;height:30px;font-size:12px;">JA</div>
+      </div>
+    </div>
+
+    <!-- ===================== DASHBOARD ===================== -->
+    <section id="dashboard" class="view active">
+      <div class="topbar">
+        <div>
+          <h1>Good morning, Jeffrey</h1>
+          <div class="meta">Sunday, July 19 · 3 days to launch</div>
+        </div>
+        <button class="btn btn-primary">＋ New pickup</button>
+      </div>
+
+      <div class="view-body">
+        <div class="demo-note">◐ Sample data — this view fills in automatically from real bookings and CRM activity once Looppr goes live.</div>
+        <div class="demo-note" id="market-banner" style="display:none;background:#FDECEC;border-color:#F3C6C6;color:#8A2A2A;">◐ This market hasn't launched yet — these are planning-stage placeholders, not live figures. Full launch plan lives under Markets.</div>
+
+        <div class="grid stat-row">
+          <div class="stat-card">
+            <div class="label">Weekly recurring pickups</div>
+            <div class="value" id="dash-pickups">0</div>
+            <div class="delta flat" id="dash-pickups-sub">North-star metric · pre-launch</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">New leads (B2C + B2B)</div>
+            <div class="value" id="dash-leads">14</div>
+            <div class="delta up" id="dash-leads-sub">↑ from booking page + outreach</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">B2B trials in motion</div>
+            <div class="value" id="dash-trials">2</div>
+            <div class="delta flat" id="dash-trials-sub">Sunset Fitness · Maple Daycare</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Revenue this week</div>
+            <div class="value" id="dash-revenue">$0</div>
+            <div class="delta flat" id="dash-revenue-sub">Tracking toward Week 13 goal</div>
+          </div>
+        </div>
+
+        <div class="grid two-col">
+          <div class="panel">
+            <h3>Today &amp; tomorrow <span class="pill">Jobs &amp; Routes</span></h3>
+            <div class="list-row">
+              <div><div class="who">Launch content — final review</div><div class="when">Jeffrey · today</div></div>
+              <button class="link-jump" onclick="switchView('social')">Open →</button>
+            </div>
+            <div class="list-row">
+              <div><div class="who">Sunset Fitness — B2B trial route setup</div><div class="when">Maudlin · tomorrow, 9:00 AM</div></div>
+              <button class="link-jump" onclick="switchView('jobs')">Open →</button>
+            </div>
+            <div class="list-row">
+              <div><div class="who">2 pickup slots unassigned for launch day</div><div class="when">Jul 22 · needs driver</div></div>
+              <button class="link-jump" onclick="switchView('jobs')">Resolve →</button>
+            </div>
+            <div class="list-row">
+              <div><div class="who">10 Google review requests queued</div><div class="when">Sends after first deliveries</div></div>
+              <button class="link-jump" onclick="switchView('reviews')">View →</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>90-day phase gates <span class="pill">Scorecard</span></h3>
+            <div class="phase-track">
+              <div class="phase">
+                <div class="phase-head">Week 4 <span class="sub">10 customers · 2 B2B trials</span></div>
+                <div class="bar-track"><div class="bar-fill" style="width:6%"></div></div>
+              </div>
+              <div class="phase">
+                <div class="phase-head">Week 8 <span class="sub">25 customers · 3 pilots · 10 reviews</span></div>
+                <div class="bar-track"><div class="bar-fill" style="width:2%"></div></div>
+              </div>
+              <div class="phase">
+                <div class="phase-head">Week 13 <span class="sub">40–50 customers · 5 B2B · $5K month</span></div>
+                <div class="bar-track"><div class="bar-fill" style="width:0%"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== MARKETS ===================== -->
+    <section id="markets" class="view">
+      <div class="topbar">
+        <div>
+          <h1>Markets</h1>
+          <div class="meta">Operating footprint — where Looppr runs today, and where it's headed</div>
+        </div>
+        <button class="btn btn-primary">＋ Add market</button>
+      </div>
+
+      <div class="view-body">
+        <div class="demo-note">◐ Illustrative expansion plan — OKC Metro is the only live market. Dallas–Fort Worth and Atlanta are modeled here to show how the platform scales, not committed launch dates.</div>
+
+        <div class="grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px;">
+          <div class="panel market-card">
+            <div class="mc-head"><span class="status-dot live"></span><h4>OKC Metro</h4><span class="tag done">Live</span></div>
+            <p class="mc-sub">Edmond &amp; Oklahoma City, OK</p>
+            <div class="list-row"><div><div class="who">Launch</div></div><span class="tag mint">Jul 22, 2026</span></div>
+            <div class="list-row"><div><div class="who">Team</div></div><span class="tag scheduled">Jeffrey (solo)</span></div>
+            <div class="list-row"><div><div class="who">Week 13 target</div></div><span class="tag scheduled">40–50 cust. · $5K/mo</span></div>
+            <button class="btn btn-ghost" style="width:100%;margin-top:10px;" onclick="setMarket('okc')">View this market's dashboard</button>
+          </div>
+
+          <div class="panel market-card">
+            <div class="mc-head"><span class="status-dot planned"></span><h4>Dallas–Fort Worth</h4><span class="tag warn">Planned</span></div>
+            <p class="mc-sub">TX metro · ~7.6M population</p>
+            <div class="list-row"><div><div class="who">Target launch</div></div><span class="tag scheduled">After OKC Week 13 gate</span></div>
+            <div class="list-row"><div><div class="who">Team</div></div><span class="tag warn">Not yet assigned</span></div>
+            <div class="list-row"><div><div class="who">Watch-outs</div></div><span class="tag alert">Poplin, HappyNest active</span></div>
+            <button class="btn btn-ghost" style="width:100%;margin-top:10px;" onclick="setMarket('dfw')">View planning placeholder</button>
+          </div>
+
+          <div class="panel market-card">
+            <div class="mc-head"><span class="status-dot planned"></span><h4>Atlanta</h4><span class="tag warn">Planned</span></div>
+            <p class="mc-sub">GA metro · ~6.3M population</p>
+            <div class="list-row"><div><div class="who">Target launch</div></div><span class="tag scheduled">Evaluated after DFW</span></div>
+            <div class="list-row"><div><div class="who">Team</div></div><span class="tag warn">Not yet assigned</span></div>
+            <div class="list-row"><div><div class="who">Watch-outs</div></div><span class="tag scheduled">Denser multifamily routes</span></div>
+            <button class="btn btn-ghost" style="width:100%;margin-top:10px;" onclick="setMarket('atl')">View planning placeholder</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Market comparison</h3>
+          <table>
+            <thead><tr><th>Market</th><th>Status</th><th>B2B priority segments</th><th>Competitive density</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr><td>OKC Metro</td><td><span class="tag done">Live</span></td><td>Airbnb, gyms, salons, daycares, restaurants</td><td>Low–moderate</td><td>Founder-run positioning is the wedge</td></tr>
+              <tr><td>Dallas–Fort Worth</td><td><span class="tag warn">Planned</span></td><td>Airbnb, gyms, multifamily</td><td>High — Poplin, HappyNest active</td><td>Needs differentiation beyond "local"</td></tr>
+              <tr><td>Atlanta</td><td><span class="tag warn">Planned</span></td><td>Airbnb, salons, restaurants</td><td>Moderate–high</td><td>Higher order value, denser routes</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== BOOKINGS (Calendly module) ===================== -->
+    <section id="bookings" class="view">
+      <div class="topbar">
+        <div>
+          <h1>Bookings</h1>
+          <div class="meta">Public scheduling page · replaces Google Form</div>
+        </div>
+        <button class="btn btn-ghost">Preview booking page ↗</button>
+      </div>
+
+      <div class="view-body">
+        <div class="grid stat-row">
+          <div class="stat-card"><div class="label">Capacity today</div><div class="value">8 slots</div><div class="delta flat">Jeffrey solo · 1 route</div></div>
+          <div class="stat-card"><div class="label">Booked</div><div class="value">3</div><div class="delta flat">5 open</div></div>
+          <div class="stat-card"><div class="label">Waitlist</div><div class="value">0</div><div class="delta flat">Auto-fills from cancellations</div></div>
+          <div class="stat-card"><div class="label">No-show rate</div><div class="value">—</div><div class="delta flat">Tracked once live</div></div>
+        </div>
+
+        <div class="grid booking-types">
+          <div class="btype" style="--type-color:var(--teal);">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 3 7v10l9 5 9-5V7l-9-5Z"/></svg></div>
+            <h4>One-Time Pickup</h4>
+            <p>Single wash &amp; fold bag, picked up and returned in 24 hrs.</p>
+            <div class="dur">30 min window</div>
+          </div>
+          <div class="btype" style="--type-color:var(--mint);">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9M3 12l3-3M3 12l3 3"/></svg></div>
+            <h4>Weekly Subscription</h4>
+            <p>Recurring weekly pickup on a fixed day &amp; window.</p>
+            <div class="dur">30 min window</div>
+          </div>
+          <div class="btype" style="--type-color:var(--blue);">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 10h18"/></svg></div>
+            <h4>Bi-Weekly Plan</h4>
+            <p>Every other week — the light-laundry household plan.</p>
+            <div class="dur">30 min window</div>
+          </div>
+          <div class="btype" style="--type-color:var(--purple);">
+            <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/></svg></div>
+            <h4>B2B Route Setup</h4>
+            <p>Intro call to scope a recurring account — gyms, salons, Airbnbs.</p>
+            <div class="dur">15 min call</div>
+          </div>
+        </div>
+
+        <div class="promo-banner">
+          <div>
+            <b>Every new booking type carries the launch offer</b>
+            <span>Applies automatically to a customer's first order</span>
+          </div>
+          <div class="promo-code">LOOP10 · $10 OFF</div>
+        </div>
+
+        <div class="cal-wrap">
+          <h3 style="margin:0;font-size:15px;color:var(--navy);">Week of July 20 — availability</h3>
+          <div class="cal-grid">
+            <div></div>
+            <div class="cal-head">Mon</div><div class="cal-head">Tue</div><div class="cal-head">Wed</div><div class="cal-head">Thu</div><div class="cal-head">Fri</div><div class="cal-head">Sat</div>
+
+            <div class="cal-time">9 AM</div>
+            <div class="slot open">Open</div><div class="slot booked">Booked</div><div class="slot open">Open</div><div class="slot open">Open</div><div class="slot b2b">B2B</div><div class="slot open">Open</div>
+
+            <div class="cal-time">11 AM</div>
+            <div class="slot booked">Booked</div><div class="slot open">Open</div><div class="slot open">Open</div><div class="slot b2b">B2B</div><div class="slot open">Open</div><div class="slot open">Open</div>
+
+            <div class="cal-time">1 PM</div>
+            <div class="slot open">Open</div><div class="slot open">Open</div><div class="slot booked">Booked</div><div class="slot open">Open</div><div class="slot open">Open</div><div class="slot blank"></div>
+
+            <div class="cal-time">3 PM</div>
+            <div class="slot open">Open</div><div class="slot b2b">B2B</div><div class="slot open">Open</div><div class="slot open">Open</div><div class="slot booked">Booked</div><div class="slot blank"></div>
+          </div>
+          <div class="link-bar">
+            🔗 <span class="url">getlooppr.com/book</span> — customers self-schedule directly into this calendar, no more manual Form + Venmo matching.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== JOBS & ROUTES (Jobber module) ===================== -->
+    <section id="jobs" class="view">
+      <div class="topbar">
+        <div>
+          <h1>Jobs &amp; Routes</h1>
+          <div class="meta">Every bag, tracked pickup to delivery</div>
+        </div>
+        <button class="btn btn-primary">＋ Add job</button>
+      </div>
+
+      <div class="view-body">
+        <div class="view-toggle">
+          <button class="active" data-jv="board">Job board</button>
+          <button data-jv="route">Today's route</button>
+        </div>
+
+        <div id="jv-board">
+          <div class="kanban">
+            <div class="kcol" style="--stage-color:var(--blue);">
+              <div class="kcol-head"><b>Scheduled</b><span class="n">4</span></div>
+              <div class="job-card"><div class="name">M. Alvarez</div><div class="addr">412 Bryant Ave · Edmond</div><div class="foot"><span class="win">9–9:30 AM</span><span class="tag mint">1 bag</span></div></div>
+              <div class="job-card"><div class="name">Maple Daycare (B2B)</div><div class="addr">Route stop 2 · Edmond</div><div class="foot"><span class="win">10 AM</span><span class="tag b2b">B2B</span></div></div>
+            </div>
+            <div class="kcol" style="--stage-color:var(--purple);">
+              <div class="kcol-head"><b>Picked Up</b><span class="n">2</span></div>
+              <div class="job-card"><div class="name">R. Chen</div><div class="addr">88 Danforth Dr · OKC</div><div class="foot"><span class="win">11 AM</span><span class="tag mint">2 bags</span></div></div>
+            </div>
+            <div class="kcol" style="--stage-color:var(--amber);">
+              <div class="kcol-head"><b>Washing</b><span class="n">3</span></div>
+              <div class="job-card"><div class="name">T. Nguyen</div><div class="addr">Subscription · wk 1</div><div class="foot"><span class="win">Started 11:40</span><span class="tag mint">1 bag</span></div></div>
+            </div>
+            <div class="kcol" style="--stage-color:var(--orange);">
+              <div class="kcol-head"><b>Folding</b><span class="n">1</span></div>
+              <div class="job-card"><div class="name">Sunset Fitness (B2B)</div><div class="addr">Towel service · trial wk 2</div><div class="foot"><span class="win">Due 3 PM</span><span class="tag b2b">B2B</span></div></div>
+            </div>
+            <div class="kcol" style="--stage-color:var(--teal);">
+              <div class="kcol-head"><b>Out for Delivery</b><span class="n">2</span></div>
+              <div class="job-card"><div class="name">K. Osei</div><div class="addr">201 Coffee Creek Rd</div><div class="foot"><span class="win">Due 4 PM</span><span class="tag mint">1 bag</span></div></div>
+            </div>
+            <div class="kcol" style="--stage-color:var(--mint);">
+              <div class="kcol-head"><b>Delivered</b><span class="n">6</span></div>
+              <div class="job-card"><div class="name">J. Patel</div><div class="addr">Weekly plan</div><div class="foot"><span class="win">Completed 8:50 AM</span><span class="tag done">📷 Photo confirmed</span></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="jv-route" style="display:none;">
+          <div class="route-wrap">
+            <div class="panel stop-list">
+              <h3>Jeffrey's route <span class="pill">7 stops · 24 mi</span></h3>
+              <div class="stop"><div class="stop-num">1</div><div class="stop-info"><b>M. Alvarez — Pickup</b><span>412 Bryant Ave, Edmond · 9:00 AM</span></div></div>
+              <div class="stop"><div class="stop-num">2</div><div class="stop-info"><b>Maple Daycare — B2B pickup</b><span>Linens &amp; towels · 9:35 AM</span></div></div>
+              <div class="stop"><div class="stop-num">3</div><div class="stop-info"><b>R. Chen — Pickup</b><span>88 Danforth Dr, OKC · 10:15 AM</span></div></div>
+              <div class="stop"><div class="stop-num">4</div><div class="stop-info"><b>K. Osei — Delivery</b><span>201 Coffee Creek Rd · 11:00 AM</span></div></div>
+              <div class="stop"><div class="stop-num">5</div><div class="stop-info"><b>Sunset Fitness — B2B delivery</b><span>Towel service · 11:40 AM</span></div></div>
+            </div>
+            <div class="route-map">
+              <svg viewBox="0 0 260 220" width="100%" height="220">
+                <path d="M30 190 C 60 120, 90 170, 120 100 S 190 60, 230 30" stroke="#028090" stroke-width="3" fill="none" stroke-dasharray="1 10" stroke-linecap="round"/>
+                <circle cx="30" cy="190" r="7" fill="#073B4C"/><text x="24" y="207" font-size="10" fill="#5C7377">Start</text>
+                <circle cx="90" cy="140" r="6" fill="#02C39A"/>
+                <circle cx="150" cy="95" r="6" fill="#02C39A"/>
+                <circle cx="230" cy="30" r="7" fill="#073B4C"/><text x="205" y="20" font-size="10" fill="#5C7377">End</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== CRM & PIPELINE (HubSpot module) ===================== -->
+    <section id="crm" class="view">
+      <div class="topbar">
+        <div>
+          <h1>CRM &amp; Pipeline</h1>
+          <div class="meta">B2C customers &amp; local small-business B2B — Airbnbs, gyms, salons, daycares, restaurants</div>
+        </div>
+        <button class="btn btn-primary">＋ Add contact</button>
+      </div>
+
+      <div class="view-body">
+        <div class="crm-tabs">
+          <button class="active" data-cv="customers">Customers</button>
+          <button data-cv="pipeline">B2B pipeline</button>
+        </div>
+
+        <div id="cv-customers" class="grid two-col">
+          <div class="panel">
+            <h3>Customers</h3>
+            <table>
+              <thead><tr><th>Customer</th><th>Plan</th><th>Last order</th><th>Lifetime value</th><th>LOOP10 used</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>M. Alvarez</td><td>One-time</td><td>—</td><td>$0</td><td>Yes</td><td><span class="tag scheduled">First pickup pending</span></td></tr>
+                <tr><td>R. Chen</td><td>Weekly</td><td>—</td><td>$0</td><td>Yes</td><td><span class="tag scheduled">First pickup pending</span></td></tr>
+                <tr><td>T. Nguyen</td><td>Weekly</td><td>—</td><td>$0</td><td>Yes</td><td><span class="tag scheduled">First pickup pending</span></td></tr>
+                <tr><td>K. Osei</td><td>Bi-weekly</td><td>—</td><td>$0</td><td>No</td><td><span class="tag scheduled">First pickup pending</span></td></tr>
+                <tr><td>J. Patel</td><td>Weekly</td><td>—</td><td>$0</td><td>Yes</td><td><span class="tag warn">Review requested</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="panel">
+            <h3>Client profile <span class="pill">R. Chen</span></h3>
+            <div class="list-row"><div><div class="who">Contact</div><div class="when">(405) 555-0148 · r.chen@email.com</div></div></div>
+            <div class="list-row"><div><div class="who">Address</div><div class="when">88 Danforth Dr, OKC</div></div></div>
+            <div class="list-row"><div><div class="who">Plan</div><div class="when">Weekly subscription · $28/wk</div></div><span class="tag mint">Active</span></div>
+            <h4 style="margin:16px 0 8px 0;font-size:12.5px;color:#5C7377;text-transform:uppercase;letter-spacing:0.4px;">Preferences</h4>
+            <div class="list-row"><div><div class="who">Cold wash only, no fabric softener</div></div></div>
+            <div class="list-row"><div><div class="who">Leave bag at side door if not home</div></div></div>
+            <h4 style="margin:16px 0 8px 0;font-size:12.5px;color:#5C7377;text-transform:uppercase;letter-spacing:0.4px;">Activity timeline</h4>
+            <div class="timeline">
+              <div class="tl-item"><div class="tl-dot" style="background:var(--blue);"></div><div class="tl-content"><b>Booked first pickup</b><span>Jul 18, 4:15 PM · via getlooppr.com/book</span></div></div>
+              <div class="tl-item"><div class="tl-dot"></div><div class="tl-content"><b>Welcome email sent &amp; opened</b><span>Jul 18, 4:16 PM · Email Marketing</span></div></div>
+              <div class="tl-item"><div class="tl-dot" style="background:var(--amber);"></div><div class="tl-content"><b>Added special instructions</b><span>Jul 18, 6:02 PM · via SMS</span></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="cv-pipeline" class="pipe" style="display:none;">
+          <div>
+            <div class="pcol-head">Lead <span>6</span></div>
+            <div class="deal-card"><div class="biz">Crest Bakery</div><span class="tag warn">Restaurant</span><div class="next">Next: cold outreach email</div></div>
+            <div class="deal-card"><div class="biz">Riverside Airbnb (x3 units)</div><span class="tag b2b">Airbnb</span> <span class="tag warn">Score 54</span><div class="next">Next: intro call</div></div>
+          </div>
+          <div>
+            <div class="pcol-head">Contacted <span>4</span></div>
+            <div class="deal-card"><div class="biz">Glow Studio Salon</div><span class="tag b2b">Salon</span> <span class="tag mint">Score 78</span><div class="next">Next: send pilot terms</div></div>
+            <div class="deal-card"><div class="biz">Little Sprouts Daycare</div><span class="tag b2b">Daycare</span><div class="next">Next: follow up Tue</div></div>
+          </div>
+          <div>
+            <div class="pcol-head">Trial <span>2</span></div>
+            <div class="deal-card"><div class="biz">Sunset Fitness</div><span class="tag b2b">Gym</span> <span class="tag mint">Score 85</span><div class="next">Next: trial ends in 5 days</div></div>
+            <div class="deal-card"><div class="biz">Maple Daycare</div><span class="tag b2b">Daycare</span><div class="next">Next: check-in call</div></div>
+          </div>
+          <div>
+            <div class="pcol-head">Signed <span>0</span></div>
+            <div class="deal-card" style="color:#8A9A9D;text-align:center;padding:24px 10px;">No signed accounts yet — first pilots convert after Week 4</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== STRATEGIC ACCOUNTS (Salesforce module) ===================== -->
+    <section id="strategic" class="view">
+      <div class="topbar">
+        <div>
+          <h1>Strategic Accounts</h1>
+          <div class="meta">Regional &amp; national retail partnerships · multi-stakeholder deals</div>
+        </div>
+        <button class="btn btn-primary">＋ New account</button>
+      </div>
+
+      <div class="view-body">
+        <div class="demo-note">◐ Sample data — models the grocery-chain retail pilot pipeline once outreach begins. Kept separate from CRM &amp; Pipeline because these deals involve multiple stakeholders, longer cycles, and formal pilot terms — not a single-contact close.</div>
+
+        <div class="grid stat-row">
+          <div class="stat-card">
+            <div class="label">Open opportunities</div>
+            <div class="value">3</div>
+            <div class="delta flat">Homeland · Crest Foods · Uptown Grocery</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Pipeline value (weighted)</div>
+            <div class="value">$830/mo</div>
+            <div class="delta flat">Probability-adjusted</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Stakeholders mapped</div>
+            <div class="value">5</div>
+            <div class="delta flat">Across 3 accounts</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">Pilots signed</div>
+            <div class="value">0</div>
+            <div class="delta flat">None launched yet</div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-bottom:16px;">
+          <h3>Opportunity stages <span class="pill">Salesforce-style</span></h3>
+          <div class="pipe pipe-6">
+            <div>
+              <div class="pcol-head">Prospecting <span>2</span></div>
+              <div class="deal-card"><div class="biz">Uptown Grocery</div><span class="tag warn">Grocery chain</span><div class="stakeholder">No contact yet — researching regional buyer</div><div class="next">Next: identify decision-maker</div></div>
+              <div class="deal-card"><div class="biz">Homeland (HQ)</div><span class="tag warn">Grocery chain</span><div class="stakeholder">Cold outreach sent to 2 stores</div><div class="next">Next: await reply</div></div>
+            </div>
+            <div>
+              <div class="pcol-head">Discovery <span>1</span></div>
+              <div class="deal-card"><div class="biz">Crest Foods</div><span class="tag warn">Grocery chain</span><div class="stakeholder">Store Ops Manager engaged</div><div class="next">Next: scope 4 sq ft pilot footprint</div></div>
+            </div>
+            <div>
+              <div class="pcol-head">Pilot Proposal <span>0</span></div>
+              <div class="deal-card" style="color:#8A9A9D;text-align:center;padding:20px 8px;">—</div>
+            </div>
+            <div>
+              <div class="pcol-head">Pilot Active <span>0</span></div>
+              <div class="deal-card" style="color:#8A9A9D;text-align:center;padding:20px 8px;">First 90-day pilot begins after Week 8</div>
+            </div>
+            <div>
+              <div class="pcol-head">Negotiation <span>0</span></div>
+              <div class="deal-card" style="color:#8A9A9D;text-align:center;padding:20px 8px;">—</div>
+            </div>
+            <div>
+              <div class="pcol-head">Closed Won <span>0</span></div>
+              <div class="deal-card" style="color:#8A9A9D;text-align:center;padding:20px 8px;">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid two-col">
+          <div class="panel">
+            <h3>Account 360 — Crest Foods <span class="pill">Example</span></h3>
+            <div class="list-row"><div><div class="who">Stage</div></div><span class="tag warn">Discovery</span></div>
+            <div class="list-row"><div><div class="who">Pilot scope</div><div class="when">4 sq ft drop-off kiosk near entrance, zero cost/labor to store</div></div></div>
+            <div class="list-row"><div><div class="who">Potential</div><div class="when">If rolled out chain-wide</div></div><span class="tag mint">~$1,400/mo</span></div>
+            <div class="list-row"><div><div class="who">Owner</div><div class="when">Jeffrey Azuatalam</div></div></div>
+            <h4 style="margin:16px 0 8px 0;font-size:12.5px;color:#5C7377;text-transform:uppercase;letter-spacing:0.4px;">Stakeholders</h4>
+            <div class="list-row"><div><div class="who">Store Ops Manager</div><div class="when">Champion · engaged weekly</div></div></div>
+            <div class="list-row"><div><div class="who">Regional Category Buyer</div><div class="when">Economic buyer · not yet contacted</div></div></div>
+          </div>
+
+          <div class="panel">
+            <h3>Weighted forecast <span class="pill">This quarter</span></h3>
+            <table>
+              <thead><tr><th>Stage</th><th>Accts</th><th>Value</th><th>Prob.</th><th>Weighted</th></tr></thead>
+              <tbody>
+                <tr><td>Prospecting</td><td>2</td><td>$2,000/mo</td><td>10%</td><td>$200/mo</td></tr>
+                <tr><td>Discovery</td><td>1</td><td>$1,400/mo</td><td>25%</td><td>$350/mo</td></tr>
+                <tr><td>Pilot Proposal</td><td>0</td><td>—</td><td>—</td><td>—</td></tr>
+              </tbody>
+            </table>
+            <div class="demo-note" style="margin-top:14px;margin-bottom:0;">Rolls up separately from the B2C/local-B2B scorecard — grocery partnerships are a different revenue line with their own pilot terms and store-count math.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== EMAIL MARKETING ===================== -->
+    <section id="email" class="view">
+      <div class="topbar">
+        <div>
+          <h1>Email Marketing</h1>
+          <div class="meta">Automated sequences and one-off sends — no separate tool needed</div>
+        </div>
+        <button class="btn btn-primary">＋ New campaign</button>
+      </div>
+
+      <div class="view-body">
+        <div class="demo-note">◐ Sample data — sequences are built and armed; volume fills in once bookings start.</div>
+
+        <div class="grid stat-row">
+          <div class="stat-card"><div class="label">Active sequences</div><div class="value">2</div><div class="delta flat">Welcome · Review request</div></div>
+          <div class="stat-card"><div class="label">Emails sent (30 days)</div><div class="value">362</div><div class="delta up">↑ mostly build-in-public updates</div></div>
+          <div class="stat-card"><div class="label">Avg. open rate</div><div class="value">41%</div><div class="delta up">Above 25–30% industry norm</div></div>
+          <div class="stat-card"><div class="label">Avg. click rate</div><div class="value">8.4%</div><div class="delta flat">Mostly LOOP10 clicks</div></div>
+        </div>
+
+        <div class="grid two-col">
+          <div class="panel">
+            <h3>Sequences <span class="pill">Automated</span></h3>
+            <div class="list-row"><div><div class="who">Welcome Series</div><div class="when">3 steps · triggers on first booking</div></div><span class="tag done">Live</span></div>
+            <div class="list-row"><div><div class="who">Review Request</div><div class="when">1 step · triggers after delivery</div></div><span class="tag done">Live</span></div>
+            <div class="list-row"><div><div class="who">B2B Pilot Follow-up</div><div class="when">4 steps · triggers on trial start</div></div><span class="tag warn">Draft</span></div>
+            <div class="list-row"><div><div class="who">Win-back / re-engagement</div><div class="when">2 steps · triggers after 30 days idle</div></div><span class="tag warn">Draft</span></div>
+          </div>
+
+          <div class="panel">
+            <h3>Recent &amp; scheduled sends</h3>
+            <table>
+              <thead><tr><th>Campaign</th><th>Audience</th><th>Sent</th><th>Open</th><th>Click</th></tr></thead>
+              <tbody>
+                <tr><td>Launch Countdown — Day 3</td><td>All leads</td><td>Scheduled Jul 19</td><td>—</td><td>—</td></tr>
+                <tr><td>We're live! Book now</td><td>All leads</td><td>Scheduled Jul 22</td><td>—</td><td>—</td></tr>
+                <tr><td>Build-in-Public Update #6</td><td>Subscribers</td><td>340</td><td>38%</td><td>6%</td></tr>
+                <tr><td>LOOP10 Reminder</td><td>Started, didn't finish booking</td><td>22</td><td>51%</td><td>19%</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== GOOGLE & SOCIAL ===================== -->
+    <section id="social" class="view">
+      <div class="topbar">
+        <div>
+          <h1>Google &amp; Social</h1>
+          <div class="meta">Local SEO, Google Business Profile, and @getlooppr content — one view</div>
+        </div>
+        <button class="btn btn-primary">＋ Schedule post</button>
+      </div>
+
+      <div class="view-body">
+        <div class="demo-note">✓ Verified live, Jul 19 — fetched getlooppr.com directly: the crawler sees only the page title and meta description, nothing else. The meta description has been rewritten since it was last flagged (no longer gig-marketplace language), but the site still has zero local keywords and doesn't show up in Google at all yet — not even for "Looppr Edmond Oklahoma laundry."</div>
+
+        <div class="grid two-col">
+          <div class="panel">
+            <h3>Local SEO &amp; Google Business Profile <span class="pill">7 open</span></h3>
+            <div class="list-row"><div><div class="who">Claim &amp; verify Google Business Profile</div></div><span class="tag warn">Not started</span></div>
+            <div class="list-row"><div><div class="who">Meta description rewritten — no longer "gig-marketplace"</div><div class="when">Now: "book a laundry pickup in minutes... a trusted local laundry pro"</div></div><span class="tag warn">Partial fix</span></div>
+            <div class="list-row"><div><div class="who">Add "Edmond" &amp; "OKC" to title/description</div><div class="when">Current title: "Looppr — Laundry, handled." — zero location terms</div></div><span class="tag alert">Confirmed missing</span></div>
+            <div class="list-row"><div><div class="who">Server-render content for crawlers</div></div><span class="tag alert">Confirmed broken</span></div>
+            <div class="list-row"><div><div class="who">Site indexed by Google</div><div class="when">Zero results, including for your own brand name + city</div></div><span class="tag alert">Not indexed</span></div>
+            <div class="list-row"><div><div class="who">NAP consistency across directories</div></div><span class="tag warn">Not started</span></div>
+            <div class="list-row"><div><div class="who">LOOP10 offer live on GBP</div></div><span class="tag warn">Not started</span></div>
+          </div>
+
+          <div class="panel">
+            <h3>Local competitors <span class="pill">Verified live</span></h3>
+            <div class="list-row"><div><div class="who">Simply Tilly Laundry Co. — Edmond</div><div class="when">Wash &amp; fold · same founder-story positioning you're using</div></div><span class="tag alert">Direct overlap</span></div>
+            <div class="list-row"><div><div class="who">King's Green Cleaning (KingSpin) — Edmond &amp; OKC metro</div><div class="when">Wash &amp; fold pickup/delivery · same coverage area</div></div><span class="tag alert">Direct overlap</span></div>
+            <div class="list-row"><div><div class="who">"Laundry Loop" — GA/NM/MN (unrelated brand)</div><div class="when">Not a competitor, but dominates generic "laundry loop" search results</div></div><span class="tag warn">Name collision risk</span></div>
+            <div class="list-row"><div><div class="who">Lapels Cleaners, Tide Cleaners</div><div class="when">National chains, dry-cleaning-led, less direct overlap</div></div><span class="tag scheduled">Monitor</span></div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:16px;">
+          <h3>This week on @getlooppr <span class="pill">Launch Week</span></h3>
+          <div class="list-row"><div><div class="who">Instagram — "3 days to launch" countdown</div><div class="when">Scheduled Jul 20</div></div></div>
+          <div class="list-row"><div><div class="who">TikTok — Behind the scenes: first wash day</div><div class="when">Scheduled Jul 21</div></div></div>
+          <div class="list-row"><div><div class="who">Facebook + X — "We're live" launch post</div><div class="when">Scheduled Jul 22</div></div></div>
+          <div class="list-row"><div><div class="who">YouTube — 60-sec launch reel</div><div class="when">Draft</div></div></div>
+          <div class="list-row"><div><div class="who">All platforms — LOOP10 pinned post</div><div class="when">Live now</div></div><span class="tag done">Posted</span></div>
+        </div>
+
+        <div class="grid stat-row" style="margin-top:16px;">
+          <div class="stat-card"><div class="label">Google rating</div><div class="value">—</div><div class="delta flat">Pre-launch · target 4.8★</div></div>
+          <div class="stat-card"><div class="label">Indexed by Google</div><div class="value">No</div><div class="delta flat" style="color:var(--red);">Verified live, Jul 19</div></div>
+          <div class="stat-card"><div class="label">GBP checklist complete</div><div class="value">0 / 7</div><div class="delta flat">Priority before launch</div></div>
+          <div class="stat-card"><div class="label">Posts this week</div><div class="value">5</div><div class="delta up">On the 30-day calendar</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== DIGITAL OPTIMIZATION ===================== -->
+    <section id="optimize" class="view">
+      <div class="topbar">
+        <div>
+          <h1>Digital Optimization</h1>
+          <div class="meta">Conversion experiments and site performance for getlooppr.com</div>
+        </div>
+        <button class="btn btn-primary">＋ New experiment</button>
+      </div>
+
+      <div class="view-body">
+        <div class="demo-note">◐ Traffic/funnel numbers are illustrative — meaningful volume starts at launch. The search visibility stat below is a confirmed live check, not a sample.</div>
+
+        <div class="grid stat-row">
+          <div class="stat-card"><div class="label">Search visibility</div><div class="value">Not indexed</div><div class="delta flat" style="color:var(--red);">Verified live, Jul 19 — see Google &amp; Social</div></div>
+          <div class="stat-card"><div class="label">Avg. page load (mobile)</div><div class="value">3.4s</div><div class="delta flat" style="color:var(--red);">Target under 2.5s</div></div>
+          <div class="stat-card"><div class="label">Core Web Vitals</div><div class="value">Needs work</div><div class="delta flat">JS-render issue is the main driver</div></div>
+          <div class="stat-card"><div class="label">Active experiments</div><div class="value">2</div><div class="delta flat">Booking page · CTA copy</div></div>
+        </div>
+
+        <div class="grid two-col">
+          <div class="panel">
+            <h3>Active experiments <span class="pill">A/B</span></h3>
+            <div class="deal-card"><div class="biz">Booking page hero</div><div class="stakeholder">Control vs. "3 days left — LOOP10 ends soon" urgency banner</div><div class="next">50/50 split · Variant B +12% · 68% confidence (not yet significant)</div></div>
+            <div class="deal-card"><div class="biz">Primary CTA copy</div><div class="stakeholder">"Book a pickup" vs. "Get $10 off my first order"</div><div class="next">50/50 split · too early to call</div></div>
+            <div class="deal-card"><div class="biz">B2B intro form length</div><div class="stakeholder">Full form vs. name + email only, details on call</div><div class="next">Queued — starts after launch week</div></div>
+          </div>
+
+          <div class="panel">
+            <h3>Booking funnel <span class="pill">Illustrative</span></h3>
+            <div class="list-row"><div><div class="who">Landed on getlooppr.com</div></div><span class="tag scheduled">184</span></div>
+            <div class="list-row"><div><div class="who">Opened booking page</div></div><span class="tag scheduled">96 · 52%</span></div>
+            <div class="list-row"><div><div class="who">Started booking form</div></div><span class="tag warn">68 · 71%</span></div>
+            <div class="list-row"><div><div class="who">Completed booking</div></div><span class="tag mint">61 · 90%</span></div>
+            <h4 style="margin:16px 0 8px 0;font-size:12.5px;color:#5C7377;text-transform:uppercase;letter-spacing:0.4px;">Site health <span style="text-transform:none;letter-spacing:0;color:#04795E;">· verified live</span></h4>
+            <div class="list-row"><div><div class="who">Content server-rendered for crawlers</div></div><span class="tag alert">Confirmed broken</span></div>
+            <div class="list-row"><div><div class="who">Largest Contentful Paint</div></div><span class="tag warn">2.9s · needs improvement</span></div>
+            <div class="list-row"><div><div class="who">Cumulative Layout Shift</div></div><span class="tag done">Good</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== DATA COLLECTION ===================== -->
+    <section id="datacollection" class="view">
+      <div class="topbar">
+        <div>
+          <h1>Data Collection</h1>
+          <div class="meta">Every intake point, one view of what's captured and how well it converts</div>
+        </div>
+        <button class="btn btn-primary">＋ New form</button>
+      </div>
+
+      <div class="view-body">
+        <div class="demo-note">✓ Verified live, Jul 19 — getlooppr.com's own booking flow is still external (Google Form), not a page the site itself owns. Beyond the zero-tech-stack tradeoff already known, that also means the booking CTA itself can't be indexed by Google even after the crawler fix below — two separate problems with one shared solution: a native booking page.</div>
+
+        <div class="panel" style="margin-bottom:16px;">
+          <h3>Intake points</h3>
+          <table>
+            <thead><tr><th>Form</th><th>Location</th><th>Fields captured</th><th>Submissions (30d)</th><th>Completion</th></tr></thead>
+            <tbody>
+              <tr><td>Booking form <span class="tag alert" style="margin-left:4px;">External today</span></td><td>Google Form, linked from site</td><td>Name, address, phone, plan, notes</td><td>61</td><td><span class="tag done">74%</span></td></tr>
+              <tr><td>B2B partnership inquiry</td><td>Website contact form</td><td>Business name, contact, segment</td><td>6</td><td><span class="tag done">88%</span></td></tr>
+              <tr><td>Newsletter signup</td><td>Footer + social bio links</td><td>Email</td><td>340</td><td><span class="tag done">96%</span></td></tr>
+              <tr><td>Grocery pilot interest</td><td>Strategic Accounts outreach</td><td>Store count, contact, region</td><td>3</td><td><span class="tag done">100%</span></td></tr>
+              <tr><td>Review request</td><td>Post-delivery email/SMS</td><td>Star rating, comment</td><td>0</td><td><span class="tag warn">Pre-launch</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel">
+          <h3>Data quality</h3>
+          <div class="list-row"><div><div class="who">Contacts missing a phone number</div></div><span class="tag warn">1 of 5</span></div>
+          <div class="list-row"><div><div class="who">Possible duplicate contacts</div></div><span class="tag done">0 flagged</span></div>
+          <div class="list-row"><div><div class="who">Unverified emails</div></div><span class="tag warn">2 of 5</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== REQUESTS ===================== -->
+    <section id="requests" class="view">
+      <div class="topbar">
+        <div>
+          <h1>Requests</h1>
+          <div class="meta">Every reschedule, special instruction, and inquiry — one inbox</div>
+        </div>
+        <button class="btn btn-ghost">Mark all read</button>
+      </div>
+
+      <div class="view-body">
+        <div class="demo-note">◐ Sample data — pulls in from the booking page, SMS, email, and social DMs once live.</div>
+
+        <div class="grid stat-row">
+          <div class="stat-card"><div class="label">Open requests</div><div class="value">3</div><div class="delta flat">2 new · 1 in progress</div></div>
+          <div class="stat-card"><div class="label">Avg. response time</div><div class="value">—</div><div class="delta flat">Tracked once live</div></div>
+          <div class="stat-card"><div class="label">Resolved this week</div><div class="value">1</div><div class="delta flat">Instagram DM, answered</div></div>
+          <div class="stat-card"><div class="label">Top channel</div><div class="value">Booking page</div><div class="delta flat">Most requests arrive here</div></div>
+        </div>
+
+        <div class="panel">
+          <h3>Inbox</h3>
+          <table>
+            <thead><tr><th>Type</th><th>From</th><th>Channel</th><th>Received</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Reschedule pickup</td><td>M. Alvarez</td><td>Booking page</td><td>Jul 19</td><td><span class="tag alert">New</span></td></tr>
+              <tr><td>Special instructions — cold wash only</td><td>R. Chen</td><td>SMS</td><td>Jul 18</td><td><span class="tag warn">In progress</span></td></tr>
+              <tr><td>Partnership inquiry</td><td>Glow Studio Salon</td><td>Website contact form</td><td>Jul 17</td><td><span class="tag alert">New</span></td></tr>
+              <tr><td>Pricing question</td><td>Instagram DM</td><td>Social</td><td>Jul 16</td><td><span class="tag done">Resolved</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== REVIEWS ===================== -->
+    <section id="reviews" class="view">
+      <div class="topbar">
+        <div>
+          <h1>Reviews</h1>
+          <div class="meta">Requests, responses, and your Google rating in one place</div>
+        </div>
+        <button class="btn btn-ghost">Review templates</button>
+      </div>
+
+      <div class="view-body">
+        <div class="demo-note">◐ No reviews yet — request automation fires after a customer's first completed delivery. Target: 10 Google reviews by Week 8.</div>
+
+        <div class="grid stat-row">
+          <div class="stat-card"><div class="label">Google rating</div><div class="value">—</div><div class="delta flat">0 reviews so far</div></div>
+          <div class="stat-card"><div class="label">Review requests armed</div><div class="value">5</div><div class="delta flat">Queued behind first deliveries</div></div>
+          <div class="stat-card"><div class="label">Target by Week 8</div><div class="value">10</div><div class="delta flat">Phase-gate metric</div></div>
+          <div class="stat-card"><div class="label">Response rate goal</div><div class="value">100%</div><div class="delta flat">Every review gets a reply</div></div>
+        </div>
+
+        <div class="panel">
+          <h3>Review request queue <span class="pill">Sends after delivery</span></h3>
+          <div class="list-row"><div><div class="who">M. Alvarez</div><div class="when">First pickup pending — fires on delivery</div></div><span class="tag scheduled">Queued</span></div>
+          <div class="list-row"><div><div class="who">R. Chen</div><div class="when">First pickup pending — fires on delivery</div></div><span class="tag scheduled">Queued</span></div>
+          <div class="list-row"><div><div class="who">T. Nguyen</div><div class="when">First pickup pending — fires on delivery</div></div><span class="tag scheduled">Queued</span></div>
+          <div class="list-row"><div><div class="who">J. Patel</div><div class="when">Delivered Jul 19 — request sent</div></div><span class="tag warn">Awaiting response</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SCORECARD ===================== -->
+    <section id="scorecard" class="view">
+      <div class="topbar">
+        <div>
+          <h1>Weekly Scorecard</h1>
+          <div class="meta">Same cadence as the Monday scorecard — now it fills itself in</div>
+        </div>
+        <button class="btn btn-ghost">Export ↗</button>
+      </div>
+
+      <div class="view-body">
+        <div class="panel">
+          <h3>This week vs. phase-gate targets</h3>
+          <table class="metric-table">
+            <thead><tr><th>Metric</th><th>This week</th><th>Week 4 target</th><th>Owner</th><th></th></tr></thead>
+            <tbody>
+              <tr><td>Weekly recurring pickups</td><td>0</td><td class="metric-target">10 customers</td><td>Jeffrey</td><td><span class="metric-status tag warn">Pre-launch</span></td></tr>
+              <tr><td>B2B trials active</td><td>2</td><td class="metric-target">2 trials</td><td>Jeffrey</td><td><span class="metric-status tag done">On track</span></td></tr>
+              <tr><td>Google reviews collected</td><td>0</td><td class="metric-target">10 by Week 8</td><td>Maudlin</td><td><span class="metric-status tag warn">Not started</span></td></tr>
+              <tr><td>Content posted (build in public)</td><td>5</td><td class="metric-target">Daily cadence</td><td>Maudlin</td><td><span class="metric-status tag done">On track</span></td></tr>
+              <tr><td>Driver utilization</td><td>—</td><td class="metric-target">Tracked from launch</td><td>Jeffrey</td><td><span class="metric-status tag warn">Not tracked yet</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== INSIGHTS & REPORTS ===================== -->
+    <section id="insights" class="view">
+      <div class="topbar">
+        <div>
+          <h1>Insights &amp; Reports</h1>
+          <div class="meta">The trends behind the weekly scorecard</div>
+        </div>
+        <button class="btn btn-ghost">Export ↗</button>
+      </div>
+
+      <div class="view-body">
+        <div class="demo-note">◐ Illustrative Week 6 snapshot — shows the shape of these reports once real orders are flowing.</div>
+
+        <div class="grid two-col">
+          <div class="panel">
+            <h3>Revenue by segment <span class="pill">Sample · $3,000/wk</span></h3>
+            <div class="phase-track">
+              <div class="phase">
+                <div class="phase-head">B2C Recurring <span class="sub">$1,860 · 62%</span></div>
+                <div class="bar-track"><div class="bar-fill" style="width:62%"></div></div>
+              </div>
+              <div class="phase">
+                <div class="phase-head">Local B2B <span class="sub">$720 · 24%</span></div>
+                <div class="bar-track"><div class="bar-fill" style="width:24%"></div></div>
+              </div>
+              <div class="phase">
+                <div class="phase-head">Strategic Accounts <span class="sub">$420 · 14%</span></div>
+                <div class="bar-track"><div class="bar-fill" style="width:14%"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <h3>Acquisition funnel <span class="pill">Sample</span></h3>
+            <div class="list-row"><div><div class="who">Leads</div></div><span class="tag scheduled">184</span></div>
+            <div class="list-row"><div><div class="who">Booked first pickup</div></div><span class="tag scheduled">61 · 33%</span></div>
+            <div class="list-row"><div><div class="who">Completed first order</div></div><span class="tag mint">58 · 95%</span></div>
+            <div class="list-row"><div><div class="who">Became repeat customer</div></div><span class="tag done">39 · 67%</span></div>
+            <h4 style="margin:16px 0 8px 0;font-size:12.5px;color:#5C7377;text-transform:uppercase;letter-spacing:0.4px;">By channel</h4>
+            <div class="list-row"><div><div class="who">Organic social</div></div><span class="tag scheduled">44%</span></div>
+            <div class="list-row"><div><div class="who">Referral</div></div><span class="tag scheduled">28%</span></div>
+            <div class="list-row"><div><div class="who">Google / local search</div></div><span class="tag scheduled">18%</span></div>
+            <div class="list-row"><div><div class="who">Direct</div></div><span class="tag scheduled">10%</span></div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:16px;">
+          <h3>Driver utilization <span class="pill">Newly tracked</span></h3>
+          <div class="grid stat-row" style="margin-bottom:0;">
+            <div class="stat-card"><div class="label">Stops per hour</div><div class="value">3.2</div><div class="delta flat">Sample · Jeffrey solo</div></div>
+            <div class="stat-card"><div class="label">Miles per stop</div><div class="value">2.8</div><div class="delta flat">Route-optimized</div></div>
+            <div class="stat-card"><div class="label">Utilization vs. target</div><div class="value">71%</div><div class="delta up">Target 80%+</div></div>
+            <div class="stat-card"><div class="label">Idle time / route</div><div class="value">18 min</div><div class="delta flat">Mostly folding wait</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== ACTIVITY LOG ===================== -->
+    <section id="activitylog" class="view">
+      <div class="topbar">
+        <div>
+          <h1>Activity Log</h1>
+          <div class="meta">A real-time audit trail — every action, every automation, who did what</div>
+        </div>
+        <button class="btn btn-ghost">Export ↗</button>
+      </div>
+
+      <div class="view-body">
+        <div class="demo-note">◐ Sample data — every module writes here: bookings, CRM changes, automation runs, and manual edits.</div>
+
+        <div class="panel">
+          <h3>Recent activity</h3>
+          <div class="list-row"><div><div class="who">Welcome Series email sent to M. Alvarez</div><div class="when">Automation · Email Marketing</div></div><span class="when">Jul 19, 9:02 AM</span></div>
+          <div class="list-row"><div><div class="who">Jeffrey moved Crest Foods to "Discovery"</div><div class="when">Jeffrey · Strategic Accounts</div></div><span class="when">Jul 19, 8:40 AM</span></div>
+          <div class="list-row"><div><div class="who">New booking: R. Chen, Weekly plan</div><div class="when">System · Bookings</div></div><span class="when">Jul 18, 4:15 PM</span></div>
+          <div class="list-row"><div><div class="who">Maudlin added a note to Sunset Fitness</div><div class="when">Maudlin · CRM &amp; Pipeline</div></div><span class="when">Jul 18, 2:05 PM</span></div>
+          <div class="list-row"><div><div class="who">Review request sent to J. Patel</div><div class="when">Automation · Reviews</div></div><span class="when">Jul 19, 7:30 AM</span></div>
+          <div class="list-row"><div><div class="who">Unassigned-pickup alert triggered for Jul 22</div><div class="when">Automation · Jobs &amp; Routes</div></div><span class="when">Jul 19, 6:00 AM</span></div>
+          <div class="list-row"><div><div class="who">Jeffrey edited meta description on getlooppr.com</div><div class="when">Jeffrey · Digital Optimization</div></div><span class="when">Jul 17, 11:20 AM</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== PERFORMANCE MONITORING ===================== -->
+    <section id="performance" class="view">
+      <div class="topbar">
+        <div>
+          <h1>Performance</h1>
+          <div class="meta">Platform health — uptime, integrations, and automation reliability</div>
+        </div>
+        <button class="btn btn-ghost">View incident history ↗</button>
+      </div>
+
+      <div class="view-body">
+        <div class="demo-note">◐ Sample data — this is what "system health" looks like once real traffic and automations are running.</div>
+
+        <div class="grid stat-row">
+          <div class="stat-card"><div class="label">Uptime (30d)</div><div class="value">99.9%</div><div class="delta up">Booking page &amp; site</div></div>
+          <div class="stat-card"><div class="label">Booking page response</div><div class="value">3.4s</div><div class="delta flat" style="color:var(--red);">Slower than target</div></div>
+          <div class="stat-card"><div class="label">Automation success rate</div><div class="value">100%</div><div class="delta up">0 failures, 7 days</div></div>
+          <div class="stat-card"><div class="label">Integration errors (7d)</div><div class="value">0</div><div class="delta flat">Email + SMS delivery</div></div>
+        </div>
+
+        <div class="grid two-col">
+          <div class="panel">
+            <h3>System status</h3>
+            <div class="list-row"><div><div class="who">Site hosting — Vercel</div></div><span class="tag done"><span class="dot live" style="margin-right:5px;"></span>Operational</span></div>
+            <div class="list-row"><div><div class="who">Server-side rendering / prerendering</div><div class="when">Root cause of the crawler + indexing issue</div></div><span class="tag alert">Not configured</span></div>
+            <div class="list-row"><div><div class="who">Booking page — getlooppr.com/book</div></div><span class="tag done"><span class="dot live" style="margin-right:5px;"></span>Operational</span></div>
+            <div class="list-row"><div><div class="who">Email delivery</div></div><span class="tag done"><span class="dot live" style="margin-right:5px;"></span>Operational</span></div>
+            <div class="list-row"><div><div class="who">SMS delivery</div></div><span class="tag done"><span class="dot live" style="margin-right:5px;"></span>Operational</span></div>
+            <div class="list-row"><div><div class="who">Payment processing (Venmo → moving to Stripe)</div></div><span class="tag warn"><span class="dot planned" style="margin-right:5px;"></span>Manual</span></div>
+            <div class="list-row"><div><div class="who">Google Business Profile sync</div></div><span class="tag alert">Not connected</span></div>
+          </div>
+
+          <div class="panel">
+            <h3>Automation run log <span class="pill">7 days</span></h3>
+            <table>
+              <thead><tr><th>Automation</th><th>Last run</th><th>Success</th><th>Failures</th></tr></thead>
+              <tbody>
+                <tr><td>Welcome Series</td><td>Jul 19, 9:02 AM</td><td>100%</td><td>0</td></tr>
+                <tr><td>Review Request</td><td>Jul 19, 7:30 AM</td><td>100%</td><td>0</td></tr>
+                <tr><td>Unassigned-pickup alert</td><td>Jul 19, 6:00 AM</td><td>100%</td><td>0</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== AUTOMATIONS ===================== -->
+    <section id="automations" class="view">
+      <div class="topbar">
+        <div>
+          <h1>Automations</h1>
+          <div class="meta">Every trigger-based rule running across the platform, in one index</div>
+        </div>
+        <button class="btn btn-primary">＋ New automation</button>
+      </div>
+
+      <div class="view-body">
+        <div class="demo-note">◐ These are the rules already powering Email Marketing, Reviews, and Jobs &amp; Routes — this index just makes them visible and editable in one place instead of buried inside each module.</div>
+
+        <div class="panel">
+          <h3>Active &amp; draft rules</h3>
+          <table>
+            <thead><tr><th>Trigger</th><th>Action</th><th>Lives in</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>Customer books first pickup</td><td>Send Welcome Series (3 emails)</td><td>Email Marketing</td><td><span class="tag done">Live</span></td></tr>
+              <tr><td>Job marked "Delivered"</td><td>Send review request</td><td>Reviews</td><td><span class="tag done">Live</span></td></tr>
+              <tr><td>Pickup slot unassigned 24 hrs out</td><td>Flag on Dashboard</td><td>Jobs &amp; Routes</td><td><span class="tag done">Live</span></td></tr>
+              <tr><td>B2B account enters "Trial"</td><td>Start 4-step follow-up sequence</td><td>Email Marketing</td><td><span class="tag warn">Draft</span></td></tr>
+              <tr><td>Customer idle 30+ days</td><td>Send win-back offer</td><td>Email Marketing</td><td><span class="tag warn">Draft</span></td></tr>
+              <tr><td>New review under 4★</td><td>Alert Jeffrey + draft a response</td><td>Reviews</td><td><span class="tag warn">Draft</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <footer class="mockup-foot">
+      Looppr OS — a platform concept combining scheduling (Calendly-style), job/route management (Jobber-style), and CRM/pipeline (HubSpot-style) into one app built around your actual GTM plan. This is a clickable design mockup, not a live application — sample data throughout.
+    </footer>
+
+  </main>
+</div>
+
+<script>
+  const navItems = document.querySelectorAll('.nav-item[data-view]');
+  const views = document.querySelectorAll('.view');
+
+  function switchView(id){
+    navItems.forEach(b=>b.classList.remove('active'));
+    const btn = document.querySelector('.nav-item[data-view="'+id+'"]');
+    if(btn) btn.classList.add('active');
+    views.forEach(v=>v.classList.remove('active'));
+    const sec = document.getElementById(id);
+    if(sec) sec.classList.add('active');
+  }
+  navItems.forEach(btn=>{
+    btn.addEventListener('click', ()=> switchView(btn.dataset.view));
+  });
+
+  const jToggle = document.querySelectorAll('.view-toggle button');
+  jToggle.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      jToggle.forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('jv-board').style.display = btn.dataset.jv==='board' ? 'block' : 'none';
+      document.getElementById('jv-route').style.display = btn.dataset.jv==='route' ? 'block' : 'none';
+    });
+  });
+
+  const cTabs = document.querySelectorAll('.crm-tabs button');
+  cTabs.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      cTabs.forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('cv-customers').style.display = btn.dataset.cv==='customers' ? 'grid' : 'none';
+      document.getElementById('cv-pipeline').style.display = btn.dataset.cv==='pipeline' ? 'grid' : 'none';
+    });
+  });
+
+  /* ---- Market switcher ---- */
+  const marketData = {
+    all:{label:'All Markets', dot:'live', pickups:'0', pickupsSub:'North-star metric · pre-launch', leads:'14', leadsSub:'↑ across OKC Metro (only live market)', trials:'2', trialsSub:'Sunset Fitness · Maple Daycare', revenue:'$0', revenueSub:'Tracking toward Week 13 goal'},
+    okc:{label:'OKC Metro', dot:'live', pickups:'0', pickupsSub:'North-star metric · pre-launch', leads:'14', leadsSub:'↑ from booking page + outreach', trials:'2', trialsSub:'Sunset Fitness · Maple Daycare', revenue:'$0', revenueSub:'Tracking toward Week 13 goal'},
+    dfw:{label:'Dallas–Fort Worth', dot:'planned', pickups:'—', pickupsSub:'Not yet launched', leads:'0', leadsSub:'No outreach started', trials:'0', trialsSub:'No accounts yet', revenue:'—', revenueSub:'Not yet launched'},
+    atl:{label:'Atlanta', dot:'planned', pickups:'—', pickupsSub:'Not yet launched', leads:'0', leadsSub:'No outreach started', trials:'0', trialsSub:'No accounts yet', revenue:'—', revenueSub:'Not yet launched'}
+  };
+
+  function setMarket(id){
+    const m = marketData[id];
+    if(!m) return;
+    document.getElementById('marketLabel').textContent = m.label;
+    document.getElementById('marketDot').className = 'dot ' + m.dot;
+    document.getElementById('dash-pickups').textContent = m.pickups;
+    document.getElementById('dash-pickups-sub').textContent = m.pickupsSub;
+    document.getElementById('dash-leads').textContent = m.leads;
+    document.getElementById('dash-leads-sub').textContent = m.leadsSub;
+    document.getElementById('dash-trials').textContent = m.trials;
+    document.getElementById('dash-trials-sub').textContent = m.trialsSub;
+    document.getElementById('dash-revenue').textContent = m.revenue;
+    document.getElementById('dash-revenue-sub').textContent = m.revenueSub;
+    document.getElementById('market-banner').style.display = (id==='dfw'||id==='atl') ? 'flex' : 'none';
+    document.getElementById('marketMenu').classList.remove('open');
+    switchView('dashboard');
+  }
+
+  const marketSwitch = document.getElementById('marketSwitch');
+  const marketMenu = document.getElementById('marketMenu');
+  marketSwitch.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    marketMenu.classList.toggle('open');
+  });
+  marketMenu.querySelectorAll('button[data-market]').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      setMarket(btn.dataset.market);
+    });
+  });
+  document.addEventListener('click', ()=> marketMenu.classList.remove('open'));
+</script>
+
+</body>
+</html>

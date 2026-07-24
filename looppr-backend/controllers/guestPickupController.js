@@ -17,6 +17,9 @@ function guestPublic(pickup) {
     preferredDate: pickup.preferredDate,
     window: pickup.window,
     loadSize: pickup.loadSize,
+    foldStyle: pickup.foldStyle,
+    detergent: pickup.detergent,
+    waterTemperature: pickup.waterTemperature,
     notes: pickup.notes,
     deliveryWindow: pickup.deliveryWindow,
     deliveryAddress: pickup.deliveryAddress,
@@ -39,7 +42,7 @@ async function findGuestPickupByToken(id, token) {
 }
 
 export const createGuestPickup = asyncHandler(async (req, res) => {
-  const { guest, address, preferredDate, window, loadSize, notes, deliveryWindow, deliveryAddress } = req.body
+  const { guest, address, preferredDate, window, loadSize, foldStyle, detergent, waterTemperature, notes, deliveryWindow, deliveryAddress } = req.body
 
   const guestAccessToken = crypto.randomBytes(24).toString('hex')
 
@@ -57,6 +60,9 @@ export const createGuestPickup = asyncHandler(async (req, res) => {
     preferredDate,
     window,
     loadSize,
+    foldStyle,
+    detergent,
+    waterTemperature,
     notes,
     deliveryWindow,
     deliveryAddress,

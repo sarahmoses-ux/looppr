@@ -1,5 +1,5 @@
 import StatusBadge from './StatusBadge'
-import { formatCurrency, formatDate, LOAD_SIZE_LABELS, orderRef, WINDOW_LABELS } from './businessUi'
+import { FOLD_STYLE_LABELS, formatCurrency, formatDate, LOAD_SIZE_LABELS, orderRef, WINDOW_LABELS } from './businessUi'
 
 // Shared table used by Laundry Requests and Active Orders. `emptyLabel`
 // tailors the empty state per section.
@@ -12,6 +12,7 @@ export default function OrdersTable({ pickups, emptyLabel = 'No orders to show.'
             <th className="px-4 py-3 font-semibold">Order</th>
             <th className="px-4 py-3 font-semibold">Pickup</th>
             <th className="px-4 py-3 font-semibold">Load</th>
+            <th className="px-4 py-3 font-semibold">Fold</th>
             <th className="px-4 py-3 font-semibold">Location</th>
             <th className="px-4 py-3 font-semibold">Status</th>
             <th className="px-4 py-3 text-right font-semibold">Amount</th>
@@ -20,7 +21,7 @@ export default function OrdersTable({ pickups, emptyLabel = 'No orders to show.'
         <tbody className="divide-y divide-line">
           {pickups.length === 0 ? (
             <tr>
-              <td colSpan={6} className="px-4 py-10 text-center text-sm text-ink/45">{emptyLabel}</td>
+              <td colSpan={7} className="px-4 py-10 text-center text-sm text-ink/45">{emptyLabel}</td>
             </tr>
           ) : (
             pickups.map((p) => (
@@ -31,6 +32,7 @@ export default function OrdersTable({ pickups, emptyLabel = 'No orders to show.'
                   <div className="text-xs text-ink/45">{WINDOW_LABELS[p.window]}</div>
                 </td>
                 <td className="px-4 py-3 text-ink/70">{LOAD_SIZE_LABELS[p.loadSize] || p.loadSize}</td>
+                <td className="px-4 py-3 text-ink/70">{FOLD_STYLE_LABELS[p.foldStyle] || 'Standard fold'}</td>
                 <td className="px-4 py-3 text-ink/70">{p.address?.city}, {p.address?.state}</td>
                 <td className="px-4 py-3"><StatusBadge status={p.status} /></td>
                 <td className="px-4 py-3 text-right font-medium text-ink/80">{formatCurrency(p.pricing?.amount)}</td>

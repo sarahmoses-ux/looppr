@@ -1,6 +1,8 @@
+import { Link } from 'react-router-dom'
 import Button from '../components/Button'
 import SEO from '../components/SEO'
 import { BUSINESS_PLANS } from '../data/pricingPlans'
+import { BUSINESS_STEPS } from '../data/businessSteps'
 import { PUBLIC_PAGES } from '../seo/publicPages'
 import { breadcrumbJsonLd, serviceJsonLd } from '../seo/structuredData'
 
@@ -12,56 +14,30 @@ const SERVICE_JSON_LD = serviceJsonLd({
 
 const PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/business')
 
-const WHAT_YOU_GET = [
-  { title: '8-hour turnaround SLA', body: 'Guaranteed, in writing.' },
-  { title: 'Same laundromat every time', body: 'A consistent partner who knows your account.' },
-  { title: 'Dedicated account manager', body: 'For any account over 50 lbs/day.' },
-  { title: 'First week free', body: 'No contract, no credit card to start.' },
-]
-
 const SEGMENTS = [
   {
+    slug: 'airbnb-hosts',
     title: 'Airbnb superhosts',
     range: '8–20 lbs/day',
     body: 'Turn over linens between every guest, on time, without touching a washer.',
   },
   {
+    slug: 'boutique-hotels',
     title: 'Boutique hotels',
     range: '50–200 lbs/day',
     body: 'Linens, towels and staff uniforms — daily or on surge, handled reliably.',
   },
   {
+    slug: 'gyms-studios',
     title: 'Gyms & studios',
     range: '30–80 lbs/day',
     body: 'Towels, mats and apparel on a predictable schedule your members rely on.',
   },
   {
+    slug: 'med-spas-salons',
     title: 'Med spas & salons',
     range: '10–30 lbs/day',
     body: 'Robes and treatment linens returned with premium, gentle care.',
-  },
-]
-
-const STEPS = [
-  {
-    n: '1',
-    title: 'Onboarding call',
-    body: 'We map your volume, schedule and linen types, then match a partner laundromat.',
-  },
-  {
-    n: '2',
-    title: 'Daily pickups begin',
-    body: 'A driver collects at the same time each day. Track every bag in the dashboard.',
-  },
-  {
-    n: '3',
-    title: 'Back within 8 hours',
-    body: 'Clean, folded and sorted to your spec — guaranteed by the SLA.',
-  },
-  {
-    n: '4',
-    title: 'One monthly invoice',
-    body: "No per-order accounting. One clean statement at month's end.",
   },
 ]
 
@@ -110,29 +86,46 @@ export default function Business() {
             </p>
           </div>
 
-          <div className="rounded-3xl border border-white/15 bg-white/[0.06] p-7 backdrop-blur">
+          <div className="flex flex-col gap-4">
             <p className="text-xs font-semibold uppercase tracking-[0.06em] text-white/50">
-              What you get
+              Business pricing
             </p>
-            <div className="mt-4 flex flex-col gap-4">
-              {WHAT_YOU_GET.map((item) => (
-                <div key={item.title} className="flex items-start gap-3">
-                  <svg viewBox="0 0 20 20" className="mt-0.5 h-4 w-4 shrink-0 text-[#5DCAA5]" fill="none" aria-hidden="true">
-                    <path
-                      d="M4 10.5l3.5 3.5L16 6"
-                      stroke="currentColor"
-                      strokeWidth="1.75"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  <div>
-                    <p className="text-sm font-semibold text-white">{item.title}</p>
-                    <p className="mt-0.5 text-xs text-periwinkle-muted">{item.body}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            {BUSINESS_PLANS.map((plan) => (
+              <div
+                key={plan.name}
+                className={`rounded-3xl border p-6 ${
+                  plan.highlight
+                    ? 'border-transparent bg-gradient-to-br from-periwinkle to-periwinkle-text shadow-[0_26px_60px_-20px_rgba(124,115,230,0.45)]'
+                    : 'border-white/15 bg-white/[0.06] backdrop-blur'
+                }`}
+              >
+                <p className="text-sm font-semibold text-white">{plan.name}</p>
+                <p className="mt-2 flex items-baseline gap-1">
+                  <span className="font-display text-3xl font-semibold text-white">{plan.price}</span>
+                  <span className="text-sm text-white/60">{plan.unit}</span>
+                </p>
+                <p className="mt-1 text-xs text-white/70">{plan.detail}</p>
+                <ul className="mt-4 space-y-1.5">
+                  {plan.features.slice(0, 3).map((f) => (
+                    <li key={f} className="flex items-start gap-2 text-xs text-white/80">
+                      <svg viewBox="0 0 20 20" className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#5DCAA5]" fill="none" aria-hidden="true">
+                        <path
+                          d="M4 10.5l3.5 3.5L16 6"
+                          stroke="currentColor"
+                          strokeWidth="1.75"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Button to={plan.to} variant={plan.highlight ? 'inverse' : 'ghost-light'} className="mt-5 w-full">
+                  {plan.cta}
+                </Button>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -149,7 +142,11 @@ export default function Business() {
           </div>
           <div className="mt-10 grid gap-3.5 sm:grid-cols-2">
             {SEGMENTS.map((s) => (
-              <div key={s.title} className="rounded-2xl border border-line bg-linen-soft p-6">
+              <Link
+                key={s.title}
+                to={`/business/${s.slug}`}
+                className="group rounded-2xl border border-line bg-linen-soft p-6 transition-colors hover:border-periwinkle-muted hover:bg-white"
+              >
                 <div className="flex items-center justify-between">
                   <span className="rounded-lg bg-periwinkle-soft px-2.5 py-2 text-periwinkle-text">
                     <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
@@ -162,7 +159,13 @@ export default function Business() {
                 </div>
                 <h3 className="mt-4 text-base font-semibold text-ink">{s.title}</h3>
                 <p className="mt-1.5 text-sm leading-relaxed text-ink/60">{s.body}</p>
-              </div>
+                <span className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-periwinkle-text">
+                  See details
+                  <svg viewBox="0 0 20 20" className="h-4 w-4 transition-transform group-hover:translate-x-0.5" fill="none" aria-hidden="true">
+                    <path d="M4 10h11m0 0l-4-4m4 4l-4 4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+              </Link>
             ))}
           </div>
         </div>
@@ -179,7 +182,7 @@ export default function Business() {
             </h2>
           </div>
           <div className="mt-10 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
-            {STEPS.map((step) => (
+            {BUSINESS_STEPS.map((step) => (
               <div key={step.n} className="rounded-2xl border border-line bg-white p-6">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-ink font-display text-sm font-semibold text-white">
                   {step.n}

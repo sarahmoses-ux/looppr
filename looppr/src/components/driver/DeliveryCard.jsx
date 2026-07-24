@@ -2,6 +2,7 @@ import { useState } from 'react'
 import StageBadge from './StageBadge'
 import {
   displayWeight,
+  FOLD_STYLE_LABELS,
   formatAddress,
   formatCurrency,
   formatDate,
@@ -73,6 +74,7 @@ export default function DeliveryCard({ delivery, onAccept, onReject, onAdvance, 
         <Field label="Pickup address">{formatAddress(delivery.address)}</Field>
         <Field label="Delivery address">{delivery.deliveryAddress ? formatAddress(delivery.deliveryAddress) : 'Same as pickup'}</Field>
         <Field label="Weight">{displayWeight(delivery)}</Field>
+        <Field label="Fold style">{FOLD_STYLE_LABELS[delivery.foldStyle] || 'Standard fold'}</Field>
         <Field label="Pickup window">{formatDate(delivery.preferredDate)} · {WINDOW_LABELS[delivery.window]?.split(' ')[0]}</Field>
         <Field label="Delivery window">{WINDOW_LABELS[delivery.deliveryWindow]?.split(' ')[0] || '—'}</Field>
         <Field label="Delivery fee">{formatCurrency(delivery.pricing?.deliveryFee)}</Field>

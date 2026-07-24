@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  html { scroll-behavior:smooth; }
+  body { margin:0; background:#F8F7FF; }
+</style>
+</helmet>
+<div style="font-family:'Hanken Grotesk',system-ui,sans-serif; color:#1E1B4B; background:#F8F7FF; overflow-x:hidden;">
+  <dc-import name="SiteNav" active="pricing" hint-size="100%,66px"></dc-import>
+
+  <!-- Hero -->
+  <section style="position:relative; padding:84px 24px 56px; text-align:center; overflow:hidden;">
+    <div style="position:absolute; inset:0; pointer-events:none; background:radial-gradient(ellipse 50% 60% at 50% 16%, #D7D3F7 0%, transparent 60%); opacity:.7;"></div>
+    <div style="position:relative; max-width:680px; margin:0 auto;">
+      <p style="font-size:13px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:#7C73E6; margin:0 0 14px;">Pricing</p>
+      <h1 style="font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(2.4rem,5.5vw,3.8rem); font-weight:600; letter-spacing:-.025em; color:#1E1B4B; margin:0 0 18px; line-height:1.06;">Pay by the pound.<br>No surprises, ever.</h1>
+      <p style="font-size:18px; color:#5A52C5; line-height:1.6; margin:0 0 8px;">$1.59 per pound for wash &amp; fold. Subscribe and delivery is free. Your first pickup is always on us.</p>
+    </div>
+  </section>
+
+  <!-- Plan cards -->
+  <section style="padding:8px 24px 84px;">
+    <div style="max-width:1080px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; align-items:start;">
+      <div data-reveal style="background:#fff; border:1px solid #E8E6F4; border-radius:22px; padding:32px;">
+        <p style="font-size:14px; font-weight:600; color:#5A52C5; margin:0 0 12px;">Pay-per-use</p>
+        <p style="font-family:'Bricolage Grotesque',sans-serif; font-size:44px; font-weight:600; color:#1E1B4B; line-height:1; margin:0;">$0<span style="font-size:17px; font-weight:400; color:#8885A0;">/mo</span></p>
+        <p style="font-size:13.5px; color:#8885A0; margin:8px 0 24px;">No subscription. Order when you need it.</p>
+        <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:28px;">
+          <p style="display:flex; gap:10px; font-size:14px; color:#5A52C5; margin:0;"><span style="color:#1D9E75;">✓</span>$1.59 per lb, wash &amp; fold</p>
+          <p style="display:flex; gap:10px; font-size:14px; color:#5A52C5; margin:0;"><span style="color:#1D9E75;">✓</span>$4.99 delivery per order</p>
+          <p style="display:flex; gap:10px; font-size:14px; color:#5A52C5; margin:0;"><span style="color:#1D9E75;">✓</span>Real-time order tracking</p>
+          <p style="display:flex; gap:10px; font-size:14px; color:#5A52C5; margin:0;"><span style="color:#1D9E75;">✓</span>Saved wash preferences</p>
+          <p style="display:flex; gap:10px; font-size:14px; color:#5A52C5; margin:0;"><span style="color:#1D9E75;">✓</span>100% of tips to your driver</p>
+        </div>
+        <a href="Checkout.dc.html#free" style="display:block; text-align:center; border:1.5px solid #DDDCF0; color:#5A52C5; padding:13px; border-radius:11px; font-size:14.5px; font-weight:600; text-decoration:none; transition:border-color .15s,color .15s;" style-hover="border-color:#AFA9EC; color:#1E1B4B;">Get started free</a>
+      </div>
+      <div data-reveal data-reveal-delay="90" style="background:linear-gradient(165deg,#8b83e6,#6c63d4); border-radius:22px; padding:32px; position:relative; box-shadow:0 26px 60px rgba(100,92,210,.32);">
+        <div style="position:absolute; top:-12px; left:50%; transform:translateX(-50%); background:#EF9F27; color:#412402; font-size:11px; font-weight:700; padding:4px 14px; border-radius:20px; white-space:nowrap;">MOST POPULAR</div>
+        <p style="font-size:14px; font-weight:600; color:rgba(255,255,255,.85); margin:0 0 12px;">Looppr+</p>
+        <p style="font-family:'Bricolage Grotesque',sans-serif; font-size:44px; font-weight:600; color:#fff; line-height:1; margin:0;">$14.99<span style="font-size:17px; font-weight:400; opacity:.75;">/mo</span></p>
+        <p style="font-size:13.5px; color:rgba(255,255,255,.8); margin:8px 0 24px;">Pays for itself at 3 orders a month.</p>
+        <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:28px;">
+          <p style="display:flex; gap:10px; font-size:14px; color:#fff; margin:0;"><span>✓</span>$1.59 per lb, wash &amp; fold</p>
+          <p style="display:flex; gap:10px; font-size:14px; color:#fff; margin:0;"><span>✓</span>Free delivery on every order</p>
+          <p style="display:flex; gap:10px; font-size:14px; color:#fff; margin:0;"><span>✓</span>Priority driver matching</p>
+          <p style="display:flex; gap:10px; font-size:14px; color:#fff; margin:0;"><span>✓</span>10% off express upgrades</p>
+          <p style="display:flex; gap:10px; font-size:14px; color:#fff; margin:0;"><span>✓</span>Favorite laundromat always first</p>
+          <p style="display:flex; gap:10px; font-size:14px; color:#fff; margin:0;"><span>✓</span>Order streak rewards</p>
+        </div>
+        <a href="Checkout.dc.html#plus" style="display:block; text-align:center; background:#fff; color:#5A52C5; padding:13px; border-radius:11px; font-size:14.5px; font-weight:600; text-decoration:none; transition:background .15s;" style-hover="background:#EEEDFE;">Try free for 30 days</a>
+      </div>
+      <div data-reveal data-reveal-delay="180" style="background:#fff; border:1px solid #E8E6F4; border-radius:22px; padding:32px;">
+        <p style="font-size:14px; font-weight:600; color:#5A52C5; margin:0 0 12px;">LoopprBiz</p>
+        <p style="font-family:'Bricolage Grotesque',sans-serif; font-size:44px; font-weight:600; color:#1E1B4B; line-height:1; margin:0;">$49.99<span style="font-size:17px; font-weight:400; color:#8885A0;">/mo</span></p>
+        <p style="font-size:13.5px; color:#8885A0; margin:8px 0 24px;">For hotels, gyms &amp; Airbnb hosts.</p>
+        <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:28px;">
+          <p style="display:flex; gap:10px; font-size:14px; color:#5A52C5; margin:0;"><span style="color:#1D9E75;">✓</span>$1.29 per lb (volume rate)</p>
+          <p style="display:flex; gap:10px; font-size:14px; color:#5A52C5; margin:0;"><span style="color:#1D9E75;">✓</span>Free delivery, all orders</p>
+          <p style="display:flex; gap:10px; font-size:14px; color:#5A52C5; margin:0;"><span style="color:#1D9E75;">✓</span>Monthly invoice billing</p>
+          <p style="display:flex; gap:10px; font-size:14px; color:#5A52C5; margin:0;"><span style="color:#1D9E75;">✓</span>Dedicated account manager</p>
+          <p style="display:flex; gap:10px; font-size:14px; color:#5A52C5; margin:0;"><span style="color:#1D9E75;">✓</span>8-hour SLA guarantee</p>
+          <p style="display:flex; gap:10px; font-size:14px; color:#5A52C5; margin:0;"><span style="color:#1D9E75;">✓</span>Up to 5 team members</p>
+        </div>
+        <a href="Checkout.dc.html#biz" style="display:block; text-align:center; border:1.5px solid #DDDCF0; color:#5A52C5; padding:13px; border-radius:11px; font-size:14.5px; font-weight:600; text-decoration:none; transition:border-color .15s,color .15s;" style-hover="border-color:#AFA9EC; color:#1E1B4B;">Contact sales</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Comparison table -->
+  <section style="background:#fff; padding:88px 24px;">
+    <div style="max-width:920px; margin:0 auto;">
+      <div data-reveal style="text-align:center; margin-bottom:44px;">
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(1.7rem,3.5vw,2.4rem); font-weight:600; letter-spacing:-.02em; color:#1E1B4B; margin:0;">Compare the plans</h2>
+      </div>
+      <div data-reveal style="border:1px solid #E8E6F4; border-radius:18px; overflow:hidden;">
+        <div style="display:grid; grid-template-columns:1.6fr 1fr 1fr 1fr; background:#F5F4FF; border-bottom:1px solid #E8E6F4;">
+          <div style="padding:18px 20px; font-size:13px; font-weight:600; color:#8885A0;">Feature</div>
+          <div style="padding:18px 12px; font-size:13.5px; font-weight:600; color:#1E1B4B; text-align:center;">Per-use</div>
+          <div style="padding:18px 12px; font-size:13.5px; font-weight:600; color:#5A52C5; text-align:center; background:#EEEDFE;">Looppr+</div>
+          <div style="padding:18px 12px; font-size:13.5px; font-weight:600; color:#1E1B4B; text-align:center;">LoopprBiz</div>
+        </div>
+        <div data-row style="display:grid; grid-template-columns:1.6fr 1fr 1fr 1fr; border-bottom:1px solid #F0EEE5;"><div style="padding:15px 20px; font-size:14px; color:#5A52C5;">Per-pound rate</div><div style="padding:15px 12px; font-size:14px; color:#1E1B4B; text-align:center;">$1.59</div><div style="padding:15px 12px; font-size:14px; color:#1E1B4B; text-align:center; background:#F6F5FE;">$1.59</div><div style="padding:15px 12px; font-size:14px; color:#1E1B4B; text-align:center;">$1.29</div></div>
+        <div data-row style="display:grid; grid-template-columns:1.6fr 1fr 1fr 1fr; border-bottom:1px solid #F0EEE5;"><div style="padding:15px 20px; font-size:14px; color:#5A52C5;">Delivery fee</div><div style="padding:15px 12px; font-size:14px; color:#1E1B4B; text-align:center;">$4.99</div><div style="padding:15px 12px; font-size:14px; color:#1D9E75; font-weight:600; text-align:center; background:#F6F5FE;">Free</div><div style="padding:15px 12px; font-size:14px; color:#1D9E75; font-weight:600; text-align:center;">Free</div></div>
+        <div data-row style="display:grid; grid-template-columns:1.6fr 1fr 1fr 1fr; border-bottom:1px solid #F0EEE5;"><div style="padding:15px 20px; font-size:14px; color:#5A52C5;">Real-time tracking</div><div style="padding:15px 12px; text-align:center; color:#1D9E75;">✓</div><div style="padding:15px 12px; text-align:center; color:#1D9E75; background:#F6F5FE;">✓</div><div style="padding:15px 12px; text-align:center; color:#1D9E75;">✓</div></div>
+        <div data-row style="display:grid; grid-template-columns:1.6fr 1fr 1fr 1fr; border-bottom:1px solid #F0EEE5;"><div style="padding:15px 20px; font-size:14px; color:#5A52C5;">Priority driver matching</div><div style="padding:15px 12px; text-align:center; color:#CFCDC3;">—</div><div style="padding:15px 12px; text-align:center; color:#1D9E75; background:#F6F5FE;">✓</div><div style="padding:15px 12px; text-align:center; color:#1D9E75;">✓</div></div>
+        <div data-row style="display:grid; grid-template-columns:1.6fr 1fr 1fr 1fr; border-bottom:1px solid #F0EEE5;"><div style="padding:15px 20px; font-size:14px; color:#5A52C5;">Invoice billing</div><div style="padding:15px 12px; text-align:center; color:#CFCDC3;">—</div><div style="padding:15px 12px; text-align:center; color:#CFCDC3; background:#F6F5FE;">—</div><div style="padding:15px 12px; text-align:center; color:#1D9E75;">✓</div></div>
+        <div data-row style="display:grid; grid-template-columns:1.6fr 1fr 1fr 1fr;"><div style="padding:15px 20px; font-size:14px; color:#5A52C5;">Turnaround SLA</div><div style="padding:15px 12px; font-size:13.5px; color:#1E1B4B; text-align:center;">~24 hr</div><div style="padding:15px 12px; font-size:13.5px; color:#1E1B4B; text-align:center; background:#F6F5FE;">~24 hr</div><div style="padding:15px 12px; font-size:13.5px; color:#1E1B4B; text-align:center;">8 hr</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Add-ons -->
+  <section style="background:#F8F7FF; padding:88px 24px;">
+    <div style="max-width:1080px; margin:0 auto;">
+      <div data-reveal style="max-width:560px; margin-bottom:40px;">
+        <p style="font-size:13px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:#7C73E6; margin:0 0 12px;">Optional add-ons</p>
+        <h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(1.7rem,3.5vw,2.4rem); font-weight:600; letter-spacing:-.02em; color:#1E1B4B; margin:0;">Tack on exactly what you need</h2>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px;">
+        <div data-reveal style="background:#fff; border:1px solid #E8E6F4; border-radius:16px; padding:24px;">
+          <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;"><h3 style="font-size:15px; font-weight:600; color:#1E1B4B; margin:0;">Express 4-hour</h3><span style="font-family:'Bricolage Grotesque',sans-serif; font-size:18px; font-weight:600; color:#7C73E6;">+$9</span></div>
+          <p style="font-size:13.5px; color:#5A52C5; line-height:1.55; margin:0;">Jump the queue. Back in your hands within four hours.</p>
+        </div>
+        <div data-reveal data-reveal-delay="70" style="background:#fff; border:1px solid #E8E6F4; border-radius:16px; padding:24px;">
+          <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;"><h3 style="font-size:15px; font-weight:600; color:#1E1B4B; margin:0;">Stain pre-treatment</h3><span style="font-family:'Bricolage Grotesque',sans-serif; font-size:18px; font-weight:600; color:#7C73E6;">+$4</span></div>
+          <p style="font-size:13.5px; color:#5A52C5; line-height:1.55; margin:0;">Flag tricky items and we'll treat them with extra care.</p>
+        </div>
+        <div data-reveal data-reveal-delay="140" style="background:#fff; border:1px solid #E8E6F4; border-radius:16px; padding:24px;">
+          <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;"><h3 style="font-size:15px; font-weight:600; color:#1E1B4B; margin:0;">Hang-dry items</h3><span style="font-family:'Bricolage Grotesque',sans-serif; font-size:18px; font-weight:600; color:#7C73E6;">+$3</span></div>
+          <p style="font-size:13.5px; color:#5A52C5; line-height:1.55; margin:0;">Delicates air-dried and laid flat, never tumbled.</p>
+        </div>
+        <div data-reveal data-reveal-delay="210" style="background:#fff; border:1px solid #E8E6F4; border-radius:16px; padding:24px;">
+          <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:8px;"><h3 style="font-size:15px; font-weight:600; color:#1E1B4B; margin:0;">Hypoallergenic wash</h3><span style="font-family:'Bricolage Grotesque',sans-serif; font-size:18px; font-weight:600; color:#1D9E75;">Free</span></div>
+          <p style="font-size:13.5px; color:#5A52C5; line-height:1.55; margin:0;">Fragrance-free, dye-free detergent on request — no charge.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section style="background:#171433; text-align:center; padding:100px 24px;">
+    <div data-reveal style="max-width:560px; margin:0 auto;">
+      <h2 style="font-family:'Bricolage Grotesque',sans-serif; font-size:clamp(2rem,4.5vw,3rem); font-weight:600; letter-spacing:-.02em; color:#fff; margin:0 0 16px; line-height:1.1;">Try it free. Decide later.</h2>
+      <p style="font-size:17px; color:#AFA9EC; line-height:1.6; margin:0 0 34px;">Your first pickup is on us — no card, no subscription. See if you ever want laundry day back.</p>
+      <a href="Home.dc.html#schedule" style="background:#7C73E6; color:#fff; padding:16px 36px; border-radius:12px; font-size:16px; font-weight:600; text-decoration:none; box-shadow:0 8px 26px rgba(124,115,230,.4); transition:transform .12s,background .15s;" style-hover="transform:translateY(-2px); background:#8d86e3;">Schedule your free pickup</a>
+    </div>
+  </section>
+
+  <dc-import name="SiteFooter" hint-size="100%,380px"></dc-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  componentDidMount() { this.setupReveal(); }
+  setupReveal() {
+    if (this._revealed) return; this._revealed = true;
+    const run = () => {
+      const els = Array.from(document.querySelectorAll('[data-reveal]'));
+      if (!els.length) { setTimeout(run, 120); return; }
+      if (!('IntersectionObserver' in window)) return;
+      const vh = window.innerHeight || 800; const hidden = [];
+      els.forEach(el => {
+        if (el.getBoundingClientRect().top < vh * 0.85) return;
+        el.style.opacity = '0'; el.style.transform = 'translateY(26px)';
+        el.style.transition = 'opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1)';
+        hidden.push(el);
+      });
+      const io = new IntersectionObserver((es) => es.forEach(e => {
+        if (e.isIntersecting) {
+          const d = parseInt(e.target.getAttribute('data-reveal-delay')) || 0;
+          setTimeout(() => { e.target.style.opacity = '1'; e.target.style.transform = 'none'; }, d);
+          io.unobserve(e.target);
+        }
+      }), { threshold: 0.12, rootMargin: '0px 0px -7% 0px' });
+      hidden.forEach(el => io.observe(el));
+    };
+    run();
+  }
+}
+</script>
+</body>
+</html>

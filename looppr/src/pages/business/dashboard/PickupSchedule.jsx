@@ -3,7 +3,7 @@ import { useBusinessData } from '../../../context/BusinessDataContext'
 import DashboardCard from '../../../components/business/DashboardCard'
 import StatusBadge from '../../../components/business/StatusBadge'
 import Button from '../../../components/Button'
-import { ACTIVE_STATUSES, formatDate, LOAD_SIZE_LABELS, orderRef, WINDOW_LABELS } from '../../../components/business/businessUi'
+import { ACTIVE_STATUSES, FOLD_STYLE_LABELS, formatDate, LOAD_SIZE_LABELS, orderRef, WINDOW_LABELS } from '../../../components/business/businessUi'
 
 export default function PickupSchedule() {
   const { pickups, status } = useBusinessData()
@@ -39,7 +39,7 @@ export default function PickupSchedule() {
                   <div>
                     <p className="text-sm font-semibold text-ink">{formatDate(p.preferredDate, { weekday: 'short', month: 'short', day: 'numeric' })}</p>
                     <p className="text-xs text-ink/50">
-                      {WINDOW_LABELS[p.window]} · {LOAD_SIZE_LABELS[p.loadSize]} · {p.address?.street}, {p.address?.city}
+                      {WINDOW_LABELS[p.window]} · {LOAD_SIZE_LABELS[p.loadSize]} · {FOLD_STYLE_LABELS[p.foldStyle] || 'Standard fold'} · {p.address?.street}, {p.address?.city}
                     </p>
                   </div>
                   <div className="flex items-center gap-3">
