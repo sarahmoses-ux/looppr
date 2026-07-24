@@ -1,5 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
+// tests/setup.js globally mocks emailService.js (every other test file wants
+// that — no real network calls). This file is the one place that needs the
+// REAL implementation, to verify its provider-selection logic itself.
+vi.unmock('../services/emailService.js')
+
 const gmailSendOtpEmail = vi.fn(async () => {})
 const resendSendOtpEmail = vi.fn(async () => {})
 
