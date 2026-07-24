@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import Button from '../components/Button'
 import HeroCarousel from '../components/HeroCarousel'
 import SEO from '../components/SEO'
+import { CUSTOMER_PLANS } from '../data/pricingPlans'
 import { heroImages } from '../data/heroImages'
 import { PUBLIC_PAGES } from '../seo/publicPages'
 import { LOCAL_BUSINESS_JSON_LD, serviceJsonLd } from '../seo/structuredData'
@@ -17,54 +18,6 @@ const SERVICE_JSON_LD = serviceJsonLd({
   price: '1.59',
   description: 'Wash & fold laundry service, priced per pound',
 })
-
-const PLANS = [
-  {
-    name: 'Pay-per-use',
-    price: '$0',
-    unit: '/mo',
-    detail: 'No subscription. Order when you need it.',
-    features: [
-      '$1.59 per lb, wash & fold',
-      '$4.99 delivery per order',
-      'Real-time order tracking',
-      'Saved wash preferences',
-    ],
-    cta: 'Get started free',
-    to: '/guest/book',
-    highlight: false,
-  },
-  {
-    name: 'Looppr+',
-    price: '$14.99',
-    unit: '/mo',
-    detail: 'Pays for itself at 3 orders a month.',
-    features: [
-      '$1.59 per lb, wash & fold',
-      'Free delivery on every order',
-      'Priority driver matching',
-      'Favorite laundromat always first',
-    ],
-    cta: 'Try free for 30 days',
-    to: '/signup',
-    highlight: true,
-  },
-  {
-    name: 'LoopprBiz',
-    price: '$49.99',
-    unit: '/mo',
-    detail: 'For hotels, gyms & Airbnb hosts.',
-    features: [
-      '$1.29 per lb (volume rate)',
-      'Free delivery, all orders',
-      'Monthly invoice billing',
-      'Dedicated account manager',
-    ],
-    cta: 'Contact sales',
-    to: '/business',
-    highlight: false,
-  },
-]
 
 // In-content links to the site's other major pages — the global Navbar
 // links to these too, but a repeated boilerplate nav link carries far less
@@ -176,7 +129,7 @@ export default function Landing() {
           </div>
 
           <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {PLANS.map((plan) => (
+            {CUSTOMER_PLANS.map((plan) => (
               <div
                 key={plan.name}
                 className={`relative rounded-3xl border p-8 ${
@@ -185,9 +138,9 @@ export default function Landing() {
                     : 'border-line bg-white shadow-[0_20px_45px_-30px_rgba(30,27,75,0.25)]'
                 }`}
               >
-                {plan.highlight && (
+                {plan.badge && (
                   <span className="absolute -top-3 left-8 rounded-full bg-ink px-3 py-1 text-xs font-bold text-white">
-                    MOST POPULAR
+                    {plan.badge.toUpperCase()}
                   </span>
                 )}
                 <p

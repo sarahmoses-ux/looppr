@@ -15,8 +15,10 @@ const SECTIONS = [
   {
     heading: 'Pricing & payment',
     body: `Wash & fold is priced at $1.59 per pound, plus a $4.99 delivery fee (waived on your first
-      two orders, or on every order with a Looppr+ subscription). Your card is charged once your
-      order is confirmed. Prices are subject to change with notice on the site.`,
+      two orders, or on every order with a Looppr+ subscription). Looppr Gold subscribers
+      additionally receive priority pickup & delivery on up to 100 lbs of laundry per month. Your
+      card is charged once your order is confirmed. Prices are subject to change with notice on
+      the site.`,
   },
   {
     heading: 'Order handling',

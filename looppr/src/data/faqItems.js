@@ -39,12 +39,12 @@ export const FAQ_ITEMS = [
   {
     question: 'How does Looppr pricing work?',
     answer:
-      "It's $1.59 per pound for wash & fold, plus a $4.99 delivery fee — and delivery is free on your first two orders. If you order often, Looppr+ ($14.99/mo) waives the delivery fee on every order.",
+      "It's $1.59 per pound for wash & fold, plus a $4.99 delivery fee — and delivery is free on your first two orders. Looppr+ ($14.99/mo) waives the delivery fee on every order, and Looppr Gold ($90.99/mo) adds priority pickup & delivery, faster turnaround, and up to 100 lbs washed each month.",
   },
   {
     question: 'How much does laundry delivery cost?',
     answer:
-      'Delivery is $4.99 per order — and completely free on your first two orders, no subscription needed. Looppr+ members ($14.99/mo) get free delivery on every order after that.',
+      'Delivery is $4.99 per order — and completely free on your first two orders, no subscription needed. Looppr+ members ($14.99/mo) get free delivery on every order after that, and Looppr Gold members ($90.99/mo) get priority pickup & delivery.',
   },
   {
     question: 'Who actually washes my clothes?',

@@ -110,7 +110,7 @@ export default function BusinessForm() {
             ← Back to For business
           </Link>
           <p className="mt-5 text-sm font-semibold uppercase tracking-[0.08em] text-periwinkle-muted">
-            LoopprBiz inquiry
+            Looppr Business inquiry
           </p>
           <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-white sm:text-4xl">
             Tell us about your business.

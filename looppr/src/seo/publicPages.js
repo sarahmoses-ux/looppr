@@ -82,7 +82,7 @@ export const PUBLIC_PAGES = [
   {
     path: '/pricing',
     title: 'Pricing',
-    description: 'Looppr laundry service pricing — pay by the pound for laundry pickup and delivery, or subscribe to Looppr+ for free delivery on every order.',
+    description: 'Looppr laundry service pricing — pay per order, subscribe to Looppr+ for free delivery on every order, or go Looppr Gold for priority pickup & delivery on up to 100 lbs of laundry every month.',
     keywords: ['laundry service pricing', 'laundry pickup and delivery cost', 'wash and fold', 'same-day laundry'],
     changefreq: 'monthly',
     priority: 0.8,
@@ -90,7 +90,7 @@ export const PUBLIC_PAGES = [
   {
     path: '/business',
     title: 'Looppr for business',
-    description: 'LoopprBiz — hotel laundry services and linen turnaround for hotels, gyms, Airbnb hosts & med spas, with an 8-hour SLA and monthly invoicing.',
+    description: 'Looppr Business — commercial laundry pickup and linen turnaround for hotels, gyms, Airbnb hosts & med spas, with dedicated account management and monthly invoicing.',
     keywords: ['hotel laundry services', 'commercial laundry service', 'linen service', 'same-day laundry', 'laundry service'],
     changefreq: 'monthly',
     priority: 0.6,

@@ -1,5 +1,6 @@
 import Button from '../components/Button'
 import SEO from '../components/SEO'
+import { BUSINESS_PLANS } from '../data/pricingPlans'
 import { PUBLIC_PAGES } from '../seo/publicPages'
 import { breadcrumbJsonLd, serviceJsonLd } from '../seo/structuredData'
 
@@ -191,6 +192,66 @@ export default function Business() {
         </div>
       </section>
 
+      <section id="business-pricing" className="bg-white px-4 py-20 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-[1140px]">
+          <div className="max-w-xl">
+            <p className="text-sm font-semibold uppercase tracking-[0.08em] text-periwinkle">
+              Business pricing
+            </p>
+            <h2 className="mt-3 font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
+              Plans built for commercial volume
+            </h2>
+          </div>
+          <div className="mt-10 grid gap-4 sm:max-w-xl sm:mx-auto md:mx-0 md:max-w-none md:grid-cols-2">
+            {BUSINESS_PLANS.map((plan) => (
+              <div
+                key={plan.name}
+                className={`relative rounded-3xl border p-8 ${
+                  plan.highlight
+                    ? 'border-transparent bg-gradient-to-br from-periwinkle to-periwinkle-text text-white shadow-[0_26px_60px_-20px_rgba(124,115,230,0.45)]'
+                    : 'border-line bg-linen-soft'
+                }`}
+              >
+                <p className={`text-sm font-semibold ${plan.highlight ? 'text-white/85' : 'text-periwinkle-text'}`}>
+                  {plan.name}
+                </p>
+                <p className="mt-3 flex items-baseline gap-1">
+                  <span className="font-display text-4xl font-semibold">{plan.price}</span>
+                  <span className={plan.highlight ? 'text-white/70' : 'text-ink/50'}>{plan.unit}</span>
+                </p>
+                <p className={`mt-1 text-xs ${plan.highlight ? 'text-white/75' : 'text-ink/50'}`}>
+                  {plan.detail}
+                </p>
+                <ul className="mt-6 space-y-2.5">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2 text-sm">
+                      <svg
+                        viewBox="0 0 20 20"
+                        className={`mt-0.5 h-4 w-4 shrink-0 ${plan.highlight ? 'text-white' : 'text-success'}`}
+                        fill="none"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M4 10.5l3.5 3.5L16 6"
+                          stroke="currentColor"
+                          strokeWidth="1.75"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
+                      </svg>
+                      <span className={plan.highlight ? 'text-white/90' : 'text-ink/70'}>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+                <Button to={plan.to} variant={plan.highlight ? 'inverse' : 'ghost'} className="mt-8 w-full">
+                  {plan.cta}
+                </Button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section className="bg-success px-4 py-20 text-center sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl">
           <div className="text-lg tracking-[3px] text-white/85">★★★★★</div>
@@ -198,7 +259,7 @@ export default function Business() {
             "I run three Airbnbs. Before Looppr I was doing linen runs myself between guests. Now
             I just leave bags out and they come back folded. It changed my whole operation."
           </p>
-          <p className="mt-5 text-sm text-white/80">Derek L. · Airbnb superhost, LoopprBiz plan</p>
+          <p className="mt-5 text-sm text-white/80">Derek L. · Airbnb superhost, Looppr Business Starter plan</p>
         </div>
       </section>
 

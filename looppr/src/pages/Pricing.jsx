@@ -1,71 +1,23 @@
 import Button from '../components/Button'
 import SEO from '../components/SEO'
+import { CUSTOMER_PLANS } from '../data/pricingPlans'
 import { PUBLIC_PAGES } from '../seo/publicPages'
 import { breadcrumbJsonLd } from '../seo/structuredData'
 
 const PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/pricing')
 const BREADCRUMB_JSON_LD = breadcrumbJsonLd([{ name: 'Pricing', path: '/pricing' }])
 
-const PLANS = [
-  {
-    name: 'Pay-per-use',
-    price: '$0',
-    unit: '/mo',
-    detail: 'No subscription. Order when you need it.',
-    features: [
-      '$1.59 per lb, wash & fold',
-      '$4.99 delivery per order',
-      'Real-time order tracking',
-      'Saved wash preferences',
-      '100% of tips to your driver',
-    ],
-    cta: 'Get started free',
-    to: '/guest/book',
-    highlight: false,
-  },
-  {
-    name: 'Looppr+',
-    price: '$14.99',
-    unit: '/mo',
-    detail: 'Pays for itself at 3 orders a month.',
-    features: [
-      '$1.59 per lb, wash & fold',
-      'Free delivery on every order',
-      'Priority driver matching',
-      '10% off express upgrades',
-      'Favorite laundromat always first',
-      'Order streak rewards',
-    ],
-    cta: 'Try free for 30 days',
-    to: '/signup',
-    highlight: true,
-  },
-  {
-    name: 'LoopprBiz',
-    price: '$49.99',
-    unit: '/mo',
-    detail: 'For hotels, gyms & Airbnb hosts.',
-    features: [
-      '$1.29 per lb (volume rate)',
-      'Free delivery, all orders',
-      'Monthly invoice billing',
-      'Dedicated account manager',
-      '8-hour SLA guarantee',
-      'Up to 5 team members',
-    ],
-    cta: 'Contact sales',
-    to: '/business',
-    highlight: false,
-  },
-]
-
+// Mirrors CUSTOMER_PLANS (data/pricingPlans.js) as a feature-by-feature
+// comparison — kept in the same order as that array (Free, Looppr+, Looppr
+// Gold) so a column never silently points at the wrong plan.
 const COMPARISON_ROWS = [
-  { label: 'Per-pound rate', values: ['$1.59', '$1.59', '$1.29'] },
-  { label: 'Delivery fee', values: ['$4.99', 'Free', 'Free'], freeFrom: 1 },
-  { label: 'Real-time tracking', values: ['✓', '✓', '✓'] },
-  { label: 'Priority driver matching', values: ['—', '✓', '✓'] },
-  { label: 'Invoice billing', values: ['—', '—', '✓'] },
-  { label: 'Turnaround SLA', values: ['~24 hr', '~24 hr', '8 hr'] },
+  { label: 'Schedule pickups', values: ['✓', '✓', '✓'] },
+  { label: 'Track orders', values: ['✓', '✓', '✓'] },
+  { label: 'Delivery fee', values: ['$4.99 (free on first 2)', 'Free every order', 'Included'] },
+  { label: 'Driver matching', values: ['Standard', 'Priority', 'Priority'] },
+  { label: 'Monthly laundry included', values: ['Pay per order', 'Pay per order', 'Up to 100 lbs'] },
+  { label: 'Turnaround time', values: ['Standard', 'Standard', 'Faster'] },
+  { label: 'Customer support', values: ['Standard', 'Standard', 'Premium'] },
 ]
 
 const ADDONS = [
@@ -134,15 +86,16 @@ export default function Pricing() {
             No surprises, ever.
           </h1>
           <p className="mt-4 text-lg leading-relaxed text-periwinkle-text">
-            $1.59 per pound for wash &amp; fold. Subscribe and delivery is free. Your first pickup
-            is always on us.
+            $1.59 per pound for wash &amp; fold. Subscribe to Looppr+ for free delivery, or go
+            Looppr Gold for priority service on up to 100 lbs a month. Your first pickup is
+            always on us.
           </p>
         </div>
       </section>
 
       <section className="mx-auto max-w-[1100px] px-4 pb-16 sm:px-6 lg:px-8">
         <div className="grid gap-4 md:grid-cols-3">
-          {PLANS.map((plan) => (
+          {CUSTOMER_PLANS.map((plan) => (
             <div
               key={plan.name}
               className={`relative rounded-3xl border p-8 ${
@@ -151,9 +104,9 @@ export default function Pricing() {
                   : 'border-line bg-white'
               }`}
             >
-              {plan.highlight && (
+              {plan.badge && (
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#EF9F27] px-3.5 py-1 text-xs font-bold text-[#412402]">
-                  MOST POPULAR
+                  {plan.badge.toUpperCase()}
                 </span>
               )}
               <p
@@ -196,11 +149,11 @@ export default function Pricing() {
               <thead>
                 <tr className="border-b border-line bg-linen-soft">
                   <th className="px-5 py-3.5 text-xs font-semibold text-ink/45">Feature</th>
-                  <th className="px-3 py-3.5 text-center text-sm font-semibold text-ink">Per-use</th>
+                  <th className="px-3 py-3.5 text-center text-sm font-semibold text-ink">Free</th>
                   <th className="bg-periwinkle-soft px-3 py-3.5 text-center text-sm font-semibold text-periwinkle-text">
                     Looppr+
                   </th>
-                  <th className="px-3 py-3.5 text-center text-sm font-semibold text-ink">LoopprBiz</th>
+                  <th className="px-3 py-3.5 text-center text-sm font-semibold text-ink">Looppr Gold</th>
                 </tr>
               </thead>
               <tbody>
