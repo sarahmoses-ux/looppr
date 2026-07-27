@@ -8,7 +8,7 @@ const BREADCRUMB_JSON_LD = breadcrumbJsonLd([{ name: 'Drive with Looppr', path: 
 const PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/drive')
 
 const STATS = [
-  { value: '$18/hr', label: 'Guaranteed first 2 weeks' },
+  { value: '$15/hr', label: 'Guaranteed first 2 weeks' },
   { value: '100%', label: 'Of tips go to you' },
   { value: 'Friday', label: 'Weekly direct deposit' },
 ]
@@ -64,7 +64,7 @@ export default function Drive() {
           </h1>
           <p className="mx-auto mt-5 max-w-lg text-lg leading-relaxed text-periwinkle-text">
             Pick up laundry, drop it at a partner laundromat, deliver it back clean. Short
-            routes, flexible hours, and a guaranteed $18/hr minimum your first two weeks.
+            routes, flexible hours, and a guaranteed $15/hr minimum your first two weeks.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Button to="/drive/signup" variant="primary" className="px-8! py-4!">

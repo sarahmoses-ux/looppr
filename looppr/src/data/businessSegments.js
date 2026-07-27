@@ -31,9 +31,9 @@ export const BUSINESS_SEGMENTS = [
   },
   {
     slug: 'boutique-hotels',
-    name: 'Boutique hotels',
+    name: 'Hotels',
     range: '50–200 lbs/day',
-    heroEyebrow: 'For boutique hotels',
+    heroEyebrow: 'For hotels',
     heroTitle: 'Hotel-grade linen turnaround without an on-site laundry.',
     heroBody:
       "Between housekeeping, staff uniforms and guest linens, small hotel teams end up managing laundry instead of running the property. Looppr takes the daily linen cycle off your plate with pickups timed to housekeeping's schedule.",

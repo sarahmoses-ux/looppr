@@ -25,7 +25,6 @@ const AREA_SERVED = [
   { '@type': 'City', name: 'Edmond, OK' },
   { '@type': 'City', name: 'Norman, OK' },
   { '@type': 'City', name: 'Moore, OK' },
-  { '@type': 'City', name: 'Indianapolis, IN' },
 ]
 
 // Approximate center of the launch metro (public, well-known coordinates for

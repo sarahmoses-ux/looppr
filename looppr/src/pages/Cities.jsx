@@ -33,9 +33,9 @@ const STATES = [
   {
     key: 'in',
     name: 'Indiana',
-    sub: 'Now available - Indianapolis',
+    sub: 'Coming January 2027',
     cities: [
-      { name: 'Indianapolis', region: 'Marion County', eta: 'Available now', isAvailable: true },
+      { name: 'Indianapolis', region: 'Marion County', eta: 'Jan 2027' },
       { name: 'Carmel', region: 'Hamilton County', eta: EXPANSION_ETA },
       { name: 'Fishers', region: 'Hamilton County', eta: EXPANSION_ETA },
     ],
@@ -219,8 +219,8 @@ export default function Cities() {
             in more cities.
           </h1>
           <p className="mt-4 text-lg leading-relaxed text-periwinkle-muted">
-            Looppr is live in Oklahoma City, Edmond, Norman, Moore, and Indianapolis,
-            with more cities coming soon. Pick an available city to book today.
+            Looppr is live in Oklahoma City, Edmond, Norman, and Moore, with Indianapolis
+            coming in January 2027. Pick an available city to book today.
           </p>
 
           <div className="mt-8 inline-flex items-center gap-3 rounded-2xl border border-white/15 bg-white/[0.07] px-5 py-4">

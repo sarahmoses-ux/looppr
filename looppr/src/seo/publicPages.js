@@ -105,9 +105,9 @@ export const PUBLIC_PAGES = [
   },
   {
     path: '/business/boutique-hotels',
-    title: 'Laundry service for boutique hotels',
-    description: 'Daily linen pickup and turnaround for boutique hotels — bed linens, towels, robes and staff uniforms handled without an on-site laundry.',
-    keywords: ['hotel laundry service', 'boutique hotel linen service', 'commercial linen service'],
+    title: 'Laundry service for hotels',
+    description: 'Daily linen pickup and turnaround for hotels — bed linens, towels, robes and staff uniforms handled without an on-site laundry.',
+    keywords: ['hotel laundry service', 'hotel linen service', 'commercial linen service'],
     changefreq: 'monthly',
     priority: 0.5,
   },
