@@ -63,7 +63,8 @@ export const BUSINESS_PLANS = [
     unit: '/mo',
     detail: 'For single-location businesses getting started with Looppr.',
     features: [
-      '100 lbs of clothes included free each month',
+      'Wash up to 500 lbs of clothes',
+      'An extra 100 lbs of clothes free',
       'Business dashboard',
       'Dedicated account manager',
       'Scheduled commercial pickups',
@@ -81,7 +82,8 @@ export const BUSINESS_PLANS = [
     unit: '/mo',
     detail: 'For multi-location operations with higher volume.',
     features: [
-      'Wash up to 5,000 lbs of clothes, with 1,000 lbs included free each month',
+      'Wash up to 5,000 lbs of clothes',
+      'An extra 1,000 lbs of clothes free',
       'Everything included in the Starter plan',
       'Unlimited commercial pickups',
       'Multi-location management',
