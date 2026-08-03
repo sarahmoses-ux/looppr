@@ -43,3 +43,27 @@ export function approveDriverApplication(id) {
 export function rejectDriverApplication(id, reason) {
   return api.post(`/admin/drivers/${id}/reject`, { reason }).then((res) => res.data)
 }
+
+export function fetchContactMessages(filters = {}) {
+  return api.get('/admin/contact-messages', { params: filters }).then((res) => res.data)
+}
+
+export function resolveContactMessage(id) {
+  return api.post(`/admin/contact-messages/${id}/resolve`).then((res) => res.data)
+}
+
+export function fetchBusinessLeads(filters = {}) {
+  return api.get('/admin/business-leads', { params: filters }).then((res) => res.data)
+}
+
+export function markBusinessLeadContacted(id) {
+  return api.post(`/admin/business-leads/${id}/mark-contacted`).then((res) => res.data)
+}
+
+export function fetchBusinessAccounts() {
+  return api.get('/admin/business-accounts').then((res) => res.data)
+}
+
+export function fetchActivityLog(filters = {}) {
+  return api.get('/admin/activity-log', { params: filters }).then((res) => res.data)
+}

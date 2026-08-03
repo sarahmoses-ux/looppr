@@ -23,4 +23,8 @@ const activityLogSchema = new mongoose.Schema(
 // pattern (admin activity feed, an order's assignment trail, etc.).
 activityLogSchema.index({ entityType: 1, entityId: 1, createdAt: -1 })
 
+// Separate index for the admin-wide activity feed (GET /admin/activity-log),
+// which sorts across all entities rather than one at a time.
+activityLogSchema.index({ createdAt: -1 })
+
 export const ActivityLog = mongoose.model('ActivityLog', activityLogSchema)

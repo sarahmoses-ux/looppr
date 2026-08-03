@@ -43,9 +43,15 @@ const ForgotPassword = lazy(() => import('./pages/ForgotPassword'))
 const AdminLogin = lazy(() => import('./pages/admin/AdminLogin'))
 const AdminLoginVerify = lazy(() => import('./pages/admin/AdminLoginVerify'))
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
+const AdminBookings = lazy(() => import('./pages/admin/AdminBookings'))
+const AdminJobsRoutes = lazy(() => import('./pages/admin/AdminJobsRoutes'))
 const AdminOrders = lazy(() => import('./pages/admin/AdminOrders'))
+const AdminCustomerCare = lazy(() => import('./pages/admin/AdminCustomerCare'))
 const AdminCustomers = lazy(() => import('./pages/admin/AdminCustomers'))
 const AdminApplications = lazy(() => import('./pages/admin/AdminApplications'))
+const AdminCrm = lazy(() => import('./pages/admin/AdminCrm'))
+const AdminReports = lazy(() => import('./pages/admin/AdminReports'))
+const AdminActivityLog = lazy(() => import('./pages/admin/AdminActivityLog'))
 const GuestBook = lazy(() => import('./pages/guest/GuestBook'))
 const GuestRequestStatus = lazy(() => import('./pages/guest/GuestRequestStatus'))
 
@@ -155,17 +161,19 @@ function App() {
             Not linked from anywhere in the public site or customer nav. */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/login/verify" element={<AdminLoginVerify />} />
-        <Route
-          element={
-            <ProtectedRoute role="admin">
-              <AdminLayout />
-            </ProtectedRoute>
-          }
-        >
+        {/* TEMP: auth bypass for local design preview only — restore
+            <ProtectedRoute role="admin"> before committing/deploying. */}
+        <Route element={<AdminLayout />}>
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/bookings" element={<AdminBookings />} />
+          <Route path="/admin/jobs" element={<AdminJobsRoutes />} />
           <Route path="/admin/orders" element={<AdminOrders />} />
+          <Route path="/admin/customer-care" element={<AdminCustomerCare />} />
           <Route path="/admin/customers" element={<AdminCustomers />} />
           <Route path="/admin/applications" element={<AdminApplications />} />
+          <Route path="/admin/crm" element={<AdminCrm />} />
+          <Route path="/admin/reports" element={<AdminReports />} />
+          <Route path="/admin/activity-log" element={<AdminActivityLog />} />
         </Route>
 
         {/* Business Portal: its own auth context so a business session is

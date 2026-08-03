@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import SEO from '../../components/SEO'
 import { useToast } from '../../context/ToastContext'
 import { ALL_STATUSES } from '../../constants/orderStatus'
@@ -185,8 +186,10 @@ function AdminOrderRow({ pickup, onChange }) {
 }
 
 export default function AdminOrders() {
+  // Seeded from ?search= so the admin header search box can deep-link here.
+  const [searchParams] = useSearchParams()
   const [pickups, setPickups] = useState(null)
-  const [search, setSearch] = useState('')
+  const [search, setSearch] = useState(() => searchParams.get('search') || '')
   const [statusFilter, setStatusFilter] = useState('')
   const [paymentFilter, setPaymentFilter] = useState('')
 
@@ -216,14 +219,10 @@ export default function AdminOrders() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <>
       <SEO title="Orders" description="All Looppr laundry orders." noindex />
-      <p className="text-sm font-semibold uppercase tracking-[0.08em] text-periwinkle">Admin</p>
-      <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-        Orders
-      </h1>
 
-      <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+      <div className="flex flex-col gap-3 sm:flex-row">
         <input
           type="search"
           value={search}
@@ -273,6 +272,6 @@ export default function AdminOrders() {
           </div>
         )}
       </div>
-    </div>
+    </>
   )
 }

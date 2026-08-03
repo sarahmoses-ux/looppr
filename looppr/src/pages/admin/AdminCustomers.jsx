@@ -36,12 +36,8 @@ export default function AdminCustomers() {
   }, [customers, search])
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <>
       <SEO title="Customers" description="All registered Looppr customers." noindex />
-      <p className="text-sm font-semibold uppercase tracking-[0.08em] text-periwinkle">Admin</p>
-      <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-        Registered customers
-      </h1>
 
       {customers && customers.length > 0 && (
         <input
@@ -49,7 +45,7 @@ export default function AdminCustomers() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search name, email, or phone…"
-          className="mt-6 w-full rounded-xl border border-line bg-white px-4 py-2.5 text-sm text-ink outline-none focus:border-periwinkle sm:max-w-xs"
+          className="w-full rounded-xl border border-line bg-white px-4 py-2.5 text-sm text-ink outline-none focus:border-periwinkle sm:max-w-xs"
         />
       )}
 
@@ -65,7 +61,7 @@ export default function AdminCustomers() {
         ) : filtered.length === 0 ? (
           <p className="py-10 text-center text-sm text-ink/55">No customers match your search.</p>
         ) : (
-          <table className="w-full min-w-[720px] text-left text-sm">
+          <table className="w-full min-w-180 text-left text-sm">
             <thead>
               <tr className="border-b border-line text-xs font-semibold uppercase tracking-wide text-ink/45">
                 <th className="px-5 py-3">Name</th>
@@ -107,6 +103,6 @@ export default function AdminCustomers() {
           </table>
         )}
       </div>
-    </div>
+    </>
   )
 }

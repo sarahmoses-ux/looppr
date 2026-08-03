@@ -170,14 +170,10 @@ export default function AdminApplications() {
   const list = tab === 'partners' ? partners : drivers
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <>
       <SEO title="Applications" description="Review Partner and Driver applications." noindex />
-      <p className="text-sm font-semibold uppercase tracking-[0.08em] text-periwinkle">Admin</p>
-      <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
-        Applications
-      </h1>
 
-      <div className="mt-6 flex flex-wrap items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <div className="flex rounded-full bg-linen p-1">
           {[
             { value: 'partners', label: 'Partners' },
@@ -247,6 +243,6 @@ export default function AdminApplications() {
         onConfirm={handleRejectConfirm}
         onClose={() => setRejectTarget(null)}
       />
-    </div>
+    </>
   )
 }

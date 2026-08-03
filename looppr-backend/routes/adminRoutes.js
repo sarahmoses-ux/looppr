@@ -14,6 +14,13 @@ import {
   rejectDriverApplication,
   rejectPartnerApplication,
 } from '../controllers/adminApplicationsController.js'
+import { listContactMessages, resolveContactMessage } from '../controllers/adminContactController.js'
+import { listActivity } from '../controllers/adminActivityController.js'
+import {
+  listBusinessAccounts,
+  listBusinessLeads,
+  markBusinessLeadContacted,
+} from '../controllers/adminCrmController.js'
 import { requireAuth, requireRole } from '../middleware/auth.js'
 import { validate } from '../middleware/validate.js'
 import { adminRejectApplicationValidation, updateOrderStatusValidation } from '../validations/adminValidation.js'
@@ -35,5 +42,14 @@ router.post('/partners/:id/approve', approvePartnerApplication)
 router.post('/partners/:id/reject', adminRejectApplicationValidation, validate, rejectPartnerApplication)
 router.post('/drivers/:id/approve', approveDriverApplication)
 router.post('/drivers/:id/reject', adminRejectApplicationValidation, validate, rejectDriverApplication)
+
+router.get('/contact-messages', listContactMessages)
+router.post('/contact-messages/:id/resolve', resolveContactMessage)
+
+router.get('/business-leads', listBusinessLeads)
+router.post('/business-leads/:id/mark-contacted', markBusinessLeadContacted)
+router.get('/business-accounts', listBusinessAccounts)
+
+router.get('/activity-log', listActivity)
 
 export default router
