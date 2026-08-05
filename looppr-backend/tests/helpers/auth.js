@@ -9,6 +9,7 @@ let counter = 0
 // clients") and shouldn't have to pay for a full signup every time.
 export async function createTestUser({
   role = 'client',
+  adminRole,
   email,
   name = 'Test User',
   phone = '+14055550000',
@@ -23,6 +24,7 @@ export async function createTestUser({
     phone,
     passwordHash,
     role,
+    adminRole,
     isVerified,
   })
 }
