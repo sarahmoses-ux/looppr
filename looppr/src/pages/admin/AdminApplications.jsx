@@ -77,41 +77,83 @@ function ApplicationRow({ application, type, onApprove, onReject, onSuspend, onR
     }
   }
 
+  const photo = isPartner ? application.logo : application.profilePhoto
+
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-line px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
-      <div className="min-w-0">
-        <p className="font-medium text-ink">
-          {name}
-          <span className={`ml-2 rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_BADGE[application.accountStatus] || 'bg-ink/5 text-ink/50'}`}>
-            {STATUS_LABEL[application.accountStatus] || application.accountStatus}
-          </span>
-        </p>
-        {isPartner && <p className="mt-0.5 text-sm text-ink/70">{application.businessName}</p>}
-        {!isPartner && (
-          <p className="mt-0.5 text-sm text-ink/70">
-            {application.vehicleType}
-            {application.vehicleName ? ` — ${application.vehicleName}` : ''}
-          </p>
+      <div className="flex min-w-0 items-start gap-3">
+        {photo && (
+          <img src={photo} alt="" className="h-10 w-10 shrink-0 rounded-full border border-line object-cover" />
         )}
-        <p className="mt-0.5 text-sm text-ink/55">
-          {application.email} · {application.phone}
-        </p>
-        <p className="mt-0.5 text-sm text-ink/55">
-          {application.city}, {application.state} · Applied {formatDate(application.createdAt)}
-        </p>
-        {(application.accountStatus === 'active' || application.accountStatus === 'suspended') && (
-          <p className="mt-1.5 text-xs font-medium text-ink/45">
-            {isPartner
-              ? `Capacity ${application.maxDailyCapacity ?? '—'}/day · ${application.activeOrderCount ?? 0} active order${application.activeOrderCount === 1 ? '' : 's'}`
-              : `Capacity ${application.maxActiveDeliveries ?? '—'} deliveries · ${application.activeDeliveryCount ?? 0} active`}
-            {' · '}
-            {application.availability === 'online' || application.availability === 'available'
-              ? 'Online'
-              : application.availability === 'on_delivery'
-                ? 'On delivery'
-                : 'Offline'}
+        <div className="min-w-0">
+          <p className="font-medium text-ink">
+            {name}
+            <span className={`ml-2 rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_BADGE[application.accountStatus] || 'bg-ink/5 text-ink/50'}`}>
+              {STATUS_LABEL[application.accountStatus] || application.accountStatus}
+            </span>
           </p>
-        )}
+          {isPartner && <p className="mt-0.5 text-sm text-ink/70">{application.businessName}</p>}
+          {!isPartner && (
+            <p className="mt-0.5 text-sm text-ink/70">
+              {application.vehicleType}
+              {application.vehicleName ? ` — ${application.vehicleName}` : ''}
+            </p>
+          )}
+          <p className="mt-0.5 text-sm text-ink/55">
+            {application.email} · {application.phone}
+          </p>
+          <p className="mt-0.5 text-sm text-ink/55">
+            {application.city}, {application.state} · Applied {formatDate(application.createdAt)}
+          </p>
+
+          {isPartner && application.description && (
+            <p className="mt-1.5 max-w-md text-xs text-ink/60">{application.description}</p>
+          )}
+          {isPartner && (application.yearsInBusiness || application.employeeCount || application.operatingHours) && (
+            <p className="mt-0.5 text-xs text-ink/45">
+              {[
+                application.yearsInBusiness ? `${application.yearsInBusiness} yrs in business` : null,
+                application.employeeCount ? `${application.employeeCount} employees` : null,
+                application.operatingHours || null,
+              ]
+                .filter(Boolean)
+                .join(' · ')}
+            </p>
+          )}
+          {isPartner && application.servicesOffered?.length > 0 && (
+            <p className="mt-0.5 text-xs text-ink/45">Services: {application.servicesOffered.join(', ')}</p>
+          )}
+          {isPartner && (
+            <p className="mt-0.5 text-xs text-ink/45">
+              {application.pickupAvailable ? 'Pickup ✓' : 'No pickup'} ·{' '}
+              {application.deliveryAvailable ? 'Delivery ✓' : 'No delivery'}
+            </p>
+          )}
+          {!isPartner && (application.licenseNumber || application.vehiclePlate) && (
+            <p className="mt-1.5 text-xs text-ink/45">
+              {[
+                application.licenseNumber ? `License ${application.licenseNumber}` : null,
+                application.vehiclePlate ? `Plate ${application.vehiclePlate}` : null,
+              ]
+                .filter(Boolean)
+                .join(' · ')}
+            </p>
+          )}
+
+          {(application.accountStatus === 'active' || application.accountStatus === 'suspended') && (
+            <p className="mt-1.5 text-xs font-medium text-ink/45">
+              {isPartner
+                ? `Capacity ${application.maxDailyCapacity ?? '—'}/day · ${application.activeOrderCount ?? 0} active order${application.activeOrderCount === 1 ? '' : 's'}`
+                : `Capacity ${application.maxActiveDeliveries ?? '—'} deliveries · ${application.activeDeliveryCount ?? 0} active`}
+              {' · '}
+              {application.availability === 'online' || application.availability === 'available'
+                ? 'Online'
+                : application.availability === 'on_delivery'
+                  ? 'On delivery'
+                  : 'Offline'}
+            </p>
+          )}
+        </div>
       </div>
 
       {application.accountStatus === 'pending' && (

@@ -223,6 +223,16 @@ export const updateAvailability = asyncHandler(async (req, res) => {
     { new: true },
   )
   if (!partner) throw new ApiError(401, 'Not authenticated.')
+
+  await ActivityLog.create({
+    actorType: 'partner',
+    actorId: partner._id,
+    action: 'partner_availability_changed',
+    entityType: 'PartnerUser',
+    entityId: partner._id,
+    metadata: { availability },
+  }).catch(() => {})
+
   res.json({ success: true, partner: publicPartner(partner) })
 })
 
@@ -247,10 +257,26 @@ export const updatePartnerProfile = asyncHandler(async (req, res) => {
     'operatingHours',
     'logo',
   ]
+  // Diffed before assignment (not just "field present in body") so a
+  // no-op save (form re-submitted with identical values) doesn't log noise.
+  const changedFields = editable.filter(
+    (field) => req.body[field] !== undefined && JSON.stringify(req.body[field]) !== JSON.stringify(partner[field]),
+  )
   for (const field of editable) {
     if (req.body[field] !== undefined) partner[field] = req.body[field]
   }
   await partner.save()
+
+  if (changedFields.length > 0) {
+    await ActivityLog.create({
+      actorType: 'partner',
+      actorId: partner._id,
+      action: 'partner_profile_updated',
+      entityType: 'PartnerUser',
+      entityId: partner._id,
+      metadata: { changedFields },
+    }).catch(() => {})
+  }
 
   res.json({ success: true, partner: publicPartner(partner) })
 })

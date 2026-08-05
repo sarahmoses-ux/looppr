@@ -78,6 +78,9 @@ function ActivityRow({ entry }) {
           )}
         </p>
         {line && <p className="truncate text-xs text-ink/55">{line}</p>}
+        {entry.metadata?.reason && (
+          <p className="mt-0.5 truncate text-xs italic text-ink/45">"{entry.metadata.reason}"</p>
+        )}
       </div>
       <span className="shrink-0 text-xs text-ink/45">{when}</span>
     </div>
