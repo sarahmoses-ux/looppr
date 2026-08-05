@@ -67,3 +67,7 @@ export function fetchBusinessAccounts() {
 export function fetchActivityLog(filters = {}) {
   return api.get('/admin/activity-log', { params: filters }).then((res) => res.data)
 }
+
+export function fetchIntakeStats() {
+  return api.get('/admin/data-collection').then((res) => res.data)
+}

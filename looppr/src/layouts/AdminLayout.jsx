@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
-import logo from '../assets/looppr-mark-on-dark.png'
+import logo from '../assets/looppr-mark-transparent.png'
 
 // Icon set lifted from the getloopper-app-design "Looppr OS" mockup
 // (24x24 viewBox, stroke currentColor, strokeWidth 2) so the sidebar reads
@@ -97,7 +97,7 @@ const NAV_TREE = [
   { id: 'customers', label: 'Customers', icon: IconCustomers, to: '/admin/customers' },
   { id: 'applications', label: 'Applications', icon: IconApplications, to: '/admin/applications' },
   { id: 'crm', label: 'CRM & Pipeline', icon: IconCrm, to: '/admin/crm' },
-  { id: 'growth', label: 'Growth & Marketing', icon: IconGrowth, locked: true },
+  { id: 'growth', label: 'Data Collection', icon: IconGrowth, to: '/admin/data-collection' },
   { id: 'reports', label: 'Reports', icon: IconReports, to: '/admin/reports' },
   { id: 'system', label: 'Activity Log', icon: IconSystem, to: '/admin/activity-log' },
 ]
@@ -113,6 +113,7 @@ const PAGE_META = {
   '/admin/crm': { title: 'CRM & Pipeline', subtitle: 'B2B leads and business accounts' },
   '/admin/reports': { title: 'Reports', subtitle: 'Revenue and order volume' },
   '/admin/activity-log': { title: 'Activity Log', subtitle: 'Every automated and manual action, in order' },
+  '/admin/data-collection': { title: 'Data Collection', subtitle: 'Every intake point, in one view' },
 }
 
 function NavIcon({ icon: Icon }) {
@@ -153,7 +154,7 @@ function SidebarContent({ user, onNavigate, onLogout }) {
   return (
     <div className="flex h-full flex-col p-3.5">
       <div className="mb-3 flex items-center gap-2.5 border-b border-white/15 px-1.5 pb-4">
-        <img src={logo} alt="" className="h-6 w-6 object-contain" />
+        <img src={logo} alt="" className="h-6 w-6 object-contain brightness-0 invert" />
         <div className="min-w-0">
           <p className="truncate font-display text-[15px] font-bold leading-tight text-white">
             Looppr <span className="text-linen/80">OS</span>

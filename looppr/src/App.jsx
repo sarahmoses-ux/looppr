@@ -52,6 +52,7 @@ const AdminApplications = lazy(() => import('./pages/admin/AdminApplications'))
 const AdminCrm = lazy(() => import('./pages/admin/AdminCrm'))
 const AdminReports = lazy(() => import('./pages/admin/AdminReports'))
 const AdminActivityLog = lazy(() => import('./pages/admin/AdminActivityLog'))
+const AdminDataCollection = lazy(() => import('./pages/admin/AdminDataCollection'))
 const GuestBook = lazy(() => import('./pages/guest/GuestBook'))
 const GuestRequestStatus = lazy(() => import('./pages/guest/GuestRequestStatus'))
 
@@ -178,6 +179,7 @@ function App() {
           <Route path="/admin/crm" element={<AdminCrm />} />
           <Route path="/admin/reports" element={<AdminReports />} />
           <Route path="/admin/activity-log" element={<AdminActivityLog />} />
+          <Route path="/admin/data-collection" element={<AdminDataCollection />} />
         </Route>
 
         {/* Business Portal: its own auth context so a business session is

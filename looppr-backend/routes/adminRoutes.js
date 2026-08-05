@@ -16,6 +16,7 @@ import {
 } from '../controllers/adminApplicationsController.js'
 import { listContactMessages, resolveContactMessage } from '../controllers/adminContactController.js'
 import { listActivity } from '../controllers/adminActivityController.js'
+import { getIntakeStats } from '../controllers/adminDataController.js'
 import {
   listBusinessAccounts,
   listBusinessLeads,
@@ -51,5 +52,7 @@ router.post('/business-leads/:id/mark-contacted', markBusinessLeadContacted)
 router.get('/business-accounts', listBusinessAccounts)
 
 router.get('/activity-log', listActivity)
+
+router.get('/data-collection', getIntakeStats)
 
 export default router
