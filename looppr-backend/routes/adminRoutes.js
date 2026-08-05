@@ -25,7 +25,12 @@ import {
   listBusinessLeads,
   markBusinessLeadContacted,
 } from '../controllers/adminCrmController.js'
-import { createAdminUser, listAdminUsers, updateAdminUserRole } from '../controllers/adminUsersController.js'
+import {
+  createAdminUser,
+  listAdminUsers,
+  updateAdminUserProfile,
+  updateAdminUserRole,
+} from '../controllers/adminUsersController.js'
 import { generatePayout, listPayouts, markPayoutPaid } from '../controllers/adminPayoutsController.js'
 import { advanceInvoiceStatus, generateInvoice, listInvoices } from '../controllers/adminInvoicesController.js'
 import { requireAdminRole, requireAuth, requireRole } from '../middleware/auth.js'
@@ -37,6 +42,7 @@ import {
   createAdminUserValidation,
   generateInvoiceValidation,
   generatePayoutValidation,
+  updateAdminUserProfileValidation,
   updateAdminUserRoleValidation,
   updateOrderStatusValidation,
 } from '../validations/adminValidation.js'
@@ -115,6 +121,13 @@ router.get('/data-collection', requireAdminRole(), getIntakeStats)
 router.get('/admin-users', requireAdminRole(), listAdminUsers)
 router.post('/admin-users', requireAdminRole(), createAdminUserValidation, validate, createAdminUser)
 router.patch('/admin-users/:id/role', requireAdminRole(), updateAdminUserRoleValidation, validate, updateAdminUserRole)
+router.patch(
+  '/admin-users/:id',
+  requireAdminRole(),
+  updateAdminUserProfileValidation,
+  validate,
+  updateAdminUserProfile,
+)
 
 // Payouts & Invoices — financial data, super_admin only (same tier as
 // Reports/Data Collection).

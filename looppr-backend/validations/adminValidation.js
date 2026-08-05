@@ -30,6 +30,15 @@ export const updateAdminUserRoleValidation = [
   body('adminRole').isIn(ADMIN_ROLES).withMessage('Invalid admin role.'),
 ]
 
+export const updateAdminUserProfileValidation = [
+  body('name').optional().trim().isLength({ min: 2, max: 100 }).withMessage('Name must be 2–100 characters.'),
+  body('phone')
+    .optional()
+    .trim()
+    .matches(/^\+?[0-9\s()-]{7,20}$/)
+    .withMessage('Enter a valid phone number.'),
+]
+
 export const generatePayoutValidation = [
   body('payeeType').isIn(['partner', 'driver']).withMessage('Invalid payee type.'),
   body('payeeId').isMongoId().withMessage('Invalid payee.'),

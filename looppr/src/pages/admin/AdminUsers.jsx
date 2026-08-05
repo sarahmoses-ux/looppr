@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import SEO from '../../components/SEO'
 import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
-import { createAdminUser, fetchAdminUsers, updateAdminUserRole } from '../../services/adminApi'
+import { createAdminUser, fetchAdminUsers, updateAdminUserProfile, updateAdminUserRole } from '../../services/adminApi'
 
 const ROLE_OPTIONS = [
   { value: 'super_admin', label: 'Super Admin' },
@@ -22,11 +22,13 @@ function formatDate(value) {
   return new Date(value).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
-function AdminUserRow({ admin, isSelf, onRoleChange }) {
+function AdminUserRow({ admin, isSelf, onRoleChange, onProfileUpdate }) {
   const { showToast } = useToast()
   const [busy, setBusy] = useState(false)
+  const [editing, setEditing] = useState(false)
+  const [editForm, setEditForm] = useState({ name: admin.name, phone: admin.phone })
 
-  async function handleChange(e) {
+  async function handleRoleSelectChange(e) {
     const adminRole = e.target.value
     setBusy(true)
     try {
@@ -36,6 +38,68 @@ function AdminUserRow({ admin, isSelf, onRoleChange }) {
     } finally {
       setBusy(false)
     }
+  }
+
+  function startEditing() {
+    setEditForm({ name: admin.name, phone: admin.phone })
+    setEditing(true)
+  }
+
+  async function handleSaveProfile(e) {
+    e.preventDefault()
+    setBusy(true)
+    try {
+      await onProfileUpdate(admin.id, editForm)
+      setEditing(false)
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Could not update this admin. Please try again.', 'error')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  if (editing) {
+    return (
+      <form
+        onSubmit={handleSaveProfile}
+        className="flex flex-col gap-3 rounded-2xl border border-periwinkle/40 bg-linen px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row">
+          <input
+            type="text"
+            required
+            value={editForm.name}
+            onChange={(e) => setEditForm((f) => ({ ...f, name: e.target.value }))}
+            placeholder="Full name"
+            className="rounded-xl border border-line bg-white px-3 py-2 text-sm text-ink outline-none focus:border-periwinkle"
+          />
+          <input
+            type="tel"
+            required
+            value={editForm.phone}
+            onChange={(e) => setEditForm((f) => ({ ...f, phone: e.target.value }))}
+            placeholder="Phone"
+            className="rounded-xl border border-line bg-white px-3 py-2 text-sm text-ink outline-none focus:border-periwinkle"
+          />
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          <button
+            type="submit"
+            disabled={busy}
+            className="rounded-full bg-periwinkle px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+          >
+            {busy ? 'Saving…' : 'Save'}
+          </button>
+          <button
+            type="button"
+            onClick={() => setEditing(false)}
+            className="rounded-full border border-line bg-white px-4 py-2 text-sm font-semibold text-ink/70 transition-colors hover:bg-linen-soft"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    )
   }
 
   return (
@@ -52,6 +116,13 @@ function AdminUserRow({ admin, isSelf, onRoleChange }) {
       </div>
 
       <div className="flex shrink-0 items-center gap-2">
+        <button
+          type="button"
+          onClick={startEditing}
+          className="rounded-full border border-line bg-white px-3 py-1.5 text-xs font-semibold text-ink/60 transition-colors hover:bg-linen"
+        >
+          Edit
+        </button>
         {isSelf ? (
           <span className={`rounded-full px-3 py-1.5 text-xs font-semibold ${ROLE_BADGE[admin.adminRole] || 'bg-ink/5 text-ink/60'}`}>
             {ROLE_LABEL[admin.adminRole] || admin.adminRole}
@@ -59,7 +130,7 @@ function AdminUserRow({ admin, isSelf, onRoleChange }) {
         ) : (
           <select
             value={admin.adminRole}
-            onChange={handleChange}
+            onChange={handleRoleSelectChange}
             disabled={busy}
             className="rounded-xl border border-line bg-white px-3 py-2 text-sm text-ink outline-none focus:border-periwinkle disabled:opacity-50"
           >
@@ -197,6 +268,11 @@ export default function AdminUsers() {
     setAdmins((list) => list.map((a) => (a.id === admin.id ? admin : a)))
   }
 
+  async function handleProfileUpdate(id, payload) {
+    const { admin } = await updateAdminUserProfile(id, payload)
+    setAdmins((list) => list.map((a) => (a.id === admin.id ? admin : a)))
+  }
+
   return (
     <>
       <SEO title="Admin Users" description="Manage admin accounts and access levels." noindex />
@@ -230,7 +306,13 @@ export default function AdminUsers() {
         ) : (
           <div className="space-y-3">
             {admins.map((admin) => (
-              <AdminUserRow key={admin.id} admin={admin} isSelf={admin.id === user?.id} onRoleChange={handleRoleChange} />
+              <AdminUserRow
+                key={admin.id}
+                admin={admin}
+                isSelf={admin.id === user?.id}
+                onRoleChange={handleRoleChange}
+                onProfileUpdate={handleProfileUpdate}
+              />
             ))}
           </div>
         )}
