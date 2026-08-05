@@ -29,3 +29,20 @@ export const createAdminUserValidation = [
 export const updateAdminUserRoleValidation = [
   body('adminRole').isIn(ADMIN_ROLES).withMessage('Invalid admin role.'),
 ]
+
+export const generatePayoutValidation = [
+  body('payeeType').isIn(['partner', 'driver']).withMessage('Invalid payee type.'),
+  body('payeeId').isMongoId().withMessage('Invalid payee.'),
+  body('periodStart').isISO8601().withMessage('Invalid start date.'),
+  body('periodEnd').isISO8601().withMessage('Invalid end date.'),
+]
+
+export const generateInvoiceValidation = [
+  body('businessId').isMongoId().withMessage('Invalid business account.'),
+  body('periodStart').isISO8601().withMessage('Invalid start date.'),
+  body('periodEnd').isISO8601().withMessage('Invalid end date.'),
+]
+
+export const advanceInvoiceStatusValidation = [
+  body('status').isIn(['sent', 'paid']).withMessage('Invalid status.'),
+]

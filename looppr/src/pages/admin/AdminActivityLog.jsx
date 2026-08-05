@@ -43,6 +43,10 @@ function entityLine(entry) {
     if (!entity.businessName) return null
     return entity.businessName + (entity.city ? ` · ${entity.city}` : '')
   }
+  if (entry.entityType === 'BusinessUser') {
+    if (!entity.businessName) return null
+    return entity.businessName + (entity.contactPerson ? ` · ${entity.contactPerson}` : '')
+  }
   return null
 }
 
@@ -50,6 +54,7 @@ const ENTITY_TAG = {
   PickupRequest: 'Order',
   DriverUser: 'Driver',
   PartnerUser: 'Partner',
+  BusinessUser: 'Business',
 }
 
 function ActivityRow({ entry }) {
@@ -92,6 +97,7 @@ const ENTITY_FILTERS = [
   { value: 'PickupRequest', label: 'Orders' },
   { value: 'PartnerUser', label: 'Partners' },
   { value: 'DriverUser', label: 'Drivers' },
+  { value: 'BusinessUser', label: 'Businesses' },
 ]
 
 export default function AdminActivityLog() {

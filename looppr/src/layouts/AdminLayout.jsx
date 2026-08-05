@@ -85,6 +85,14 @@ function IconAdminUsers() {
     </svg>
   )
 }
+function IconPayouts() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 7v10M9.5 9.5c0-1.4 1.2-2.5 2.5-2.5s2.5.9 2.5 2.1c0 3.2-5 1.6-5 4.8 0 1.2 1.2 2.1 2.5 2.1s2.5-1.1 2.5-2.5" />
+    </svg>
+  )
+}
 
 // Mirrors the Operations / CRM / Growth / Reports / System grouping from the
 // getloopper-app-design "Looppr OS" mockup. CRM/Growth/Reports/System are
@@ -114,6 +122,7 @@ const NAV_TREE = [
   { id: 'crm', label: 'CRM & Pipeline', icon: IconCrm, to: '/admin/crm' },
   { id: 'growth', label: 'Data Collection', icon: IconGrowth, to: '/admin/data-collection', roles: [] },
   { id: 'reports', label: 'Reports', icon: IconReports, to: '/admin/reports', roles: [] },
+  { id: 'payouts', label: 'Payouts & Invoices', icon: IconPayouts, to: '/admin/payouts', roles: [] },
   { id: 'system', label: 'Activity Log', icon: IconSystem, to: '/admin/activity-log', roles: ['ops'] },
   { id: 'admin-users', label: 'Admin Users', icon: IconAdminUsers, to: '/admin/admin-users', roles: [] },
 ]
@@ -136,6 +145,7 @@ const PAGE_META = {
   '/admin/activity-log': { title: 'Activity Log', subtitle: 'Every automated and manual action, in order' },
   '/admin/data-collection': { title: 'Data Collection', subtitle: 'Every intake point, in one view' },
   '/admin/admin-users': { title: 'Admin Users', subtitle: 'Manage admin accounts and access levels' },
+  '/admin/payouts': { title: 'Payouts & Invoices', subtitle: 'Partner/driver payouts and business invoices' },
 }
 
 function NavIcon({ icon: Icon }) {

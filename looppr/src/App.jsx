@@ -54,6 +54,7 @@ const AdminReports = lazy(() => import('./pages/admin/AdminReports'))
 const AdminActivityLog = lazy(() => import('./pages/admin/AdminActivityLog'))
 const AdminDataCollection = lazy(() => import('./pages/admin/AdminDataCollection'))
 const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'))
+const AdminPayouts = lazy(() => import('./pages/admin/AdminPayouts'))
 const GuestBook = lazy(() => import('./pages/guest/GuestBook'))
 const GuestRequestStatus = lazy(() => import('./pages/guest/GuestRequestStatus'))
 
@@ -221,6 +222,14 @@ function App() {
             element={
               <AdminRoleGate roles={[]}>
                 <AdminUsers />
+              </AdminRoleGate>
+            }
+          />
+          <Route
+            path="/admin/payouts"
+            element={
+              <AdminRoleGate roles={[]}>
+                <AdminPayouts />
               </AdminRoleGate>
             }
           />

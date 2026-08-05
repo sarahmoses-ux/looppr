@@ -26,12 +26,17 @@ import {
   markBusinessLeadContacted,
 } from '../controllers/adminCrmController.js'
 import { createAdminUser, listAdminUsers, updateAdminUserRole } from '../controllers/adminUsersController.js'
+import { generatePayout, listPayouts, markPayoutPaid } from '../controllers/adminPayoutsController.js'
+import { advanceInvoiceStatus, generateInvoice, listInvoices } from '../controllers/adminInvoicesController.js'
 import { requireAdminRole, requireAuth, requireRole } from '../middleware/auth.js'
 import { validate } from '../middleware/validate.js'
 import {
   adminRejectApplicationValidation,
   adminUpdateAccountStatusValidation,
+  advanceInvoiceStatusValidation,
   createAdminUserValidation,
+  generateInvoiceValidation,
+  generatePayoutValidation,
   updateAdminUserRoleValidation,
   updateOrderStatusValidation,
 } from '../validations/adminValidation.js'
@@ -110,5 +115,15 @@ router.get('/data-collection', requireAdminRole(), getIntakeStats)
 router.get('/admin-users', requireAdminRole(), listAdminUsers)
 router.post('/admin-users', requireAdminRole(), createAdminUserValidation, validate, createAdminUser)
 router.patch('/admin-users/:id/role', requireAdminRole(), updateAdminUserRoleValidation, validate, updateAdminUserRole)
+
+// Payouts & Invoices — financial data, super_admin only (same tier as
+// Reports/Data Collection).
+router.get('/payouts', requireAdminRole(), listPayouts)
+router.post('/payouts', requireAdminRole(), generatePayoutValidation, validate, generatePayout)
+router.post('/payouts/:id/mark-paid', requireAdminRole(), markPayoutPaid)
+
+router.get('/invoices', requireAdminRole(), listInvoices)
+router.post('/invoices', requireAdminRole(), generateInvoiceValidation, validate, generateInvoice)
+router.patch('/invoices/:id/status', requireAdminRole(), advanceInvoiceStatusValidation, validate, advanceInvoiceStatus)
 
 export default router
