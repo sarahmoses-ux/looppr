@@ -161,9 +161,13 @@ function App() {
             Not linked from anywhere in the public site or customer nav. */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/login/verify" element={<AdminLoginVerify />} />
-        {/* TEMP: auth bypass for local design preview only — restore
-            <ProtectedRoute role="admin"> before committing/deploying. */}
-        <Route element={<AdminLayout />}>
+        <Route
+          element={
+            <ProtectedRoute role="admin">
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/bookings" element={<AdminBookings />} />
           <Route path="/admin/jobs" element={<AdminJobsRoutes />} />
