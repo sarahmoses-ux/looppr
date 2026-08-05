@@ -44,6 +44,22 @@ export function rejectDriverApplication(id, reason) {
   return api.post(`/admin/drivers/${id}/reject`, { reason }).then((res) => res.data)
 }
 
+export function updatePartnerStatus(id, accountStatus) {
+  return api.patch(`/admin/partners/${id}/status`, { accountStatus }).then((res) => res.data)
+}
+
+export function updateDriverStatus(id, accountStatus) {
+  return api.patch(`/admin/drivers/${id}/status`, { accountStatus }).then((res) => res.data)
+}
+
+export function assignPartnerToOrder(pickupId, partnerUserId) {
+  return api.post(`/admin/pickups/${pickupId}/assign-partner`, { partnerUserId }).then((res) => res.data)
+}
+
+export function assignDriverToOrder(pickupId, driverUserId) {
+  return api.post(`/admin/pickups/${pickupId}/assign-driver`, { driverUserId }).then((res) => res.data)
+}
+
 export function fetchContactMessages(filters = {}) {
   return api.get('/admin/contact-messages', { params: filters }).then((res) => res.data)
 }

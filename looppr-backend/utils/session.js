@@ -63,6 +63,8 @@ export function publicDriver(driver) {
     isVerified: driver.isVerified,
     accountStatus: driver.accountStatus,
     availability: driver.availability,
+    maxActiveDeliveries: driver.maxActiveDeliveries,
+    activeDeliveryCount: driver.activeDeliveryCount,
     location: driver.location || null,
     locationUpdatedAt: driver.locationUpdatedAt || null,
     averageRating: driver.averageRating,

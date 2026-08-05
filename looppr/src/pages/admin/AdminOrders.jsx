@@ -3,7 +3,14 @@ import { useSearchParams } from 'react-router-dom'
 import SEO from '../../components/SEO'
 import { useToast } from '../../context/ToastContext'
 import { ALL_STATUSES } from '../../constants/orderStatus'
-import { fetchAllPickups, updateOrderStatus } from '../../services/adminApi'
+import {
+  assignDriverToOrder,
+  assignPartnerToOrder,
+  fetchAllPickups,
+  fetchDriverApplications,
+  fetchPartnerApplications,
+  updateOrderStatus,
+} from '../../services/adminApi'
 
 const WINDOW_LABELS = {
   morning: 'Morning · 8am – 11am',
@@ -54,7 +61,7 @@ function formatMoney(amount, currency = 'usd') {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency.toUpperCase() }).format(amount)
 }
 
-function AdminOrderRow({ pickup, onChange }) {
+function AdminOrderRow({ pickup, onChange, partners, drivers }) {
   const { showToast } = useToast()
   const contact = pickup.clientId || pickup.guest
   const notificationsOff = pickup.source === 'account' && pickup.clientId?.emailNotifications === false
@@ -73,6 +80,28 @@ function AdminOrderRow({ pickup, onChange }) {
       // The <select> reverts on next render since we never applied an
       // optimistic update — still worth telling the admin it didn't save.
       showToast('Could not update order status. Please try again.', 'error')
+    }
+  }
+
+  async function handleAssignPartner(e) {
+    const partnerUserId = e.target.value
+    if (!partnerUserId) return
+    try {
+      const { pickup: updated } = await assignPartnerToOrder(pickup._id, partnerUserId)
+      onChange(updated)
+    } catch {
+      showToast('Could not assign a partner. Please try again.', 'error')
+    }
+  }
+
+  async function handleAssignDriver(e) {
+    const driverUserId = e.target.value
+    if (!driverUserId) return
+    try {
+      const { pickup: updated } = await assignDriverToOrder(pickup._id, driverUserId)
+      onChange(updated)
+    } catch {
+      showToast('Could not assign a driver. Please try again.', 'error')
     }
   }
 
@@ -134,6 +163,20 @@ function AdminOrderRow({ pickup, onChange }) {
             </p>
           )
         )}
+        {partners?.length > 0 && (
+          <select
+            value=""
+            onChange={handleAssignPartner}
+            className="mt-1.5 rounded-lg border border-line bg-white px-2 py-1 text-xs text-ink/70 outline-none focus:border-periwinkle"
+          >
+            <option value="">{pickup.partnerUserId ? 'Reassign partner…' : 'Assign partner…'}</option>
+            {partners.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.businessName}
+              </option>
+            ))}
+          </select>
+        )}
 
         {/* Driver Portal attribution — reflects any accept/advance/weight
             action a driver took on this delivery. */}
@@ -154,6 +197,20 @@ function AdminOrderRow({ pickup, onChange }) {
               Unclaimed · {pickup.driverRejectedBy.length} driver rejection{pickup.driverRejectedBy.length === 1 ? '' : 's'}
             </p>
           )
+        )}
+        {drivers?.length > 0 && (
+          <select
+            value=""
+            onChange={handleAssignDriver}
+            className="mt-1.5 rounded-lg border border-line bg-white px-2 py-1 text-xs text-ink/70 outline-none focus:border-periwinkle"
+          >
+            <option value="">{pickup.driverUserId ? 'Reassign driver…' : 'Assign driver…'}</option>
+            {drivers.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.name}
+              </option>
+            ))}
+          </select>
         )}
 
         {/* Driver-confirmed weight overrides the customer/business's
@@ -192,6 +249,19 @@ export default function AdminOrders() {
   const [search, setSearch] = useState(() => searchParams.get('search') || '')
   const [statusFilter, setStatusFilter] = useState('')
   const [paymentFilter, setPaymentFilter] = useState('')
+  const [partners, setPartners] = useState([])
+  const [drivers, setDrivers] = useState([])
+
+  // Fetched once, independent of the pickups filters above — powers the
+  // assign/reassign selects on each row.
+  useEffect(() => {
+    fetchPartnerApplications({ status: 'active' })
+      .then(({ partners: list }) => setPartners(list))
+      .catch(() => {})
+    fetchDriverApplications({ status: 'active' })
+      .then(({ drivers: list }) => setDrivers(list))
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -267,7 +337,7 @@ export default function AdminOrders() {
         ) : (
           <div className="space-y-3">
             {pickups.map((p) => (
-              <AdminOrderRow key={p._id} pickup={p} onChange={handleChange} />
+              <AdminOrderRow key={p._id} pickup={p} onChange={handleChange} partners={partners} drivers={drivers} />
             ))}
           </div>
         )}

@@ -13,7 +13,10 @@ import {
   listPartnerApplications,
   rejectDriverApplication,
   rejectPartnerApplication,
+  updateDriverStatus,
+  updatePartnerStatus,
 } from '../controllers/adminApplicationsController.js'
+import { assignDriverToOrder, assignPartnerToOrder } from '../controllers/adminAssignmentController.js'
 import { listContactMessages, resolveContactMessage } from '../controllers/adminContactController.js'
 import { listActivity } from '../controllers/adminActivityController.js'
 import { getIntakeStats } from '../controllers/adminDataController.js'
@@ -24,7 +27,11 @@ import {
 } from '../controllers/adminCrmController.js'
 import { requireAuth, requireRole } from '../middleware/auth.js'
 import { validate } from '../middleware/validate.js'
-import { adminRejectApplicationValidation, updateOrderStatusValidation } from '../validations/adminValidation.js'
+import {
+  adminRejectApplicationValidation,
+  adminUpdateAccountStatusValidation,
+  updateOrderStatusValidation,
+} from '../validations/adminValidation.js'
 
 const router = Router()
 
@@ -36,13 +43,17 @@ router.get('/customers', listCustomers)
 router.get('/pickups', listAllPickups)
 router.post('/pickups/:id/send-payment-request', sendPaymentRequest)
 router.patch('/pickups/:id/status', updateOrderStatusValidation, validate, updateOrderStatus)
+router.post('/pickups/:id/assign-partner', assignPartnerToOrder)
+router.post('/pickups/:id/assign-driver', assignDriverToOrder)
 
 router.get('/partners', listPartnerApplications)
 router.get('/drivers', listDriverApplications)
 router.post('/partners/:id/approve', approvePartnerApplication)
 router.post('/partners/:id/reject', adminRejectApplicationValidation, validate, rejectPartnerApplication)
+router.patch('/partners/:id/status', adminUpdateAccountStatusValidation, validate, updatePartnerStatus)
 router.post('/drivers/:id/approve', approveDriverApplication)
 router.post('/drivers/:id/reject', adminRejectApplicationValidation, validate, rejectDriverApplication)
+router.patch('/drivers/:id/status', adminUpdateAccountStatusValidation, validate, updateDriverStatus)
 
 router.get('/contact-messages', listContactMessages)
 router.post('/contact-messages/:id/resolve', resolveContactMessage)

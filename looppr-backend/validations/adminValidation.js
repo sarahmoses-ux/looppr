@@ -8,3 +8,7 @@ export const updateOrderStatusValidation = [
 export const adminRejectApplicationValidation = [
   body('reason').optional().trim().isLength({ max: 500 }).withMessage('Reason is too long.'),
 ]
+
+export const adminUpdateAccountStatusValidation = [
+  body('accountStatus').isIn(['active', 'suspended']).withMessage('Invalid account status.'),
+]

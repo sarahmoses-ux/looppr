@@ -9,6 +9,8 @@ import {
   fetchPartnerApplications,
   rejectDriverApplication,
   rejectPartnerApplication,
+  updateDriverStatus,
+  updatePartnerStatus,
 } from '../../services/adminApi'
 
 const STATUS_BADGE = {
@@ -35,7 +37,7 @@ function formatDate(value) {
   })
 }
 
-function ApplicationRow({ application, type, onApprove, onReject }) {
+function ApplicationRow({ application, type, onApprove, onReject, onSuspend, onReactivate }) {
   const { showToast } = useToast()
   const [busy, setBusy] = useState(false)
   const isPartner = type === 'partner'
@@ -48,6 +50,28 @@ function ApplicationRow({ application, type, onApprove, onReject }) {
       await onApprove(application._id)
     } catch (err) {
       showToast(err.response?.data?.message || 'Could not approve. Please try again.', 'error')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function handleSuspend() {
+    setBusy(true)
+    try {
+      await onSuspend(application._id)
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Could not suspend. Please try again.', 'error')
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  async function handleReactivate() {
+    setBusy(true)
+    try {
+      await onReactivate(application._id)
+    } catch (err) {
+      showToast(err.response?.data?.message || 'Could not reactivate. Please try again.', 'error')
     } finally {
       setBusy(false)
     }
@@ -75,6 +99,19 @@ function ApplicationRow({ application, type, onApprove, onReject }) {
         <p className="mt-0.5 text-sm text-ink/55">
           {application.city}, {application.state} · Applied {formatDate(application.createdAt)}
         </p>
+        {(application.accountStatus === 'active' || application.accountStatus === 'suspended') && (
+          <p className="mt-1.5 text-xs font-medium text-ink/45">
+            {isPartner
+              ? `Capacity ${application.maxDailyCapacity ?? '—'}/day · ${application.activeOrderCount ?? 0} active order${application.activeOrderCount === 1 ? '' : 's'}`
+              : `Capacity ${application.maxActiveDeliveries ?? '—'} deliveries · ${application.activeDeliveryCount ?? 0} active`}
+            {' · '}
+            {application.availability === 'online' || application.availability === 'available'
+              ? 'Online'
+              : application.availability === 'on_delivery'
+                ? 'On delivery'
+                : 'Offline'}
+          </p>
+        )}
       </div>
 
       {application.accountStatus === 'pending' && (
@@ -94,6 +131,32 @@ function ApplicationRow({ application, type, onApprove, onReject }) {
             className="rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50"
           >
             Reject
+          </button>
+        </div>
+      )}
+
+      {application.accountStatus === 'active' && (
+        <div className="flex shrink-0 gap-2">
+          <button
+            type="button"
+            onClick={handleSuspend}
+            disabled={busy}
+            className="rounded-full border border-red-200 bg-white px-4 py-2 text-sm font-semibold text-red-600 transition-colors hover:bg-red-50 disabled:opacity-50"
+          >
+            {busy ? 'Suspending…' : 'Suspend'}
+          </button>
+        </div>
+      )}
+
+      {application.accountStatus === 'suspended' && (
+        <div className="flex shrink-0 gap-2">
+          <button
+            type="button"
+            onClick={handleReactivate}
+            disabled={busy}
+            className="rounded-full bg-success-dark px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+          >
+            {busy ? 'Reactivating…' : 'Reactivate'}
           </button>
         </div>
       )}
@@ -147,6 +210,26 @@ export default function AdminApplications() {
 
   async function handleApproveDriver(id) {
     const { driver } = await approveDriverApplication(id)
+    replaceInList(setDrivers, driver)
+  }
+
+  async function handleSuspendPartner(id) {
+    const { partner } = await updatePartnerStatus(id, 'suspended')
+    replaceInList(setPartners, partner)
+  }
+
+  async function handleReactivatePartner(id) {
+    const { partner } = await updatePartnerStatus(id, 'active')
+    replaceInList(setPartners, partner)
+  }
+
+  async function handleSuspendDriver(id) {
+    const { driver } = await updateDriverStatus(id, 'suspended')
+    replaceInList(setDrivers, driver)
+  }
+
+  async function handleReactivateDriver(id) {
+    const { driver } = await updateDriverStatus(id, 'active')
     replaceInList(setDrivers, driver)
   }
 
@@ -207,6 +290,7 @@ export default function AdminApplications() {
           <option value="">All statuses</option>
           <option value="pending">Pending</option>
           <option value="active">Approved</option>
+          <option value="suspended">Suspended</option>
           <option value="rejected">Rejected</option>
         </select>
       </div>
@@ -231,6 +315,8 @@ export default function AdminApplications() {
                 onReject={(app, applicantLabel) =>
                   setRejectTarget({ application: app, applicantLabel, type: tab === 'partners' ? 'partner' : 'driver' })
                 }
+                onSuspend={tab === 'partners' ? handleSuspendPartner : handleSuspendDriver}
+                onReactivate={tab === 'partners' ? handleReactivatePartner : handleReactivateDriver}
               />
             ))}
           </div>

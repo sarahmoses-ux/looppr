@@ -1,5 +1,7 @@
+import { TERMINAL_STATUSES } from '../constants/orderStatus.js'
 import { DriverUser } from '../models/DriverUser.js'
 import { PartnerUser } from '../models/PartnerUser.js'
+import { PickupRequest } from '../models/PickupRequest.js'
 import { sendApplicationApprovedEmail, sendApplicationRejectedEmail } from '../services/emailService.js'
 import { ApiError } from '../utils/ApiError.js'
 import { asyncHandler } from '../utils/asyncHandler.js'
@@ -38,7 +40,24 @@ export const listPartnerApplications = asyncHandler(async (req, res) => {
   ])
   let partners = await PartnerUser.find(match).sort({ createdAt: -1 })
   partners = filterBySearch(partners, search, searchFields)
-  res.json({ success: true, partners: partners.map(publicPartner) })
+
+  // PartnerUser has no denormalized load counter (unlike DriverUser's
+  // activeDeliveryCount), so derive it here — one aggregate for the whole
+  // page instead of a query per row, same shape as adminCrmController.js's
+  // listBusinessAccounts.
+  const counts = await PickupRequest.aggregate([
+    { $match: { partnerUserId: { $in: partners.map((p) => p._id) }, status: { $nin: TERMINAL_STATUSES } } },
+    { $group: { _id: '$partnerUserId', count: { $sum: 1 } } },
+  ])
+  const countByPartnerId = new Map(counts.map((c) => [c._id.toString(), c.count]))
+
+  res.json({
+    success: true,
+    partners: partners.map((p) => ({
+      ...publicPartner(p),
+      activeOrderCount: countByPartnerId.get(p._id.toString()) || 0,
+    })),
+  })
 })
 
 export const listDriverApplications = asyncHandler(async (req, res) => {
@@ -122,6 +141,38 @@ export const rejectDriverApplication = asyncHandler(async (req, res) => {
   } catch (err) {
     console.error('Failed to send driver rejection email', err)
   }
+
+  res.json({ success: true, driver: publicDriver(driver) })
+})
+
+// Suspend/reactivate an already-approved account — deliberately separate from
+// approve/reject above, which only ever move a 'pending' application and stay
+// untouched here so replaying an approve/reject can't accidentally undo a
+// suspension (or vice versa).
+export const updatePartnerStatus = asyncHandler(async (req, res) => {
+  const { accountStatus } = req.body
+  const partner = await PartnerUser.findById(req.params.id)
+  if (!partner) throw new ApiError(404, 'Partner not found.')
+  if (!['active', 'suspended'].includes(partner.accountStatus)) {
+    throw new ApiError(409, 'This account is not yet approved.')
+  }
+
+  partner.accountStatus = accountStatus
+  await partner.save()
+
+  res.json({ success: true, partner: publicPartner(partner) })
+})
+
+export const updateDriverStatus = asyncHandler(async (req, res) => {
+  const { accountStatus } = req.body
+  const driver = await DriverUser.findById(req.params.id)
+  if (!driver) throw new ApiError(404, 'Driver not found.')
+  if (!['active', 'suspended'].includes(driver.accountStatus)) {
+    throw new ApiError(409, 'This account is not yet approved.')
+  }
+
+  driver.accountStatus = accountStatus
+  await driver.save()
 
   res.json({ success: true, driver: publicDriver(driver) })
 })
