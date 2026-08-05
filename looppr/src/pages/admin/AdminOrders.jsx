@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import SEO from '../../components/SEO'
+import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
+import { effectiveAdminRole } from '../../constants/adminRoles'
 import { ALL_STATUSES } from '../../constants/orderStatus'
 import {
   assignDriverToOrder,
@@ -61,7 +63,7 @@ function formatMoney(amount, currency = 'usd') {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency.toUpperCase() }).format(amount)
 }
 
-function AdminOrderRow({ pickup, onChange, partners, drivers }) {
+function AdminOrderRow({ pickup, onChange, partners, drivers, readOnly }) {
   const { showToast } = useToast()
   const contact = pickup.clientId || pickup.guest
   const notificationsOff = pickup.source === 'account' && pickup.clientId?.emailNotifications === false
@@ -163,7 +165,7 @@ function AdminOrderRow({ pickup, onChange, partners, drivers }) {
             </p>
           )
         )}
-        {partners?.length > 0 && (
+        {partners?.length > 0 && !readOnly && (
           <select
             value=""
             onChange={handleAssignPartner}
@@ -198,7 +200,7 @@ function AdminOrderRow({ pickup, onChange, partners, drivers }) {
             </p>
           )
         )}
-        {drivers?.length > 0 && (
+        {drivers?.length > 0 && !readOnly && (
           <select
             value=""
             onChange={handleAssignDriver}
@@ -229,7 +231,8 @@ function AdminOrderRow({ pickup, onChange, partners, drivers }) {
         <select
           value={pickup.status}
           onChange={handleStatusChange}
-          className="rounded-xl border border-line bg-white px-3 py-2 text-sm text-ink outline-none focus:border-periwinkle"
+          disabled={readOnly}
+          className="rounded-xl border border-line bg-white px-3 py-2 text-sm text-ink outline-none focus:border-periwinkle disabled:opacity-50"
         >
           {ALL_STATUSES.map((s) => (
             <option key={s.value} value={s.value}>
@@ -243,6 +246,12 @@ function AdminOrderRow({ pickup, onChange, partners, drivers }) {
 }
 
 export default function AdminOrders() {
+  const { user } = useAuth()
+  // Support has read-only access to Orders (see requireAdminRole('ops') on
+  // the mutation routes in adminRoutes.js) — disable rather than hide the
+  // controls so support can still see current status/assignment at a glance.
+  const readOnly = effectiveAdminRole(user) === 'support'
+
   // Seeded from ?search= so the admin header search box can deep-link here.
   const [searchParams] = useSearchParams()
   const [pickups, setPickups] = useState(null)
@@ -337,7 +346,14 @@ export default function AdminOrders() {
         ) : (
           <div className="space-y-3">
             {pickups.map((p) => (
-              <AdminOrderRow key={p._id} pickup={p} onChange={handleChange} partners={partners} drivers={drivers} />
+              <AdminOrderRow
+                key={p._id}
+                pickup={p}
+                onChange={handleChange}
+                partners={partners}
+                drivers={drivers}
+                readOnly={readOnly}
+              />
             ))}
           </div>
         )}

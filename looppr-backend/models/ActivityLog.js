@@ -2,7 +2,7 @@ import mongoose from 'mongoose'
 
 export const ACTIVITY_ACTOR_TYPES = ['system', 'admin', 'rider', 'partner', 'client']
 
-export const ACTIVITY_ENTITY_TYPES = ['PickupRequest', 'Rider', 'LaundryPartner', 'User']
+export const ACTIVITY_ENTITY_TYPES = ['PickupRequest', 'Rider', 'LaundryPartner', 'User', 'DriverUser', 'PartnerUser']
 
 // Append-only log — nothing here is ever updated or deleted, only inserted.
 // No `ref` on actorId/entityId: which collection they point to depends on

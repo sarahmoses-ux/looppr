@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 
 export function signAccessToken(user) {
   return jwt.sign(
-    { sub: user._id.toString(), role: user.role, tokenVersion: user.tokenVersion },
+    { sub: user._id.toString(), role: user.role, adminRole: user.adminRole, tokenVersion: user.tokenVersion },
     process.env.JWT_ACCESS_SECRET,
     { expiresIn: process.env.JWT_ACCESS_EXPIRES || '15m' },
   )
@@ -10,7 +10,7 @@ export function signAccessToken(user) {
 
 export function signRefreshToken(user) {
   return jwt.sign(
-    { sub: user._id.toString(), role: user.role, tokenVersion: user.tokenVersion },
+    { sub: user._id.toString(), role: user.role, adminRole: user.adminRole, tokenVersion: user.tokenVersion },
     process.env.JWT_REFRESH_SECRET,
     { expiresIn: process.env.JWT_REFRESH_EXPIRES || '30d' },
   )

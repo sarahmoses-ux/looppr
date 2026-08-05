@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useToast } from '../context/ToastContext'
+import { effectiveAdminRole } from '../constants/adminRoles'
 import logo from '../assets/looppr-mark-transparent.png'
 
 // Icon set lifted from the getloopper-app-design "Looppr OS" mockup
@@ -76,11 +77,25 @@ function IconSystem() {
     </svg>
   )
 }
+function IconAdminUsers() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M12 3l7 3v6c0 4.4-3 7.4-7 9-4-1.6-7-4.6-7-9V6l7-3z" />
+      <path d="M9.5 12l1.8 1.8L14.8 10" />
+    </svg>
+  )
+}
 
 // Mirrors the Operations / CRM / Growth / Reports / System grouping from the
 // getloopper-app-design "Looppr OS" mockup. CRM/Growth/Reports/System are
 // locked placeholders — that part of the design has no real page behind it
 // yet, so they show the mockup's own lock affordance instead of a dead link.
+//
+// `roles` on an item/child gates it to those admin sub-roles (super_admin
+// always sees everything); omit `roles` for items open to every admin.
+// Mirrors the backend's requireAdminRole(...) matrix in routes/adminRoutes.js
+// — kept in sync by hand since nav is presentation-only, not a security
+// boundary (the API enforces the real one).
 const NAV_TREE = [
   { id: 'dashboard', label: 'Dashboard', icon: IconDashboard, to: '/admin/dashboard', end: true },
   {
@@ -91,16 +106,22 @@ const NAV_TREE = [
       { label: 'Bookings', to: '/admin/bookings' },
       { label: 'Jobs & Routes', to: '/admin/jobs' },
       { label: 'Orders', to: '/admin/orders' },
-      { label: 'Customer Care', to: '/admin/customer-care' },
+      { label: 'Customer Care', to: '/admin/customer-care', roles: ['support'] },
     ],
   },
   { id: 'customers', label: 'Customers', icon: IconCustomers, to: '/admin/customers' },
-  { id: 'applications', label: 'Applications', icon: IconApplications, to: '/admin/applications' },
+  { id: 'applications', label: 'Applications', icon: IconApplications, to: '/admin/applications', roles: ['ops'] },
   { id: 'crm', label: 'CRM & Pipeline', icon: IconCrm, to: '/admin/crm' },
-  { id: 'growth', label: 'Data Collection', icon: IconGrowth, to: '/admin/data-collection' },
-  { id: 'reports', label: 'Reports', icon: IconReports, to: '/admin/reports' },
-  { id: 'system', label: 'Activity Log', icon: IconSystem, to: '/admin/activity-log' },
+  { id: 'growth', label: 'Data Collection', icon: IconGrowth, to: '/admin/data-collection', roles: [] },
+  { id: 'reports', label: 'Reports', icon: IconReports, to: '/admin/reports', roles: [] },
+  { id: 'system', label: 'Activity Log', icon: IconSystem, to: '/admin/activity-log', roles: ['ops'] },
+  { id: 'admin-users', label: 'Admin Users', icon: IconAdminUsers, to: '/admin/admin-users', roles: [] },
 ]
+
+function canSee(item, adminRole) {
+  if (!item.roles) return true
+  return adminRole === 'super_admin' || item.roles.includes(adminRole)
+}
 
 const PAGE_META = {
   '/admin/dashboard': { title: 'Dashboard', subtitle: 'Business overview' },
@@ -114,6 +135,7 @@ const PAGE_META = {
   '/admin/reports': { title: 'Reports', subtitle: 'Revenue and order volume' },
   '/admin/activity-log': { title: 'Activity Log', subtitle: 'Every automated and manual action, in order' },
   '/admin/data-collection': { title: 'Data Collection', subtitle: 'Every intake point, in one view' },
+  '/admin/admin-users': { title: 'Admin Users', subtitle: 'Manage admin accounts and access levels' },
 }
 
 function NavIcon({ icon: Icon }) {
@@ -137,6 +159,17 @@ function SidebarContent({ user, onNavigate, onLogout }) {
   const location = useLocation()
   const { showToast } = useToast()
   const [openGroups, setOpenGroups] = useState({ ops: true })
+  const adminRole = effectiveAdminRole(user)
+
+  const visibleNav = useMemo(
+    () =>
+      NAV_TREE.filter((item) => canSee(item, adminRole))
+        .map((item) =>
+          item.children ? { ...item, children: item.children.filter((c) => canSee(c, adminRole)) } : item,
+        )
+        .filter((item) => !item.children || item.children.length > 0),
+    [adminRole],
+  )
 
   const initials = (user?.name || '?')
     .split(' ')
@@ -164,7 +197,7 @@ function SidebarContent({ user, onNavigate, onLogout }) {
       </div>
 
       <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto">
-        {NAV_TREE.map((item) => {
+        {visibleNav.map((item) => {
           if (item.locked) {
             return (
               <button
@@ -228,7 +261,7 @@ function SidebarContent({ user, onNavigate, onLogout }) {
         </span>
         <div className="min-w-0 flex-1">
           <p className="truncate text-xs font-bold text-white">{user?.name}</p>
-          <p className="truncate text-[10.5px] text-linen/70">Admin</p>
+          <p className="truncate text-[10.5px] capitalize text-linen/70">{adminRole.replace('_', ' ')}</p>
         </div>
         <button
           type="button"

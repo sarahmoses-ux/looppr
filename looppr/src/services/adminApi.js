@@ -87,3 +87,15 @@ export function fetchActivityLog(filters = {}) {
 export function fetchIntakeStats() {
   return api.get('/admin/data-collection').then((res) => res.data)
 }
+
+export function fetchAdminUsers() {
+  return api.get('/admin/admin-users').then((res) => res.data)
+}
+
+export function createAdminUser(payload) {
+  return api.post('/admin/admin-users', payload).then((res) => res.data)
+}
+
+export function updateAdminUserRole(id, adminRole) {
+  return api.patch(`/admin/admin-users/${id}/role`, { adminRole }).then((res) => res.data)
+}

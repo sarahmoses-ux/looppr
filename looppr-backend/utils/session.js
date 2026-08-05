@@ -128,6 +128,7 @@ export function publicUser(user) {
     email: user.email,
     phone: user.phone,
     role: user.role,
+    adminRole: user.adminRole,
     isVerified: user.isVerified,
     emailNotifications: user.emailNotifications,
     createdAt: user.createdAt,

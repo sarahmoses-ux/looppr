@@ -1,8 +1,22 @@
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { effectiveAdminRole } from '../constants/adminRoles'
 
 const LOGIN_PATH = { client: '/login', admin: '/admin/login' }
 const DASHBOARD_PATH = { client: '/home', admin: '/admin/dashboard' }
+
+// Gates an already-admin-authenticated page to a subset of admin sub-roles.
+// Used *inside* the outer <ProtectedRoute role="admin"> layout route (see
+// App.jsx) rather than replacing it — this only adds the sub-role check.
+// super_admin always passes, regardless of `roles`.
+export function AdminRoleGate({ roles, children }) {
+  const { user } = useAuth()
+  const adminRole = effectiveAdminRole(user)
+  if (adminRole !== 'super_admin' && !roles.includes(adminRole)) {
+    return <Navigate to="/admin/dashboard" replace />
+  }
+  return children
+}
 
 // `role` is the role required to view this route ('client' by default).
 // Signed-out users go to that role's login page; signed-in users of the

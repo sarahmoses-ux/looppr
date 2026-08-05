@@ -1,4 +1,5 @@
 import { TERMINAL_STATUSES } from '../constants/orderStatus.js'
+import { ActivityLog } from '../models/ActivityLog.js'
 import { DriverUser } from '../models/DriverUser.js'
 import { PartnerUser } from '../models/PartnerUser.js'
 import { PickupRequest } from '../models/PickupRequest.js'
@@ -83,6 +84,15 @@ export const approvePartnerApplication = asyncHandler(async (req, res) => {
   partner.accountStatus = 'active'
   await partner.save()
 
+  await ActivityLog.create({
+    actorType: 'admin',
+    actorId: req.user.sub,
+    action: 'partner_application_approved',
+    entityType: 'PartnerUser',
+    entityId: partner._id,
+    metadata: { businessName: partner.businessName },
+  }).catch(() => {})
+
   try {
     await sendApplicationApprovedEmail(partner.email, partner.ownerName, 'partner', `${CLIENT_URL}/partners/login`)
   } catch (err) {
@@ -101,6 +111,15 @@ export const rejectPartnerApplication = asyncHandler(async (req, res) => {
   partner.accountStatus = 'rejected'
   await partner.save()
 
+  await ActivityLog.create({
+    actorType: 'admin',
+    actorId: req.user.sub,
+    action: 'partner_application_rejected',
+    entityType: 'PartnerUser',
+    entityId: partner._id,
+    metadata: { businessName: partner.businessName, reason },
+  }).catch(() => {})
+
   try {
     await sendApplicationRejectedEmail(partner.email, partner.ownerName, reason)
   } catch (err) {
@@ -117,6 +136,15 @@ export const approveDriverApplication = asyncHandler(async (req, res) => {
 
   driver.accountStatus = 'active'
   await driver.save()
+
+  await ActivityLog.create({
+    actorType: 'admin',
+    actorId: req.user.sub,
+    action: 'driver_application_approved',
+    entityType: 'DriverUser',
+    entityId: driver._id,
+    metadata: { name: driver.name },
+  }).catch(() => {})
 
   try {
     await sendApplicationApprovedEmail(driver.email, driver.name, 'driver', `${CLIENT_URL}/drive/login`)
@@ -135,6 +163,15 @@ export const rejectDriverApplication = asyncHandler(async (req, res) => {
 
   driver.accountStatus = 'rejected'
   await driver.save()
+
+  await ActivityLog.create({
+    actorType: 'admin',
+    actorId: req.user.sub,
+    action: 'driver_application_rejected',
+    entityType: 'DriverUser',
+    entityId: driver._id,
+    metadata: { name: driver.name, reason },
+  }).catch(() => {})
 
   try {
     await sendApplicationRejectedEmail(driver.email, driver.name, reason)
@@ -160,6 +197,15 @@ export const updatePartnerStatus = asyncHandler(async (req, res) => {
   partner.accountStatus = accountStatus
   await partner.save()
 
+  await ActivityLog.create({
+    actorType: 'admin',
+    actorId: req.user.sub,
+    action: accountStatus === 'suspended' ? 'partner_suspended' : 'partner_reactivated',
+    entityType: 'PartnerUser',
+    entityId: partner._id,
+    metadata: { businessName: partner.businessName },
+  }).catch(() => {})
+
   res.json({ success: true, partner: publicPartner(partner) })
 })
 
@@ -173,6 +219,15 @@ export const updateDriverStatus = asyncHandler(async (req, res) => {
 
   driver.accountStatus = accountStatus
   await driver.save()
+
+  await ActivityLog.create({
+    actorType: 'admin',
+    actorId: req.user.sub,
+    action: accountStatus === 'suspended' ? 'driver_suspended' : 'driver_reactivated',
+    entityType: 'DriverUser',
+    entityId: driver._id,
+    metadata: { name: driver.name },
+  }).catch(() => {})
 
   res.json({ success: true, driver: publicDriver(driver) })
 })

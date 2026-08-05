@@ -25,45 +25,90 @@ import {
   listBusinessLeads,
   markBusinessLeadContacted,
 } from '../controllers/adminCrmController.js'
-import { requireAuth, requireRole } from '../middleware/auth.js'
+import { createAdminUser, listAdminUsers, updateAdminUserRole } from '../controllers/adminUsersController.js'
+import { requireAdminRole, requireAuth, requireRole } from '../middleware/auth.js'
 import { validate } from '../middleware/validate.js'
 import {
   adminRejectApplicationValidation,
   adminUpdateAccountStatusValidation,
+  createAdminUserValidation,
+  updateAdminUserRoleValidation,
   updateOrderStatusValidation,
 } from '../validations/adminValidation.js'
 
 const router = Router()
 
-// Every route below requires a valid session AND role: 'admin'.
+// Every route below requires a valid session AND role: 'admin'. Beyond
+// that, most routes are further scoped with requireAdminRole(...) — see
+// models/User.js's ADMIN_ROLES and middleware/auth.js for how sub-roles
+// work. Routes with no requireAdminRole are open to every admin sub-role
+// (dashboard stats, customers, order/lead reads, CRM reads).
 router.use(requireAuth, requireRole('admin'))
 
 router.get('/stats', getStats)
 router.get('/customers', listCustomers)
 router.get('/pickups', listAllPickups)
-router.post('/pickups/:id/send-payment-request', sendPaymentRequest)
-router.patch('/pickups/:id/status', updateOrderStatusValidation, validate, updateOrderStatus)
-router.post('/pickups/:id/assign-partner', assignPartnerToOrder)
-router.post('/pickups/:id/assign-driver', assignDriverToOrder)
+router.post('/pickups/:id/send-payment-request', requireAdminRole('ops'), sendPaymentRequest)
+router.patch('/pickups/:id/status', requireAdminRole('ops'), updateOrderStatusValidation, validate, updateOrderStatus)
+router.post('/pickups/:id/assign-partner', requireAdminRole('ops'), assignPartnerToOrder)
+router.post('/pickups/:id/assign-driver', requireAdminRole('ops'), assignDriverToOrder)
 
-router.get('/partners', listPartnerApplications)
-router.get('/drivers', listDriverApplications)
-router.post('/partners/:id/approve', approvePartnerApplication)
-router.post('/partners/:id/reject', adminRejectApplicationValidation, validate, rejectPartnerApplication)
-router.patch('/partners/:id/status', adminUpdateAccountStatusValidation, validate, updatePartnerStatus)
-router.post('/drivers/:id/approve', approveDriverApplication)
-router.post('/drivers/:id/reject', adminRejectApplicationValidation, validate, rejectDriverApplication)
-router.patch('/drivers/:id/status', adminUpdateAccountStatusValidation, validate, updateDriverStatus)
+// Applications (partner/driver review + suspend/reactivate) — ops only;
+// support has no reason to touch onboarding decisions.
+router.get('/partners', requireAdminRole('ops'), listPartnerApplications)
+router.get('/drivers', requireAdminRole('ops'), listDriverApplications)
+router.post('/partners/:id/approve', requireAdminRole('ops'), approvePartnerApplication)
+router.post(
+  '/partners/:id/reject',
+  requireAdminRole('ops'),
+  adminRejectApplicationValidation,
+  validate,
+  rejectPartnerApplication,
+)
+router.patch(
+  '/partners/:id/status',
+  requireAdminRole('ops'),
+  adminUpdateAccountStatusValidation,
+  validate,
+  updatePartnerStatus,
+)
+router.post('/drivers/:id/approve', requireAdminRole('ops'), approveDriverApplication)
+router.post(
+  '/drivers/:id/reject',
+  requireAdminRole('ops'),
+  adminRejectApplicationValidation,
+  validate,
+  rejectDriverApplication,
+)
+router.patch(
+  '/drivers/:id/status',
+  requireAdminRole('ops'),
+  adminUpdateAccountStatusValidation,
+  validate,
+  updateDriverStatus,
+)
 
-router.get('/contact-messages', listContactMessages)
-router.post('/contact-messages/:id/resolve', resolveContactMessage)
+// Customer Care (contact form inbox) — support's home base; ops doesn't
+// need it.
+router.get('/contact-messages', requireAdminRole('support'), listContactMessages)
+router.post('/contact-messages/:id/resolve', requireAdminRole('support'), resolveContactMessage)
 
 router.get('/business-leads', listBusinessLeads)
-router.post('/business-leads/:id/mark-contacted', markBusinessLeadContacted)
+router.post('/business-leads/:id/mark-contacted', requireAdminRole('ops'), markBusinessLeadContacted)
 router.get('/business-accounts', listBusinessAccounts)
 
-router.get('/activity-log', listActivity)
+// Activity Log surfaces the partner/driver update feed too (see
+// adminApplicationsController.js) — ops is the role that actually acts on
+// those applications day to day, so it gets visibility here as well.
+router.get('/activity-log', requireAdminRole('ops'), listActivity)
 
-router.get('/data-collection', getIntakeStats)
+router.get('/data-collection', requireAdminRole(), getIntakeStats)
+
+// Admin Users (assign ops/support/super_admin) — super_admin only. Passing
+// no extra roles to requireAdminRole means only super_admin (the implicit
+// bypass) can pass.
+router.get('/admin-users', requireAdminRole(), listAdminUsers)
+router.post('/admin-users', requireAdminRole(), createAdminUserValidation, validate, createAdminUser)
+router.patch('/admin-users/:id/role', requireAdminRole(), updateAdminUserRoleValidation, validate, updateAdminUserRole)
 
 export default router
