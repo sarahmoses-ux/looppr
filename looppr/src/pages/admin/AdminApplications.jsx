@@ -29,6 +29,29 @@ const STATUS_LABEL = {
   inactive: 'Inactive',
 }
 
+const DAY_LABELS = { mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat', sun: 'Sun' }
+
+// operatingHours is [{ day, open, close, closed }], not a string — condense
+// consecutive open days sharing the same hours into one range (e.g. "Mon–Fri
+// 8:00–20:00") rather than a line per day.
+function formatOperatingHours(operatingHours) {
+  if (!operatingHours?.length) return null
+  const segments = []
+  let run = null
+  for (const { day, open, close, closed } of operatingHours) {
+    const label = closed ? 'Closed' : `${open || '?'}–${close || '?'}`
+    if (run && run.label === label) {
+      run.end = day
+    } else {
+      run = { start: day, end: day, label }
+      segments.push(run)
+    }
+  }
+  return segments
+    .map((s) => `${DAY_LABELS[s.start]}${s.end !== s.start ? `–${DAY_LABELS[s.end]}` : ''} ${s.label}`)
+    .join(', ')
+}
+
 function formatDate(value) {
   return new Date(value).toLocaleDateString(undefined, {
     month: 'short',
@@ -47,7 +70,7 @@ function ApplicationRow({ application, type, onApprove, onReject, onSuspend, onR
   async function handleApprove() {
     setBusy(true)
     try {
-      await onApprove(application._id)
+      await onApprove(application.id)
     } catch (err) {
       showToast(err.response?.data?.message || 'Could not approve. Please try again.', 'error')
     } finally {
@@ -58,7 +81,7 @@ function ApplicationRow({ application, type, onApprove, onReject, onSuspend, onR
   async function handleSuspend() {
     setBusy(true)
     try {
-      await onSuspend(application._id)
+      await onSuspend(application.id)
     } catch (err) {
       showToast(err.response?.data?.message || 'Could not suspend. Please try again.', 'error')
     } finally {
@@ -69,7 +92,7 @@ function ApplicationRow({ application, type, onApprove, onReject, onSuspend, onR
   async function handleReactivate() {
     setBusy(true)
     try {
-      await onReactivate(application._id)
+      await onReactivate(application.id)
     } catch (err) {
       showToast(err.response?.data?.message || 'Could not reactivate. Please try again.', 'error')
     } finally {
@@ -109,12 +132,12 @@ function ApplicationRow({ application, type, onApprove, onReject, onSuspend, onR
           {isPartner && application.description && (
             <p className="mt-1.5 max-w-md text-xs text-ink/60">{application.description}</p>
           )}
-          {isPartner && (application.yearsInBusiness || application.employeeCount || application.operatingHours) && (
+          {isPartner && (application.yearsInBusiness || application.employeeCount || application.operatingHours?.length > 0) && (
             <p className="mt-0.5 text-xs text-ink/45">
               {[
                 application.yearsInBusiness ? `${application.yearsInBusiness} yrs in business` : null,
                 application.employeeCount ? `${application.employeeCount} employees` : null,
-                application.operatingHours || null,
+                formatOperatingHours(application.operatingHours),
               ]
                 .filter(Boolean)
                 .join(' · ')}
@@ -242,7 +265,7 @@ export default function AdminApplications() {
   }, [tab, search, statusFilter])
 
   function replaceInList(setList, updated) {
-    setList((list) => (list ? list.map((a) => (a._id === updated._id ? updated : a)) : list))
+    setList((list) => (list ? list.map((a) => (a.id === updated.id ? updated : a)) : list))
   }
 
   async function handleApprovePartner(id) {
@@ -279,10 +302,10 @@ export default function AdminApplications() {
     const { application, type } = rejectTarget
     try {
       if (type === 'partner') {
-        const { partner } = await rejectPartnerApplication(application._id, reason)
+        const { partner } = await rejectPartnerApplication(application.id, reason)
         replaceInList(setPartners, partner)
       } else {
-        const { driver } = await rejectDriverApplication(application._id, reason)
+        const { driver } = await rejectDriverApplication(application.id, reason)
         replaceInList(setDrivers, driver)
       }
       setRejectTarget(null)
@@ -350,7 +373,7 @@ export default function AdminApplications() {
           <div className="space-y-3">
             {list.map((application) => (
               <ApplicationRow
-                key={application._id}
+                key={application.id}
                 application={application}
                 type={tab === 'partners' ? 'partner' : 'driver'}
                 onApprove={tab === 'partners' ? handleApprovePartner : handleApproveDriver}
