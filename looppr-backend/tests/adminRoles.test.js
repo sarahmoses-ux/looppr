@@ -106,4 +106,37 @@ describe('Admin Users management', () => {
 
     expect(res.status).toBe(400)
   })
+
+  it('lets super_admin rename any admin account, including their own', async () => {
+    const superAdmin = await createTestUser({ role: 'admin', adminRole: 'super_admin', email: 'super-4@example.com' })
+    const ops = await createTestUser({ role: 'admin', adminRole: 'ops', email: 'ops-5@example.com' })
+    const token = tokenFor(superAdmin)
+
+    const renameOther = await request(app)
+      .patch(`/api/admin/admin-users/${ops._id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: 'Renamed Ops', phone: '+14055550099' })
+    expect(renameOther.status).toBe(200)
+    expect(renameOther.body.admin.name).toBe('Renamed Ops')
+    expect(renameOther.body.admin.phone).toBe('+14055550099')
+
+    const renameSelf = await request(app)
+      .patch(`/api/admin/admin-users/${superAdmin._id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ name: 'Looppr Admin' })
+    expect(renameSelf.status).toBe(200)
+    expect(renameSelf.body.admin.name).toBe('Looppr Admin')
+  })
+
+  it('blocks ops/support from renaming admin accounts', async () => {
+    const ops = await createTestUser({ role: 'admin', adminRole: 'ops', email: 'ops-6@example.com' })
+    const other = await createTestUser({ role: 'admin', adminRole: 'support', email: 'support-4@example.com' })
+
+    const res = await request(app)
+      .patch(`/api/admin/admin-users/${other._id}`)
+      .set('Authorization', `Bearer ${tokenFor(ops)}`)
+      .send({ name: 'Should Not Work' })
+
+    expect(res.status).toBe(403)
+  })
 })

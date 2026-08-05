@@ -61,3 +61,18 @@ export const updateAdminUserRole = asyncHandler(async (req, res) => {
 
   res.json({ success: true, admin: publicAdminUser(admin) })
 })
+
+// Name/phone only — no self-lockout risk like updateAdminUserRole, so
+// renaming your own account is allowed here.
+export const updateAdminUserProfile = asyncHandler(async (req, res) => {
+  const { name, phone } = req.body
+
+  const admin = await User.findOne({ _id: req.params.id, role: 'admin' })
+  if (!admin) throw new ApiError(404, 'Admin account not found.')
+
+  if (name !== undefined) admin.name = name
+  if (phone !== undefined) admin.phone = phone
+  await admin.save()
+
+  res.json({ success: true, admin: publicAdminUser(admin) })
+})

@@ -100,6 +100,10 @@ export function updateAdminUserRole(id, adminRole) {
   return api.patch(`/admin/admin-users/${id}/role`, { adminRole }).then((res) => res.data)
 }
 
+export function updateAdminUserProfile(id, payload) {
+  return api.patch(`/admin/admin-users/${id}`, payload).then((res) => res.data)
+}
+
 export function fetchPayouts(filters = {}) {
   return api.get('/admin/payouts', { params: filters }).then((res) => res.data)
 }
