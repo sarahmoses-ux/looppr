@@ -4,7 +4,7 @@ import ScrollToTop from './components/ScrollToTop'
 import PublicLayout from './layouts/PublicLayout'
 import AppLayout from './layouts/AppLayout'
 import AdminLayout from './layouts/AdminLayout'
-import ProtectedRoute from './routes/ProtectedRoute'
+import ProtectedRoute, { AdminRoleGate } from './routes/ProtectedRoute'
 import { BusinessAuthProvider } from './context/BusinessAuthContext'
 import BusinessProtectedRoute from './routes/BusinessProtectedRoute'
 import { PartnerAuthProvider } from './context/PartnerAuthContext'
@@ -53,6 +53,8 @@ const AdminCrm = lazy(() => import('./pages/admin/AdminCrm'))
 const AdminReports = lazy(() => import('./pages/admin/AdminReports'))
 const AdminActivityLog = lazy(() => import('./pages/admin/AdminActivityLog'))
 const AdminDataCollection = lazy(() => import('./pages/admin/AdminDataCollection'))
+const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'))
+const AdminPayouts = lazy(() => import('./pages/admin/AdminPayouts'))
 const GuestBook = lazy(() => import('./pages/guest/GuestBook'))
 const GuestRequestStatus = lazy(() => import('./pages/guest/GuestRequestStatus'))
 
@@ -173,13 +175,64 @@ function App() {
           <Route path="/admin/bookings" element={<AdminBookings />} />
           <Route path="/admin/jobs" element={<AdminJobsRoutes />} />
           <Route path="/admin/orders" element={<AdminOrders />} />
-          <Route path="/admin/customer-care" element={<AdminCustomerCare />} />
+          <Route
+            path="/admin/customer-care"
+            element={
+              <AdminRoleGate roles={['support']}>
+                <AdminCustomerCare />
+              </AdminRoleGate>
+            }
+          />
           <Route path="/admin/customers" element={<AdminCustomers />} />
-          <Route path="/admin/applications" element={<AdminApplications />} />
+          <Route
+            path="/admin/applications"
+            element={
+              <AdminRoleGate roles={['ops']}>
+                <AdminApplications />
+              </AdminRoleGate>
+            }
+          />
           <Route path="/admin/crm" element={<AdminCrm />} />
-          <Route path="/admin/reports" element={<AdminReports />} />
-          <Route path="/admin/activity-log" element={<AdminActivityLog />} />
-          <Route path="/admin/data-collection" element={<AdminDataCollection />} />
+          <Route
+            path="/admin/reports"
+            element={
+              <AdminRoleGate roles={[]}>
+                <AdminReports />
+              </AdminRoleGate>
+            }
+          />
+          <Route
+            path="/admin/activity-log"
+            element={
+              <AdminRoleGate roles={['ops']}>
+                <AdminActivityLog />
+              </AdminRoleGate>
+            }
+          />
+          <Route
+            path="/admin/data-collection"
+            element={
+              <AdminRoleGate roles={[]}>
+                <AdminDataCollection />
+              </AdminRoleGate>
+            }
+          />
+          <Route
+            path="/admin/admin-users"
+            element={
+              <AdminRoleGate roles={[]}>
+                <AdminUsers />
+              </AdminRoleGate>
+            }
+          />
+          <Route
+            path="/admin/payouts"
+            element={
+              <AdminRoleGate roles={[]}>
+                <AdminPayouts />
+              </AdminRoleGate>
+            }
+          />
         </Route>
 
         {/* Business Portal: its own auth context so a business session is

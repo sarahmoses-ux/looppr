@@ -1,5 +1,12 @@
 import mongoose from 'mongoose'
 
+// Sub-roles within role: 'admin' only — meaningless for role: 'client'.
+// super_admin implicitly passes every requireAdminRole(...) check (see
+// middleware/auth.js), so it never needs to be listed explicitly at a
+// route. ops/support are each scoped to a subset of the admin panel;
+// see routes/adminRoutes.js for the exact per-route matrix.
+export const ADMIN_ROLES = ['super_admin', 'ops', 'support']
+
 const userSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true, maxlength: 100 },
@@ -14,9 +21,12 @@ const userSchema = new mongoose.Schema(
     phone: { type: String, required: true, trim: true },
     passwordHash: { type: String, required: true, select: false },
     // 'admin' accounts are never created through a public endpoint — only
-    // via scripts/seedAdmin.js. See routes/authRoutes.js for the separate
-    // /admin/login surface.
+    // via scripts/seedAdmin.js, or by a super_admin through the Admin Users
+    // panel (see controllers/adminUsersController.js). See routes/authRoutes.js
+    // for the separate /admin/login surface.
     role: { type: String, enum: ['client', 'admin'], default: 'client' },
+    // Only set (and only meaningful) when role === 'admin'.
+    adminRole: { type: String, enum: ADMIN_ROLES },
     isVerified: { type: Boolean, default: false },
     emailNotifications: { type: Boolean, default: true },
     // Quick-select addresses for Book.jsx — plain subdocuments (Mongoose

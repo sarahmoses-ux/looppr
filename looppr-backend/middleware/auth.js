@@ -29,6 +29,21 @@ export function requireRole(...roles) {
   }
 }
 
+// Must run after requireRole('admin'). Scopes an admin-only route to a
+// subset of admin sub-roles (see ADMIN_ROLES in models/User.js). A missing
+// adminRole (any admin account created before this field existed) is
+// grandfathered in as super_admin rather than locked out, since there is no
+// migration step that backfills it — and super_admin always passes,
+// regardless of which sub-roles are listed, so it never needs to be named
+// explicitly at the call site.
+export function requireAdminRole(...roles) {
+  return (req, _res, next) => {
+    const adminRole = req.user?.adminRole || 'super_admin'
+    if (adminRole === 'super_admin' || roles.includes(adminRole)) return next()
+    return next(new ApiError(403, 'You do not have permission to access this resource.'))
+  }
+}
+
 // Business Portal guard — verifies a *business* access token (signed with the
 // dedicated business secret, see utils/tokens.js). A customer/admin token
 // fails this verification outright, so it can never reach a business route.

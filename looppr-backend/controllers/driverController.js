@@ -284,6 +284,16 @@ export const updateAvailability = asyncHandler(async (req, res) => {
   const stored = availability === 'online' ? 'available' : 'offline'
   const driver = await DriverUser.findByIdAndUpdate(req.driver.sub, { availability: stored }, { new: true })
   if (!driver) throw new ApiError(401, 'Not authenticated.')
+
+  await ActivityLog.create({
+    actorType: 'rider',
+    actorId: driver._id,
+    action: 'driver_availability_changed',
+    entityType: 'DriverUser',
+    entityId: driver._id,
+    metadata: { availability: stored },
+  }).catch(() => {})
+
   res.json({ success: true, driver: publicDriver(driver) })
 })
 
@@ -306,10 +316,26 @@ export const updateDriverProfile = asyncHandler(async (req, res) => {
   if (!driver) throw new ApiError(401, 'Not authenticated.')
 
   const editable = ['name', 'phone', 'address', 'city', 'state', 'vehicleType', 'vehicleName', 'licenseNumber', 'vehiclePlate', 'profilePhoto']
+  // Diffed before assignment (not just "field present in body") so a no-op
+  // save (form re-submitted with identical values) doesn't log noise.
+  const changedFields = editable.filter(
+    (field) => req.body[field] !== undefined && JSON.stringify(req.body[field]) !== JSON.stringify(driver[field]),
+  )
   for (const field of editable) {
     if (req.body[field] !== undefined) driver[field] = req.body[field]
   }
   await driver.save()
+
+  if (changedFields.length > 0) {
+    await ActivityLog.create({
+      actorType: 'rider',
+      actorId: driver._id,
+      action: 'driver_profile_updated',
+      entityType: 'DriverUser',
+      entityId: driver._id,
+      metadata: { changedFields },
+    }).catch(() => {})
+  }
 
   res.json({ success: true, driver: publicDriver(driver) })
 })

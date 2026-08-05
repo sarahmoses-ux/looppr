@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import SEO from '../../components/SEO'
+import { useAuth } from '../../context/AuthContext'
 import { useToast } from '../../context/ToastContext'
+import { effectiveAdminRole } from '../../constants/adminRoles'
 import { fetchBusinessAccounts, fetchBusinessLeads, markBusinessLeadContacted } from '../../services/adminApi'
 
 const ACCOUNT_STATUS_STYLES = {
@@ -14,7 +16,7 @@ function currency(amount) {
   return `$${(amount || 0).toFixed(2)}`
 }
 
-function LeadRow({ lead, onContacted }) {
+function LeadRow({ lead, onContacted, readOnly }) {
   const { showToast } = useToast()
   const [busy, setBusy] = useState(false)
   const when = new Date(lead.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
@@ -49,6 +51,8 @@ function LeadRow({ lead, onContacted }) {
           <span className="rounded-full bg-success-soft px-3 py-1.5 text-xs font-semibold text-success-dark">
             Contacted
           </span>
+        ) : readOnly ? (
+          <span className="rounded-full bg-ink/5 px-3 py-1.5 text-xs font-semibold text-ink/50">Open</span>
         ) : (
           <button
             type="button"
@@ -64,7 +68,7 @@ function LeadRow({ lead, onContacted }) {
   )
 }
 
-function LeadsTab() {
+function LeadsTab({ readOnly }) {
   const [leads, setLeads] = useState(null)
   const [statusFilter, setStatusFilter] = useState('open')
 
@@ -126,7 +130,7 @@ function LeadsTab() {
         ) : (
           <div className="space-y-3">
             {leads.map((l) => (
-              <LeadRow key={l._id} lead={l} onContacted={handleContacted} />
+              <LeadRow key={l._id} lead={l} onContacted={handleContacted} readOnly={readOnly} />
             ))}
           </div>
         )}
@@ -230,6 +234,10 @@ function AccountsTab() {
 }
 
 export default function AdminCrm() {
+  const { user } = useAuth()
+  // Support has read-only access to CRM (see requireAdminRole('ops') on the
+  // mark-contacted mutation route in adminRoutes.js).
+  const readOnly = effectiveAdminRole(user) === 'support'
   const [tab, setTab] = useState('leads')
 
   return (
@@ -254,7 +262,7 @@ export default function AdminCrm() {
         ))}
       </div>
 
-      {tab === 'leads' ? <LeadsTab /> : <AccountsTab />}
+      {tab === 'leads' ? <LeadsTab readOnly={readOnly} /> : <AccountsTab />}
     </>
   )
 }

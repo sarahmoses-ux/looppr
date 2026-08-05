@@ -71,6 +71,10 @@ async function main() {
       phone: PHONE,
       passwordHash,
       role: 'admin',
+      // Seeded admins are always super_admin — they're the only way to bootstrap
+      // an admin account at all, so the first one must be able to create/promote
+      // ops and support accounts afterward through the Admin Users panel.
+      adminRole: 'super_admin',
       isVerified: true,
     })
 

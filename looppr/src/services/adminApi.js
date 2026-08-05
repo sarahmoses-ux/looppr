@@ -87,3 +87,39 @@ export function fetchActivityLog(filters = {}) {
 export function fetchIntakeStats() {
   return api.get('/admin/data-collection').then((res) => res.data)
 }
+
+export function fetchAdminUsers() {
+  return api.get('/admin/admin-users').then((res) => res.data)
+}
+
+export function createAdminUser(payload) {
+  return api.post('/admin/admin-users', payload).then((res) => res.data)
+}
+
+export function updateAdminUserRole(id, adminRole) {
+  return api.patch(`/admin/admin-users/${id}/role`, { adminRole }).then((res) => res.data)
+}
+
+export function fetchPayouts(filters = {}) {
+  return api.get('/admin/payouts', { params: filters }).then((res) => res.data)
+}
+
+export function generatePayout(payload) {
+  return api.post('/admin/payouts', payload).then((res) => res.data)
+}
+
+export function markPayoutPaid(id) {
+  return api.post(`/admin/payouts/${id}/mark-paid`).then((res) => res.data)
+}
+
+export function fetchInvoices(filters = {}) {
+  return api.get('/admin/invoices', { params: filters }).then((res) => res.data)
+}
+
+export function generateInvoice(payload) {
+  return api.post('/admin/invoices', payload).then((res) => res.data)
+}
+
+export function advanceInvoiceStatus(id, status) {
+  return api.patch(`/admin/invoices/${id}/status`, { status }).then((res) => res.data)
+}

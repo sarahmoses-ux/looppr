@@ -29,6 +29,29 @@ const STATUS_LABEL = {
   inactive: 'Inactive',
 }
 
+const DAY_LABELS = { mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat', sun: 'Sun' }
+
+// operatingHours is [{ day, open, close, closed }], not a string — condense
+// consecutive open days sharing the same hours into one range (e.g. "Mon–Fri
+// 8:00–20:00") rather than a line per day.
+function formatOperatingHours(operatingHours) {
+  if (!operatingHours?.length) return null
+  const segments = []
+  let run = null
+  for (const { day, open, close, closed } of operatingHours) {
+    const label = closed ? 'Closed' : `${open || '?'}–${close || '?'}`
+    if (run && run.label === label) {
+      run.end = day
+    } else {
+      run = { start: day, end: day, label }
+      segments.push(run)
+    }
+  }
+  return segments
+    .map((s) => `${DAY_LABELS[s.start]}${s.end !== s.start ? `–${DAY_LABELS[s.end]}` : ''} ${s.label}`)
+    .join(', ')
+}
+
 function formatDate(value) {
   return new Date(value).toLocaleDateString(undefined, {
     month: 'short',
@@ -47,7 +70,7 @@ function ApplicationRow({ application, type, onApprove, onReject, onSuspend, onR
   async function handleApprove() {
     setBusy(true)
     try {
-      await onApprove(application._id)
+      await onApprove(application.id)
     } catch (err) {
       showToast(err.response?.data?.message || 'Could not approve. Please try again.', 'error')
     } finally {
@@ -58,7 +81,7 @@ function ApplicationRow({ application, type, onApprove, onReject, onSuspend, onR
   async function handleSuspend() {
     setBusy(true)
     try {
-      await onSuspend(application._id)
+      await onSuspend(application.id)
     } catch (err) {
       showToast(err.response?.data?.message || 'Could not suspend. Please try again.', 'error')
     } finally {
@@ -69,7 +92,7 @@ function ApplicationRow({ application, type, onApprove, onReject, onSuspend, onR
   async function handleReactivate() {
     setBusy(true)
     try {
-      await onReactivate(application._id)
+      await onReactivate(application.id)
     } catch (err) {
       showToast(err.response?.data?.message || 'Could not reactivate. Please try again.', 'error')
     } finally {
@@ -77,41 +100,83 @@ function ApplicationRow({ application, type, onApprove, onReject, onSuspend, onR
     }
   }
 
+  const photo = isPartner ? application.logo : application.profilePhoto
+
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-line px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
-      <div className="min-w-0">
-        <p className="font-medium text-ink">
-          {name}
-          <span className={`ml-2 rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_BADGE[application.accountStatus] || 'bg-ink/5 text-ink/50'}`}>
-            {STATUS_LABEL[application.accountStatus] || application.accountStatus}
-          </span>
-        </p>
-        {isPartner && <p className="mt-0.5 text-sm text-ink/70">{application.businessName}</p>}
-        {!isPartner && (
-          <p className="mt-0.5 text-sm text-ink/70">
-            {application.vehicleType}
-            {application.vehicleName ? ` — ${application.vehicleName}` : ''}
-          </p>
+      <div className="flex min-w-0 items-start gap-3">
+        {photo && (
+          <img src={photo} alt="" className="h-10 w-10 shrink-0 rounded-full border border-line object-cover" />
         )}
-        <p className="mt-0.5 text-sm text-ink/55">
-          {application.email} · {application.phone}
-        </p>
-        <p className="mt-0.5 text-sm text-ink/55">
-          {application.city}, {application.state} · Applied {formatDate(application.createdAt)}
-        </p>
-        {(application.accountStatus === 'active' || application.accountStatus === 'suspended') && (
-          <p className="mt-1.5 text-xs font-medium text-ink/45">
-            {isPartner
-              ? `Capacity ${application.maxDailyCapacity ?? '—'}/day · ${application.activeOrderCount ?? 0} active order${application.activeOrderCount === 1 ? '' : 's'}`
-              : `Capacity ${application.maxActiveDeliveries ?? '—'} deliveries · ${application.activeDeliveryCount ?? 0} active`}
-            {' · '}
-            {application.availability === 'online' || application.availability === 'available'
-              ? 'Online'
-              : application.availability === 'on_delivery'
-                ? 'On delivery'
-                : 'Offline'}
+        <div className="min-w-0">
+          <p className="font-medium text-ink">
+            {name}
+            <span className={`ml-2 rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_BADGE[application.accountStatus] || 'bg-ink/5 text-ink/50'}`}>
+              {STATUS_LABEL[application.accountStatus] || application.accountStatus}
+            </span>
           </p>
-        )}
+          {isPartner && <p className="mt-0.5 text-sm text-ink/70">{application.businessName}</p>}
+          {!isPartner && (
+            <p className="mt-0.5 text-sm text-ink/70">
+              {application.vehicleType}
+              {application.vehicleName ? ` — ${application.vehicleName}` : ''}
+            </p>
+          )}
+          <p className="mt-0.5 text-sm text-ink/55">
+            {application.email} · {application.phone}
+          </p>
+          <p className="mt-0.5 text-sm text-ink/55">
+            {application.city}, {application.state} · Applied {formatDate(application.createdAt)}
+          </p>
+
+          {isPartner && application.description && (
+            <p className="mt-1.5 max-w-md text-xs text-ink/60">{application.description}</p>
+          )}
+          {isPartner && (application.yearsInBusiness || application.employeeCount || application.operatingHours?.length > 0) && (
+            <p className="mt-0.5 text-xs text-ink/45">
+              {[
+                application.yearsInBusiness ? `${application.yearsInBusiness} yrs in business` : null,
+                application.employeeCount ? `${application.employeeCount} employees` : null,
+                formatOperatingHours(application.operatingHours),
+              ]
+                .filter(Boolean)
+                .join(' · ')}
+            </p>
+          )}
+          {isPartner && application.servicesOffered?.length > 0 && (
+            <p className="mt-0.5 text-xs text-ink/45">Services: {application.servicesOffered.join(', ')}</p>
+          )}
+          {isPartner && (
+            <p className="mt-0.5 text-xs text-ink/45">
+              {application.pickupAvailable ? 'Pickup ✓' : 'No pickup'} ·{' '}
+              {application.deliveryAvailable ? 'Delivery ✓' : 'No delivery'}
+            </p>
+          )}
+          {!isPartner && (application.licenseNumber || application.vehiclePlate) && (
+            <p className="mt-1.5 text-xs text-ink/45">
+              {[
+                application.licenseNumber ? `License ${application.licenseNumber}` : null,
+                application.vehiclePlate ? `Plate ${application.vehiclePlate}` : null,
+              ]
+                .filter(Boolean)
+                .join(' · ')}
+            </p>
+          )}
+
+          {(application.accountStatus === 'active' || application.accountStatus === 'suspended') && (
+            <p className="mt-1.5 text-xs font-medium text-ink/45">
+              {isPartner
+                ? `Capacity ${application.maxDailyCapacity ?? '—'}/day · ${application.activeOrderCount ?? 0} active order${application.activeOrderCount === 1 ? '' : 's'}`
+                : `Capacity ${application.maxActiveDeliveries ?? '—'} deliveries · ${application.activeDeliveryCount ?? 0} active`}
+              {' · '}
+              {application.availability === 'online' || application.availability === 'available'
+                ? 'Online'
+                : application.availability === 'on_delivery'
+                  ? 'On delivery'
+                  : 'Offline'}
+            </p>
+          )}
+        </div>
       </div>
 
       {application.accountStatus === 'pending' && (
@@ -200,7 +265,7 @@ export default function AdminApplications() {
   }, [tab, search, statusFilter])
 
   function replaceInList(setList, updated) {
-    setList((list) => (list ? list.map((a) => (a._id === updated._id ? updated : a)) : list))
+    setList((list) => (list ? list.map((a) => (a.id === updated.id ? updated : a)) : list))
   }
 
   async function handleApprovePartner(id) {
@@ -237,10 +302,10 @@ export default function AdminApplications() {
     const { application, type } = rejectTarget
     try {
       if (type === 'partner') {
-        const { partner } = await rejectPartnerApplication(application._id, reason)
+        const { partner } = await rejectPartnerApplication(application.id, reason)
         replaceInList(setPartners, partner)
       } else {
-        const { driver } = await rejectDriverApplication(application._id, reason)
+        const { driver } = await rejectDriverApplication(application.id, reason)
         replaceInList(setDrivers, driver)
       }
       setRejectTarget(null)
@@ -308,7 +373,7 @@ export default function AdminApplications() {
           <div className="space-y-3">
             {list.map((application) => (
               <ApplicationRow
-                key={application._id}
+                key={application.id}
                 application={application}
                 type={tab === 'partners' ? 'partner' : 'driver'}
                 onApprove={tab === 'partners' ? handleApprovePartner : handleApproveDriver}
