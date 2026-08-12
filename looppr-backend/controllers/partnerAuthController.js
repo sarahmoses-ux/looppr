@@ -112,8 +112,8 @@ export const partnerVerifyEmail = asyncHandler(async (req, res) => {
   if (!result.ok) throw new ApiError(400, result.reason)
 
   if (partner.accountStatus === 'active') {
-    const accessToken = issuePartnerSession(res, partner)
-    return res.json({ success: true, accessToken, partner: publicPartner(partner) })
+    const { accessToken, refreshToken } = issuePartnerSession(res, partner)
+    return res.json({ success: true, accessToken, refreshToken, partner: publicPartner(partner) })
   }
   if (partner.accountStatus === 'pending') {
     await notifyAdminOfApplication(partner)
@@ -179,12 +179,14 @@ export const partnerLogin = asyncHandler(async (req, res) => {
     throw new ApiError(403, 'This account cannot sign in right now. Contact Looppr support.')
   }
 
-  const accessToken = issuePartnerSession(res, partner, rememberMe !== false)
-  res.json({ success: true, accessToken, partner: publicPartner(partner) })
+  const { accessToken, refreshToken } = issuePartnerSession(res, partner, rememberMe !== false)
+  res.json({ success: true, accessToken, refreshToken, partner: publicPartner(partner) })
 })
 
 export const partnerRefresh = asyncHandler(async (req, res) => {
-  const token = req.cookies?.partnerRefreshToken
+  // Cookie for the web frontend; request body as a fallback for the mobile
+  // app, which has no cookie jar and stores/replays this token itself.
+  const token = req.cookies?.partnerRefreshToken || req.body?.refreshToken
   if (!token) throw new ApiError(401, 'Not authenticated.')
 
   let payload
@@ -200,8 +202,8 @@ export const partnerRefresh = asyncHandler(async (req, res) => {
     throw new ApiError(401, 'Session expired, please sign in again.')
   }
 
-  const accessToken = issuePartnerSession(res, partner, payload.persistent !== false)
-  res.json({ success: true, accessToken, partner: publicPartner(partner) })
+  const { accessToken, refreshToken } = issuePartnerSession(res, partner, payload.persistent !== false)
+  res.json({ success: true, accessToken, refreshToken, partner: publicPartner(partner) })
 })
 
 export const partnerLogout = asyncHandler(async (_req, res) => {
@@ -248,6 +250,6 @@ export const partnerResetPassword = asyncHandler(async (req, res) => {
   partner.tokenVersion += 1
   await partner.save()
 
-  const accessToken = issuePartnerSession(res, partner)
-  res.json({ success: true, accessToken, partner: publicPartner(partner) })
+  const { accessToken, refreshToken } = issuePartnerSession(res, partner)
+  res.json({ success: true, accessToken, refreshToken, partner: publicPartner(partner) })
 })

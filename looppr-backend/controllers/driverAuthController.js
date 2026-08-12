@@ -100,8 +100,8 @@ export const driverVerifyEmail = asyncHandler(async (req, res) => {
   if (!result.ok) throw new ApiError(400, result.reason)
 
   if (driver.accountStatus === 'active') {
-    const accessToken = issueDriverSession(res, driver)
-    return res.json({ success: true, accessToken, driver: publicDriver(driver) })
+    const { accessToken, refreshToken } = issueDriverSession(res, driver)
+    return res.json({ success: true, accessToken, refreshToken, driver: publicDriver(driver) })
   }
   if (driver.accountStatus === 'pending') {
     await notifyAdminOfApplication(driver)
@@ -166,12 +166,14 @@ export const driverLogin = asyncHandler(async (req, res) => {
     throw new ApiError(403, 'This account cannot sign in right now. Contact Looppr support.')
   }
 
-  const accessToken = issueDriverSession(res, driver, rememberMe !== false)
-  res.json({ success: true, accessToken, driver: publicDriver(driver) })
+  const { accessToken, refreshToken } = issueDriverSession(res, driver, rememberMe !== false)
+  res.json({ success: true, accessToken, refreshToken, driver: publicDriver(driver) })
 })
 
 export const driverRefresh = asyncHandler(async (req, res) => {
-  const token = req.cookies?.driverRefreshToken
+  // Cookie for the web frontend; request body as a fallback for the mobile
+  // app, which has no cookie jar and stores/replays this token itself.
+  const token = req.cookies?.driverRefreshToken || req.body?.refreshToken
   if (!token) throw new ApiError(401, 'Not authenticated.')
 
   let payload
@@ -187,8 +189,8 @@ export const driverRefresh = asyncHandler(async (req, res) => {
     throw new ApiError(401, 'Session expired, please sign in again.')
   }
 
-  const accessToken = issueDriverSession(res, driver, payload.persistent !== false)
-  res.json({ success: true, accessToken, driver: publicDriver(driver) })
+  const { accessToken, refreshToken } = issueDriverSession(res, driver, payload.persistent !== false)
+  res.json({ success: true, accessToken, refreshToken, driver: publicDriver(driver) })
 })
 
 export const driverLogout = asyncHandler(async (_req, res) => {
@@ -235,6 +237,6 @@ export const driverResetPassword = asyncHandler(async (req, res) => {
   driver.tokenVersion += 1
   await driver.save()
 
-  const accessToken = issueDriverSession(res, driver)
-  res.json({ success: true, accessToken, driver: publicDriver(driver) })
+  const { accessToken, refreshToken } = issueDriverSession(res, driver)
+  res.json({ success: true, accessToken, refreshToken, driver: publicDriver(driver) })
 })

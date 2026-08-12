@@ -68,8 +68,8 @@ export const businessVerifyEmail = asyncHandler(async (req, res) => {
   const result = await verifyOtpCode(business, code)
   if (!result.ok) throw new ApiError(400, result.reason)
 
-  const accessToken = issueBusinessSession(res, business)
-  res.json({ success: true, accessToken, business: publicBusiness(business) })
+  const { accessToken, refreshToken } = issueBusinessSession(res, business)
+  res.json({ success: true, accessToken, refreshToken, business: publicBusiness(business) })
 })
 
 // Resend a verification code. Never reveals whether the email is registered
@@ -116,12 +116,14 @@ export const businessLogin = asyncHandler(async (req, res) => {
     return res.json({ success: true, requiresVerification: true, email: business.email })
   }
 
-  const accessToken = issueBusinessSession(res, business, rememberMe !== false)
-  res.json({ success: true, accessToken, business: publicBusiness(business) })
+  const { accessToken, refreshToken } = issueBusinessSession(res, business, rememberMe !== false)
+  res.json({ success: true, accessToken, refreshToken, business: publicBusiness(business) })
 })
 
 export const businessRefresh = asyncHandler(async (req, res) => {
-  const token = req.cookies?.businessRefreshToken
+  // Cookie for the web frontend; request body as a fallback for the mobile
+  // app, which has no cookie jar and stores/replays this token itself.
+  const token = req.cookies?.businessRefreshToken || req.body?.refreshToken
   if (!token) throw new ApiError(401, 'Not authenticated.')
 
   let payload
@@ -140,8 +142,8 @@ export const businessRefresh = asyncHandler(async (req, res) => {
   }
 
   // Preserve the original "Remember me" lifetime across refreshes.
-  const accessToken = issueBusinessSession(res, business, payload.persistent !== false)
-  res.json({ success: true, accessToken, business: publicBusiness(business) })
+  const { accessToken, refreshToken } = issueBusinessSession(res, business, payload.persistent !== false)
+  res.json({ success: true, accessToken, refreshToken, business: publicBusiness(business) })
 })
 
 export const businessLogout = asyncHandler(async (_req, res) => {
@@ -216,6 +218,6 @@ export const businessResetPassword = asyncHandler(async (req, res) => {
   business.tokenVersion += 1
   await business.save()
 
-  const accessToken = issueBusinessSession(res, business)
-  res.json({ success: true, accessToken, business: publicBusiness(business) })
+  const { accessToken, refreshToken } = issueBusinessSession(res, business)
+  res.json({ success: true, accessToken, refreshToken, business: publicBusiness(business) })
 })

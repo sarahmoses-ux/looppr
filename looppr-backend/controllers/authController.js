@@ -46,8 +46,8 @@ export const register = asyncHandler(async (req, res) => {
     console.error('Failed to send verification email', err)
   }
 
-  const accessToken = issueSession(res, user)
-  res.status(201).json({ success: true, accessToken, user: publicUser(user) })
+  const { accessToken, refreshToken } = issueSession(res, user)
+  res.status(201).json({ success: true, accessToken, refreshToken, user: publicUser(user) })
 })
 
 // Step 1 of login: check the password, then email a fresh OTP instead of
@@ -109,8 +109,8 @@ export const verifyLoginOtp = asyncHandler(async (req, res) => {
   const result = await verifyOtpCode(user, code)
   if (!result.ok) throw new ApiError(400, result.reason)
 
-  const accessToken = issueSession(res, user)
-  res.json({ success: true, accessToken, user: publicUser(user) })
+  const { accessToken, refreshToken } = issueSession(res, user)
+  res.json({ success: true, accessToken, refreshToken, user: publicUser(user) })
 })
 
 // Resend for the login OTP step, keyed off the same challengeToken (the
@@ -138,7 +138,9 @@ export const resendLoginOtp = asyncHandler(async (req, res) => {
 })
 
 export const refresh = asyncHandler(async (req, res) => {
-  const token = req.cookies?.refreshToken
+  // Cookie for the web frontend; request body as a fallback for the mobile
+  // app, which has no cookie jar and stores/replays this token itself.
+  const token = req.cookies?.refreshToken || req.body?.refreshToken
   if (!token) throw new ApiError(401, 'Not authenticated.')
 
   let payload
@@ -159,8 +161,8 @@ export const refresh = asyncHandler(async (req, res) => {
     throw new ApiError(401, 'Session expired, please sign in again.')
   }
 
-  const accessToken = issueSession(res, user)
-  res.json({ success: true, accessToken, user: publicUser(user) })
+  const { accessToken, refreshToken } = issueSession(res, user)
+  res.json({ success: true, accessToken, refreshToken, user: publicUser(user) })
 })
 
 export const logout = asyncHandler(async (_req, res) => {
@@ -205,8 +207,8 @@ export const changePassword = asyncHandler(async (req, res) => {
   user.tokenVersion += 1
   await user.save()
 
-  const accessToken = issueSession(res, user)
-  res.json({ success: true, accessToken })
+  const { accessToken, refreshToken } = issueSession(res, user)
+  res.json({ success: true, accessToken, refreshToken })
 })
 
 // Step 1 of the "forgot password" flow. Always responds the same way
@@ -250,6 +252,6 @@ export const resetPassword = asyncHandler(async (req, res) => {
   user.tokenVersion += 1
   await user.save()
 
-  const accessToken = issueSession(res, user)
-  res.json({ success: true, accessToken, user: publicUser(user) })
+  const { accessToken, refreshToken } = issueSession(res, user)
+  res.json({ success: true, accessToken, refreshToken, user: publicUser(user) })
 })

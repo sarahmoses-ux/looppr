@@ -15,11 +15,15 @@ import {
 
 // Used by every authController endpoint that issues a session
 // (register/login/refresh) — one place that knows how a session is built.
+// Returns both tokens (not just accessToken) so callers can also hand the
+// refreshToken back in the JSON body — the cookie this sets is browser-only
+// (the web frontend relies on it), but a React Native client has no cookie
+// jar, so it needs the raw token to store and replay on /refresh itself.
 export function issueSession(res, user) {
   const accessToken = signAccessToken(user)
   const refreshToken = signRefreshToken(user)
   res.cookie('refreshToken', refreshToken, refreshCookieOptions())
-  return accessToken
+  return { accessToken, refreshToken }
 }
 
 // Business Portal equivalent of issueSession — issues a business access token
@@ -29,21 +33,21 @@ export function issueBusinessSession(res, business, persistent = true) {
   const accessToken = signBusinessAccessToken(business)
   const refreshToken = signBusinessRefreshToken(business, persistent)
   res.cookie('businessRefreshToken', refreshToken, businessRefreshCookieOptions(persistent))
-  return accessToken
+  return { accessToken, refreshToken }
 }
 
 export function issuePartnerSession(res, partner, persistent = true) {
   const accessToken = signPartnerAccessToken(partner)
   const refreshToken = signPartnerRefreshToken(partner, persistent)
   res.cookie('partnerRefreshToken', refreshToken, partnerRefreshCookieOptions(persistent))
-  return accessToken
+  return { accessToken, refreshToken }
 }
 
 export function issueDriverSession(res, driver, persistent = true) {
   const accessToken = signDriverAccessToken(driver)
   const refreshToken = signDriverRefreshToken(driver, persistent)
   res.cookie('driverRefreshToken', refreshToken, driverRefreshCookieOptions(persistent))
-  return accessToken
+  return { accessToken, refreshToken }
 }
 
 export function publicDriver(driver) {
