@@ -161,7 +161,7 @@ export const getPartnerOverview = asyncHandler(async (req, res) => {
       { $match: { partnerUserId: partnerId, paymentStatus: 'paid', paidAt: { $gte: startOfMonth } } },
       { $group: { _id: null, total: { $sum: '$pricing.amount' } } },
     ]),
-    PartnerUser.findById(partnerId).select('averageRating'),
+    PartnerUser.findById(partnerId).select('averageRating availability'),
   ])
 
   res.json({
@@ -172,6 +172,7 @@ export const getPartnerOverview = asyncHandler(async (req, res) => {
       completedOrders,
       monthlyRevenue: Math.round((monthlyRevenueAgg[0]?.total || 0) * 100) / 100,
       averageRating: partner?.averageRating ?? null,
+      availability: partner?.availability ?? 'offline',
     },
   })
 })

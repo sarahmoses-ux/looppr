@@ -32,6 +32,7 @@ function shapeDelivery(p) {
     customerName: customerName(p),
     address: p.address,
     deliveryAddress: p.deliveryAddress || null,
+    location: p.location || null,
     loadSize: p.loadSize,
     // Driver-confirmed weight, when set, is authoritative over loadSize —
     // frontend should prefer this for display.
