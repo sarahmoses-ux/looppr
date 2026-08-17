@@ -126,11 +126,11 @@ export async function sendPartnerLeadEmail(toEmail, type, name) {
 }
 
 // Recipient is fixed (not chosen per-call like every other function here) —
-// defaults to loopprlaundry@gmail.com, overridable via ADMIN_NOTIFICATION_EMAIL
+// defaults to laundrylooppr@gmail.com, overridable via ADMIN_NOTIFICATION_EMAIL
 // for staging/other environments.
 export async function sendAdminApplicationNotification(details) {
   const from = process.env.OTP_FROM_EMAIL || 'Looppr <onboarding@resend.dev>'
-  const to = process.env.ADMIN_NOTIFICATION_EMAIL || 'loopprlaundry@gmail.com'
+  const to = process.env.ADMIN_NOTIFICATION_EMAIL || 'laundrylooppr@gmail.com'
 
   const { error } = await getClient().emails.send({
     from,

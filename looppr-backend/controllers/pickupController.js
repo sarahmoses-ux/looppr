@@ -1,4 +1,6 @@
 import mongoose from 'mongoose'
+import { DriverUser } from '../models/DriverUser.js'
+import { PartnerUser } from '../models/PartnerUser.js'
 import { PickupRequest } from '../models/PickupRequest.js'
 import { geocodeAddress } from '../services/geocodeService.js'
 import { logAssignmentOutcome, resolveAssignment } from '../services/assignmentService.js'
@@ -127,4 +129,35 @@ export const confirmPayment = asyncHandler(async (req, res) => {
   ) || pickup
 
   res.json({ success: true, pickup: updated })
+})
+
+// Recomputes a driver/partner's averageRating from all their rated
+// deliveries — the field already exists and is displayed (getDriverOverview/
+// getPartnerOverview) but nothing wrote to it until this endpoint existed.
+async function recomputeAverageRating(Model, matchField, id) {
+  if (!id) return
+  const [agg] = await PickupRequest.aggregate([
+    { $match: { [matchField]: new mongoose.Types.ObjectId(id), 'rating.stars': { $exists: true } } },
+    { $group: { _id: null, avg: { $avg: '$rating.stars' } } },
+  ])
+  if (agg) await Model.findByIdAndUpdate(id, { averageRating: Math.round(agg.avg * 10) / 10 })
+}
+
+// A customer can only rate their own delivered order, once — resubmitting
+// (e.g. to fix a typo in the comment) overwrites rather than stacking.
+export const rateOrder = asyncHandler(async (req, res) => {
+  const { stars, comment } = req.body
+  const pickup = await PickupRequest.findOne({ _id: req.params.id, clientId: req.user.sub })
+  if (!pickup) throw new ApiError(404, 'Order not found.')
+  if (pickup.status !== 'ready_delivered') throw new ApiError(409, 'You can only rate a delivered order.')
+
+  pickup.rating = { stars, comment, ratedAt: new Date() }
+  await pickup.save()
+
+  await Promise.all([
+    recomputeAverageRating(DriverUser, 'driverUserId', pickup.driverUserId),
+    recomputeAverageRating(PartnerUser, 'partnerUserId', pickup.partnerUserId),
+  ])
+
+  res.json({ success: true, pickup })
 })

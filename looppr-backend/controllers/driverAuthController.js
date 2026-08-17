@@ -7,7 +7,12 @@ import { assignOtp, canResendOtp, verifyOtpCode } from '../utils/otp.js'
 import { issueDriverSession, publicDriver } from '../utils/session.js'
 import { verifyDriverRefreshToken } from '../utils/tokens.js'
 
-const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173'
+// Distinct from CLIENT_URL (below, used for CORS origin — see app.js): that
+// stays pointed at wherever the web app is being developed locally, while
+// this is always the real public site, since it's only ever used to build
+// links that get emailed out (and must work for whoever opens the email,
+// not just this dev machine).
+const PUBLIC_APP_URL = process.env.PUBLIC_APP_URL || process.env.CLIENT_URL || 'http://localhost:5173'
 
 async function sendVerificationCode(driver) {
   const code = await assignOtp(driver)
@@ -21,9 +26,11 @@ function vehicleDetailsLabel(driver) {
   return driver.vehiclePlate ? `${label} (plate ${driver.vehiclePlate})` : label
 }
 
-// Fired once, the moment a Driver application is email-verified — see the
-// matching comment in partnerAuthController.js for why not at raw
-// registration submit. Never blocks the response the applicant sees.
+// Fired once — for web, the moment a Driver application is email-verified
+// (raw registration accepts any address including typos/bots, so notifying
+// admins there would just be noise); for mobile (platform: 'mobile'),
+// there's no email-verification step at all, so this fires right at
+// registration instead. Never blocks the response the applicant sees.
 async function notifyAdminOfApplication(driver) {
   try {
     await sendAdminApplicationNotification({
@@ -35,14 +42,20 @@ async function notifyAdminOfApplication(driver) {
       city: driver.city,
       state: driver.state,
       appliedAt: driver.createdAt,
-      reviewUrl: `${CLIENT_URL}/admin/applications`,
+      reviewUrl: `${PUBLIC_APP_URL}/admin/applications`,
     })
   } catch (err) {
     console.error('Failed to send admin application notification (driver)', err)
   }
 }
 
-// Step 1 of onboarding: create the (unverified) account and email a code.
+// Step 1 of onboarding: create the account and email a verification code —
+// EXCEPT for platform: 'mobile' (see partnerAuthController.js for the full
+// rationale, identical here): the mobile app skips the emailed-code step
+// entirely and goes straight to pending-admin-review, so the account is
+// created already isVerified and the admin is notified immediately instead
+// of waiting on a verify-email call that will never come. Web (no platform
+// field sent) is completely unaffected — same two-step flow as before.
 export const driverRegister = asyncHandler(async (req, res) => {
   const {
     name,
@@ -57,11 +70,13 @@ export const driverRegister = asyncHandler(async (req, res) => {
     licenseNumber,
     vehiclePlate,
     profilePhoto,
+    platform,
   } = req.body
 
   const existing = await DriverUser.findOne({ email })
   if (existing) throw new ApiError(409, 'A driver account with that email already exists.')
 
+  const isMobile = platform === 'mobile'
   const passwordHash = await bcrypt.hash(password, 12)
   const driver = await DriverUser.create({
     name,
@@ -76,7 +91,13 @@ export const driverRegister = asyncHandler(async (req, res) => {
     licenseNumber,
     vehiclePlate,
     profilePhoto: profilePhoto || '',
+    isVerified: isMobile,
   })
+
+  if (isMobile) {
+    await notifyAdminOfApplication(driver)
+    return res.status(201).json({ success: true, pendingApproval: true, email: driver.email })
+  }
 
   try {
     await sendVerificationCode(driver)

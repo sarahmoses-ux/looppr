@@ -29,6 +29,14 @@ const userSchema = new mongoose.Schema(
     adminRole: { type: String, enum: ADMIN_ROLES },
     isVerified: { type: Boolean, default: false },
     emailNotifications: { type: Boolean, default: true },
+    // Default wash preferences, pre-filled into Book.jsx step 3 so a
+    // returning customer doesn't have to re-pick them every order — still
+    // overridable per-booking there (see PickupRequest's own foldStyle/
+    // detergent/waterTemperature, which record what was actually chosen).
+    defaultFoldStyle: { type: String, enum: ['standard', 'konmari', 'hangers'] },
+    defaultDetergent: { type: String, enum: ['freeAndClear', 'freshScent', 'eco'] },
+    defaultWaterTemperature: { type: String, enum: ['cold', 'warm', 'hot'] },
+    fabricSoftener: { type: Boolean, default: false },
     // Quick-select addresses for Book.jsx — plain subdocuments (Mongoose
     // gives each an _id automatically) rather than a separate collection,
     // since these only ever make sense scoped to one user.

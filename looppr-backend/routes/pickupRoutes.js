@@ -5,10 +5,11 @@ import {
   createPickup,
   getMyStats,
   listMyPickups,
+  rateOrder,
 } from '../controllers/pickupController.js'
 import { requireAuth } from '../middleware/auth.js'
 import { validate } from '../middleware/validate.js'
-import { createPickupValidation } from '../validations/pickupValidation.js'
+import { createPickupValidation, rateOrderValidation } from '../validations/pickupValidation.js'
 
 const router = Router()
 
@@ -18,5 +19,6 @@ router.get('/me', listMyPickups)
 router.get('/me/stats', getMyStats)
 router.post('/:id/pay/intent', createPaymentIntent)
 router.post('/:id/pay/confirm', confirmPayment)
+router.patch('/:id/rate', rateOrderValidation, validate, rateOrder)
 
 export default router

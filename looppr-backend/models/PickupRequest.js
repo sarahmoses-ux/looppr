@@ -77,7 +77,20 @@ const pickupRequestSchema = new mongoose.Schema(
     actualWeightLbs: { type: Number, min: 0.1, max: 500 },
     weightConfirmedAt: { type: Date },
     weightConfirmedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'DriverUser' },
+    // Data-URL photo of the bag/scale at weigh-in, same convention as
+    // DriverUser.profilePhoto / PartnerUser.logo (no external bucket yet).
+    // Optional — a driver can confirm weight without one.
+    weighInPhoto: { type: String, select: false },
     notes: { type: String, trim: true, maxlength: 500, default: '' },
+
+    // Customer's rating of a delivered order — see rateOrder in
+    // pickupController.js, which also recomputes the assigned driver's/
+    // partner's averageRating from these once submitted.
+    rating: {
+      stars: { type: Number, min: 1, max: 5 },
+      comment: { type: String, trim: true, maxlength: 500 },
+      ratedAt: { type: Date },
+    },
 
     // Delivery preferences, collected alongside pickup at booking time.
     deliveryWindow: {

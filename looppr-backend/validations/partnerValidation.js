@@ -24,6 +24,7 @@ export const partnerRegisterValidation = [
   body('pickupAvailable').optional().isBoolean(),
   body('deliveryAvailable').optional().isBoolean(),
   body('agreedToTerms').equals('true').withMessage('You must agree to the Partner Terms and Privacy Policy.'),
+  body('platform').optional().isIn(['web', 'mobile']).withMessage('Invalid platform.'),
 ]
 
 export const partnerLoginValidation = [

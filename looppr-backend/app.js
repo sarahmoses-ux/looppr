@@ -36,7 +36,13 @@ export function createApp() {
   // for why this endpoint needs the raw, unparsed body.
   app.use('/api/stripe/webhook', stripeWebhookRoutes)
 
-  app.use(express.json({ limit: '1mb' }))
+  // 8mb (not 1mb) because this is the ONE global body parser — Express's
+  // body-parser marks the request body parsed on first pass, so a smaller
+  // limit registered here means any later route-level express.json({limit:
+  // '8mb'}) override (see driverRoutes.js/partnerRoutes.js profile routes)
+  // never gets a chance to run and silently rejects large payloads first.
+  // Data-URL photo uploads (driver/partner profile photos, logos) need this.
+  app.use(express.json({ limit: '8mb' }))
   app.use(cookieParser())
   app.use(mongoSanitize())
 

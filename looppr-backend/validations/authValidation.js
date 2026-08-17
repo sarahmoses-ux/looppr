@@ -25,6 +25,10 @@ export const updateMeValidation = [
     .matches(/^\+?[0-9\s()-]{7,20}$/)
     .withMessage('Enter a valid phone number.'),
   body('emailNotifications').optional().isBoolean().withMessage('Invalid value.'),
+  body('defaultFoldStyle').optional({ values: 'falsy' }).isIn(['standard', 'konmari', 'hangers']).withMessage('Choose a valid fold style.'),
+  body('defaultDetergent').optional({ values: 'falsy' }).isIn(['freeAndClear', 'freshScent', 'eco']).withMessage('Choose a valid detergent.'),
+  body('defaultWaterTemperature').optional({ values: 'falsy' }).isIn(['cold', 'warm', 'hot']).withMessage('Choose a valid water temperature.'),
+  body('fabricSoftener').optional().isBoolean().withMessage('Invalid value.'),
 ]
 
 export const changePasswordValidation = [

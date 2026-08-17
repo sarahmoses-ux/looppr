@@ -6,6 +6,7 @@ import {
   getPartnerOverview,
   listIncomingOrders,
   listMyOrders,
+  listMyPayouts,
   rejectOrder,
   updateAvailability,
   updateOrderStage,
@@ -31,6 +32,7 @@ router.use(requirePartnerAuth, requireApprovedPartner)
 
 router.get('/overview', getPartnerOverview)
 router.get('/earnings', getPartnerEarnings)
+router.get('/payouts', listMyPayouts)
 router.get('/orders/incoming', listIncomingOrders)
 router.get('/orders/mine', listMyOrders)
 router.post('/orders/:id/accept', acceptOrder)

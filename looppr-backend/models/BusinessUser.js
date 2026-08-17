@@ -20,6 +20,25 @@ export const BUSINESS_TYPES = [
 // A business can be email-verified but still 'suspended', and vice versa.
 export const BUSINESS_ACCOUNT_STATUSES = ['pending', 'active', 'suspended', 'inactive']
 
+// A property's own active/inactive flag — distinct from accountStatus above,
+// which gates the whole business account. Lets a business temporarily pause
+// service at one location (e.g. an Airbnb between bookings) without
+// touching the others.
+export const PROPERTY_STATUSES = ['active', 'inactive']
+
+// Additional serviced locations beyond the business's own HQ address/city/
+// state above — e.g. a hotel operator's second property, or an Airbnb host's
+// other units. Not a separate top-level collection: properties are owned
+// 1:1 by a business and never queried independently across businesses, so
+// an embedded subdocument array keeps this simple.
+const propertySchema = new mongoose.Schema({
+  name: { type: String, required: true, trim: true, maxlength: 150 },
+  address: { type: String, required: true, trim: true, maxlength: 200 },
+  city: { type: String, required: true, trim: true, maxlength: 100 },
+  state: { type: String, trim: true, maxlength: 2, uppercase: true, default: 'OK' },
+  status: { type: String, enum: PROPERTY_STATUSES, default: 'active' },
+})
+
 // Completely separate from the User (client/admin) collection — a business
 // account can only ever authenticate on the Business Portal. Isolation is
 // enforced at two layers: this is its own collection, and business JWTs are
@@ -52,6 +71,8 @@ const businessUserSchema = new mongoose.Schema(
     weeklyVolume: { type: String, trim: true, maxlength: 100, default: '' },
     // Optional business/tax registration number, for verified commercial accounts.
     registrationNumber: { type: String, trim: true, maxlength: 60, default: '' },
+
+    properties: { type: [propertySchema], default: [] },
 
     // "Verification Status" — email ownership, flipped true by verifyOtpCode
     // (utils/otp.js), which this model reuses via the otp* fields below.

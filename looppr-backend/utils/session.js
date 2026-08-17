@@ -135,6 +135,10 @@ export function publicUser(user) {
     adminRole: user.adminRole,
     isVerified: user.isVerified,
     emailNotifications: user.emailNotifications,
+    defaultFoldStyle: user.defaultFoldStyle,
+    defaultDetergent: user.defaultDetergent,
+    defaultWaterTemperature: user.defaultWaterTemperature,
+    fabricSoftener: user.fabricSoftener,
     createdAt: user.createdAt,
   }
 }

@@ -19,6 +19,7 @@ export const driverRegisterValidation = [
   body('licenseNumber').optional().trim().isLength({ max: 40 }),
   body('vehiclePlate').optional().trim().isLength({ max: 20 }),
   body('agreedToTerms').equals('true').withMessage('You must agree to continue.'),
+  body('platform').optional().isIn(['web', 'mobile']).withMessage('Invalid platform.'),
 ]
 
 export const driverLoginValidation = [
@@ -81,4 +82,5 @@ export const driverConfirmWeightValidation = [
   body('actualWeightLbs')
     .isFloat({ min: 0.1, max: 500 })
     .withMessage('Enter a valid weight in pounds.'),
+  body('weighInPhoto').optional({ values: 'falsy' }).isString().withMessage('Invalid photo.'),
 ]

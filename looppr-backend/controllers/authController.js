@@ -180,13 +180,17 @@ export const me = asyncHandler(async (req, res) => {
 // { emailNotifications }. Email is deliberately not editable here: changing
 // it would need its own re-verification flow, which doesn't exist yet.
 export const updateMe = asyncHandler(async (req, res) => {
-  const { name, phone, emailNotifications } = req.body
+  const { name, phone, emailNotifications, defaultFoldStyle, defaultDetergent, defaultWaterTemperature, fabricSoftener } = req.body
   const user = await User.findById(req.user.sub)
   if (!user) throw new ApiError(401, 'Not authenticated.')
 
   if (name !== undefined) user.name = name
   if (phone !== undefined) user.phone = phone
   if (emailNotifications !== undefined) user.emailNotifications = emailNotifications
+  if (defaultFoldStyle !== undefined) user.defaultFoldStyle = defaultFoldStyle
+  if (defaultDetergent !== undefined) user.defaultDetergent = defaultDetergent
+  if (defaultWaterTemperature !== undefined) user.defaultWaterTemperature = defaultWaterTemperature
+  if (fabricSoftener !== undefined) user.fabricSoftener = fabricSoftener
   await user.save()
 
   res.json({ success: true, user: publicUser(user) })

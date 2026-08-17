@@ -7,6 +7,7 @@ import {
   getDriverOverview,
   listIncomingDeliveries,
   listMyDeliveries,
+  listMyPayouts,
   rejectDelivery,
   updateAvailability,
   updateDeliveryStage,
@@ -36,6 +37,7 @@ router.use(requireDriverAuth, requireApprovedDriver)
 
 router.get('/overview', getDriverOverview)
 router.get('/earnings', getDriverEarnings)
+router.get('/payouts', listMyPayouts)
 router.get('/deliveries/incoming', listIncomingDeliveries)
 router.get('/deliveries/mine', listMyDeliveries)
 router.post('/deliveries/:id/accept', acceptDelivery)

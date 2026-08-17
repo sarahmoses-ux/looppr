@@ -7,17 +7,24 @@ import { assignOtp, canResendOtp, verifyOtpCode } from '../utils/otp.js'
 import { issuePartnerSession, publicPartner } from '../utils/session.js'
 import { verifyPartnerRefreshToken } from '../utils/tokens.js'
 
-const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173'
+// Distinct from CLIENT_URL (used for CORS origin — see app.js): that stays
+// pointed at wherever the web app is being developed locally, while this is
+// always the real public site, since it's only ever used to build links
+// that get emailed out (and must work for whoever opens the email, not just
+// this dev machine).
+const PUBLIC_APP_URL = process.env.PUBLIC_APP_URL || process.env.CLIENT_URL || 'http://localhost:5173'
 
 async function sendVerificationCode(partner) {
   const code = await assignOtp(partner)
   await sendOtpEmail(partner.email, partner.ownerName, code)
 }
 
-// Fired once, the moment a Partner application is email-verified (not at
-// raw registration submit — step 1 accepts any address including typos/
-// bots, so notifying admins there would just be noise). Never blocks the
-// response the applicant sees; a failed notification is logged, not fatal.
+// Fired once — for web, the moment a Partner application is email-verified
+// (raw registration accepts any address including typos/bots, so notifying
+// admins there would just be noise); for mobile (platform: 'mobile'),
+// there's no email-verification step at all, so this fires right at
+// registration instead. Never blocks the response the applicant sees; a
+// failed notification is logged, not fatal.
 async function notifyAdminOfApplication(partner) {
   try {
     await sendAdminApplicationNotification({
@@ -29,14 +36,19 @@ async function notifyAdminOfApplication(partner) {
       city: partner.city,
       state: partner.state,
       appliedAt: partner.createdAt,
-      reviewUrl: `${CLIENT_URL}/admin/applications`,
+      reviewUrl: `${PUBLIC_APP_URL}/admin/applications`,
     })
   } catch (err) {
     console.error('Failed to send admin application notification (partner)', err)
   }
 }
 
-// Step 1 of onboarding: create the (unverified) account and email a code.
+// Step 1 of onboarding: create the account and email a verification code —
+// EXCEPT for platform: 'mobile': the mobile app skips the emailed-code step
+// entirely and goes straight to pending-admin-review, so the account is
+// created already isVerified and the admin is notified immediately instead
+// of waiting on a verify-email call that will never come. Web (no platform
+// field sent) is completely unaffected — same two-step flow as before.
 export const partnerRegister = asyncHandler(async (req, res) => {
   const {
     businessName,
@@ -58,11 +70,13 @@ export const partnerRegister = asyncHandler(async (req, res) => {
     logo,
     images,
     businessDocument,
+    platform,
   } = req.body
 
   const existing = await PartnerUser.findOne({ email })
   if (existing) throw new ApiError(409, 'A partner account with that email already exists.')
 
+  const isMobile = platform === 'mobile'
   const passwordHash = await bcrypt.hash(password, 12)
   const partner = await PartnerUser.create({
     businessName,
@@ -85,7 +99,13 @@ export const partnerRegister = asyncHandler(async (req, res) => {
     logo: logo || '',
     images: Array.isArray(images) ? images : [],
     businessDocument: businessDocument || '',
+    isVerified: isMobile,
   })
+
+  if (isMobile) {
+    await notifyAdminOfApplication(partner)
+    return res.status(201).json({ success: true, pendingApproval: true, email: partner.email })
+  }
 
   try {
     await sendVerificationCode(partner)

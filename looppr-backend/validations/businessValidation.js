@@ -1,5 +1,5 @@
-import { body } from 'express-validator'
-import { BUSINESS_TYPES } from '../models/BusinessUser.js'
+import { body, param } from 'express-validator'
+import { BUSINESS_TYPES, PROPERTY_STATUSES } from '../models/BusinessUser.js'
 
 const PASSWORD_RULE = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/
 const PHONE_RULE = /^\+?[0-9\s()-]{7,20}$/
@@ -56,6 +56,26 @@ export const businessUpdateMeValidation = [
   body('state').optional().trim().isLength({ min: 2, max: 2 }),
   body('weeklyVolume').optional().trim().isLength({ max: 100 }),
   body('registrationNumber').optional().trim().isLength({ max: 60 }),
+]
+
+export const businessAddPropertyValidation = [
+  body('name').trim().isLength({ min: 2, max: 150 }).withMessage('Enter a property name.'),
+  body('address').trim().isLength({ min: 3, max: 200 }).withMessage('Enter the property address.'),
+  body('city').trim().isLength({ min: 2, max: 100 }).withMessage('Enter a city.'),
+  body('state').optional().trim().isLength({ min: 2, max: 2 }).withMessage('Use the 2-letter state code.'),
+]
+
+export const businessUpdatePropertyValidation = [
+  param('propertyId').isMongoId().withMessage('Invalid property.'),
+  body('name').optional().trim().isLength({ min: 2, max: 150 }),
+  body('address').optional().trim().isLength({ min: 3, max: 200 }),
+  body('city').optional().trim().isLength({ min: 2, max: 100 }),
+  body('state').optional().trim().isLength({ min: 2, max: 2 }),
+  body('status').optional().isIn(PROPERTY_STATUSES).withMessage('Invalid status.'),
+]
+
+export const businessPropertyIdValidation = [
+  param('propertyId').isMongoId().withMessage('Invalid property.'),
 ]
 
 // Pickup requested from the dashboard. Mirrors createPickupValidation

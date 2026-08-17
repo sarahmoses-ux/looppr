@@ -67,3 +67,8 @@ export const createPickupValidation = [
   body('deliveryWindow').isIn(['morning', 'afternoon', 'evening']).withMessage('Choose a delivery window.'),
   deliveryAddressValidator('deliveryAddress'),
 ]
+
+export const rateOrderValidation = [
+  body('stars').isInt({ min: 1, max: 5 }).withMessage('Choose a rating from 1 to 5 stars.'),
+  body('comment').optional({ values: 'falsy' }).trim().isLength({ max: 500 }).withMessage('Keep your comment under 500 characters.'),
+]

@@ -1,12 +1,21 @@
 import { Router } from 'express'
 import {
+  addBusinessProperty,
   createBusinessPickup,
+  deleteBusinessProperty,
   getBusinessOverview,
   listBusinessPickups,
+  listBusinessProperties,
+  updateBusinessProperty,
 } from '../controllers/businessController.js'
 import { requireBusinessAuth } from '../middleware/auth.js'
 import { validate } from '../middleware/validate.js'
-import { businessCreatePickupValidation } from '../validations/businessValidation.js'
+import {
+  businessAddPropertyValidation,
+  businessCreatePickupValidation,
+  businessPropertyIdValidation,
+  businessUpdatePropertyValidation,
+} from '../validations/businessValidation.js'
 
 const router = Router()
 
@@ -18,5 +27,10 @@ router.use(requireBusinessAuth)
 router.get('/overview', getBusinessOverview)
 router.get('/pickups', listBusinessPickups)
 router.post('/pickups', businessCreatePickupValidation, validate, createBusinessPickup)
+
+router.get('/properties', listBusinessProperties)
+router.post('/properties', businessAddPropertyValidation, validate, addBusinessProperty)
+router.patch('/properties/:propertyId', businessUpdatePropertyValidation, validate, updateBusinessProperty)
+router.delete('/properties/:propertyId', businessPropertyIdValidation, validate, deleteBusinessProperty)
 
 export default router

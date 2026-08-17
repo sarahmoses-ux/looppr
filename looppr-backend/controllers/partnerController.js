@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 import { ActivityLog } from '../models/ActivityLog.js'
 import { PartnerUser } from '../models/PartnerUser.js'
+import { Payout } from '../models/Payout.js'
 import { PickupRequest } from '../models/PickupRequest.js'
 import { ApiError } from '../utils/ApiError.js'
 import { asyncHandler } from '../utils/asyncHandler.js'
@@ -31,6 +32,10 @@ function shapeOrder(p) {
     address: p.address,
     deliveryAddress: p.deliveryAddress || null,
     loadSize: p.loadSize,
+    foldStyle: p.foldStyle,
+    detergent: p.detergent,
+    waterTemperature: p.waterTemperature,
+    source: p.source,
     preferredDate: p.preferredDate,
     window: p.window,
     deliveryWindow: p.deliveryWindow,
@@ -191,7 +196,7 @@ export const getPartnerEarnings = asyncHandler(async (req, res) => {
       { $group: { _id: null, total: { $sum: '$pricing.amount' } } },
     ])
 
-  const [totalAgg, weekAgg, monthAgg, pendingAgg] = await Promise.all([
+  const [totalAgg, weekAgg, monthAgg, pendingAgg, paidOutAgg] = await Promise.all([
     sumPaid({}),
     sumPaid({ paidAt: { $gte: startOfWeek } }),
     sumPaid({ paidAt: { $gte: startOfMonth } }),
@@ -199,21 +204,33 @@ export const getPartnerEarnings = asyncHandler(async (req, res) => {
       { $match: { partnerUserId: partnerId, paymentStatus: { $in: ['unpaid', 'pending'] } } },
       { $group: { _id: null, total: { $sum: '$pricing.amount' } } },
     ]),
+    Payout.aggregate([
+      { $match: { payeeType: 'partner', payeeId: partnerId, status: 'paid' } },
+      { $group: { _id: null, total: { $sum: '$amount' } } },
+    ]),
   ])
 
   const round = (v) => Math.round((v || 0) * 100) / 100
-  const totalRevenue = round(totalAgg[0]?.total)
   res.json({
     success: true,
     earnings: {
-      totalRevenue,
+      totalRevenue: round(totalAgg[0]?.total),
       weeklyRevenue: round(weekAgg[0]?.total),
       monthlyRevenue: round(monthAgg[0]?.total),
       pendingPayments: round(pendingAgg[0]?.total),
-      // No payout system yet — completed payouts equal collected revenue.
-      completedPayouts: totalRevenue,
+      // Real payouts an admin has generated and marked paid — see
+      // adminPayoutsController.js. Distinct from collected revenue above:
+      // a partner can have plenty of paid orders with no payout issued yet.
+      completedPayouts: round(paidOutAgg[0]?.total),
     },
   })
+})
+
+// Payout history for this partner — the same Payout records an admin
+// generates via adminPayoutsController.js, filtered to their own payouts.
+export const listMyPayouts = asyncHandler(async (req, res) => {
+  const payouts = await Payout.find({ payeeType: 'partner', payeeId: req.partner.sub }).sort({ periodStart: -1 })
+  res.json({ success: true, payouts })
 })
 
 export const updateAvailability = asyncHandler(async (req, res) => {

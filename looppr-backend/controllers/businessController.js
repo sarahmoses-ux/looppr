@@ -1,8 +1,10 @@
 import mongoose from 'mongoose'
 import { ActivityLog } from '../models/ActivityLog.js'
+import { BusinessUser } from '../models/BusinessUser.js'
 import { PickupRequest } from '../models/PickupRequest.js'
 import { geocodeAddress } from '../services/geocodeService.js'
 import { logAssignmentOutcome, resolveAssignment } from '../services/assignmentService.js'
+import { ApiError } from '../utils/ApiError.js'
 import { asyncHandler } from '../utils/asyncHandler.js'
 import { computeOrderPrice } from '../utils/pricing.js'
 
@@ -124,4 +126,54 @@ export const getBusinessOverview = asyncHandler(async (req, res) => {
         : null,
     },
   })
+})
+
+export const listBusinessProperties = asyncHandler(async (req, res) => {
+  const business = await BusinessUser.findById(req.business.sub).select('properties')
+  if (!business) throw new ApiError(401, 'Not authenticated.')
+  res.json({ success: true, properties: business.properties })
+})
+
+export const addBusinessProperty = asyncHandler(async (req, res) => {
+  const { name, address, city, state } = req.body
+  const business = await BusinessUser.findById(req.business.sub).select('properties')
+  if (!business) throw new ApiError(401, 'Not authenticated.')
+
+  business.properties.push({ name, address, city, state })
+  await business.save()
+
+  res.status(201).json({ success: true, properties: business.properties })
+})
+
+export const updateBusinessProperty = asyncHandler(async (req, res) => {
+  const { propertyId } = req.params
+  const { name, address, city, state, status } = req.body
+  const business = await BusinessUser.findById(req.business.sub).select('properties')
+  if (!business) throw new ApiError(401, 'Not authenticated.')
+
+  const property = business.properties.id(propertyId)
+  if (!property) throw new ApiError(404, 'Property not found.')
+
+  if (name !== undefined) property.name = name
+  if (address !== undefined) property.address = address
+  if (city !== undefined) property.city = city
+  if (state !== undefined) property.state = state
+  if (status !== undefined) property.status = status
+  await business.save()
+
+  res.json({ success: true, properties: business.properties })
+})
+
+export const deleteBusinessProperty = asyncHandler(async (req, res) => {
+  const { propertyId } = req.params
+  const business = await BusinessUser.findById(req.business.sub).select('properties')
+  if (!business) throw new ApiError(401, 'Not authenticated.')
+
+  const property = business.properties.id(propertyId)
+  if (!property) throw new ApiError(404, 'Property not found.')
+
+  property.deleteOne()
+  await business.save()
+
+  res.json({ success: true, properties: business.properties })
 })

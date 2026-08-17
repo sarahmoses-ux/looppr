@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 import { ActivityLog } from '../models/ActivityLog.js'
 import { DriverUser } from '../models/DriverUser.js'
+import { Payout } from '../models/Payout.js'
 import { PickupRequest } from '../models/PickupRequest.js'
 import { ApiError } from '../utils/ApiError.js'
 import { asyncHandler } from '../utils/asyncHandler.js'
@@ -176,7 +177,7 @@ export const updateDeliveryStage = asyncHandler(async (req, res) => {
 // paid; deliveryFee is left untouched (it reflects the customer's own promo
 // eligibility from booking time, unrelated to a weight correction).
 export const confirmWeight = asyncHandler(async (req, res) => {
-  const { actualWeightLbs } = req.body
+  const { actualWeightLbs, weighInPhoto } = req.body
 
   const pickup = await PickupRequest.findOne({ _id: req.params.id, driverUserId: req.driver.sub })
   if (!pickup) throw new ApiError(404, 'Delivery not found for this driver.')
@@ -184,6 +185,7 @@ export const confirmWeight = asyncHandler(async (req, res) => {
   pickup.actualWeightLbs = actualWeightLbs
   pickup.weightConfirmedAt = new Date()
   pickup.weightConfirmedBy = req.driver.sub
+  if (weighInPhoto) pickup.weighInPhoto = weighInPhoto
 
   if (pickup.paymentStatus !== 'paid') {
     const { amount, subtotal } = recomputeSubtotalForWeight(actualWeightLbs, pickup.pricing?.deliveryFee || 0)
@@ -253,7 +255,10 @@ export const getDriverEarnings = asyncHandler(async (req, res) => {
       { $group: { _id: null, total: { $sum: '$pricing.deliveryFee' } } },
     ])
 
-  const [totalAgg, weekAgg, monthAgg, pendingAgg] = await Promise.all([
+  const startOfToday = new Date(now)
+  startOfToday.setHours(0, 0, 0, 0)
+
+  const [totalAgg, weekAgg, monthAgg, pendingAgg, paidOutAgg, todayDeliveries] = await Promise.all([
     sumFee({}),
     sumFee({ paidAt: { $gte: startOfWeek } }),
     sumFee({ paidAt: { $gte: startOfMonth } }),
@@ -261,20 +266,48 @@ export const getDriverEarnings = asyncHandler(async (req, res) => {
       { $match: { driverUserId: driverId, paymentStatus: { $in: ['unpaid', 'pending'] } } },
       { $group: { _id: null, total: { $sum: '$pricing.deliveryFee' } } },
     ]),
+    Payout.aggregate([
+      { $match: { payeeType: 'driver', payeeId: driverId, status: 'paid' } },
+      { $group: { _id: null, total: { $sum: '$amount' } } },
+    ]),
+    // "Today's shift" — no dedicated deliveredAt field, so this uses
+    // updatedAt at driverStage 'delivered' as the completion time, the same
+    // convention businessController.js's avgProcessingHours already uses.
+    PickupRequest.find({ driverUserId: driverId, driverStage: 'delivered', updatedAt: { $gte: startOfToday } })
+      .select('address pricing.deliveryFee updatedAt')
+      .sort({ updatedAt: -1 }),
   ])
 
   const round = (v) => Math.round((v || 0) * 100) / 100
-  const totalEarnings = round(totalAgg[0]?.total)
   res.json({
     success: true,
     earnings: {
-      totalEarnings,
+      totalEarnings: round(totalAgg[0]?.total),
       weeklyEarnings: round(weekAgg[0]?.total),
       monthlyEarnings: round(monthAgg[0]?.total),
       pendingPayments: round(pendingAgg[0]?.total),
-      completedPayouts: totalEarnings,
+      // Real payouts an admin has generated and marked paid — see
+      // adminPayoutsController.js. Distinct from collected fees above: a
+      // driver can have plenty of paid deliveries with no payout issued yet.
+      completedPayouts: round(paidOutAgg[0]?.total),
+      today: {
+        total: round(todayDeliveries.reduce((sum, d) => sum + (d.pricing?.deliveryFee || 0), 0)),
+        deliveries: todayDeliveries.map((d) => ({
+          _id: d._id,
+          street: d.address?.street,
+          fee: d.pricing?.deliveryFee,
+          deliveredAt: d.updatedAt,
+        })),
+      },
     },
   })
+})
+
+// Payout history for this driver — the same Payout records an admin
+// generates via adminPayoutsController.js, filtered to their own payouts.
+export const listMyPayouts = asyncHandler(async (req, res) => {
+  const payouts = await Payout.find({ payeeType: 'driver', payeeId: req.driver.sub }).sort({ periodStart: -1 })
+  res.json({ success: true, payouts })
 })
 
 // 'online' maps to DriverUser.availability's 'available' state (the enum also

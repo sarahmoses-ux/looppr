@@ -8,7 +8,12 @@ import { ApiError } from '../utils/ApiError.js'
 import { asyncHandler } from '../utils/asyncHandler.js'
 import { publicDriver, publicPartner } from '../utils/session.js'
 
-const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173'
+// Distinct from CLIENT_URL (used for CORS origin — see app.js): that stays
+// pointed at wherever the web app is being developed locally, while this is
+// always the real public site, since it's only ever used to build links
+// that get emailed out (and must work for whoever opens the email, not just
+// this dev machine).
+const PUBLIC_APP_URL = process.env.PUBLIC_APP_URL || process.env.CLIENT_URL || 'http://localhost:5173'
 
 // Kept separate from adminController.js (pickups/customers/stats) — a
 // distinct concern, same pattern as partnerAuthController.js vs
@@ -94,7 +99,7 @@ export const approvePartnerApplication = asyncHandler(async (req, res) => {
   }).catch(() => {})
 
   try {
-    await sendApplicationApprovedEmail(partner.email, partner.ownerName, 'partner', `${CLIENT_URL}/partners/login`)
+    await sendApplicationApprovedEmail(partner.email, partner.ownerName, 'partner', `${PUBLIC_APP_URL}/partners/login`)
   } catch (err) {
     console.error('Failed to send partner approval email', err)
   }
@@ -147,7 +152,7 @@ export const approveDriverApplication = asyncHandler(async (req, res) => {
   }).catch(() => {})
 
   try {
-    await sendApplicationApprovedEmail(driver.email, driver.name, 'driver', `${CLIENT_URL}/drive/login`)
+    await sendApplicationApprovedEmail(driver.email, driver.name, 'driver', `${PUBLIC_APP_URL}/drive/login`)
   } catch (err) {
     console.error('Failed to send driver approval email', err)
   }
