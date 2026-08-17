@@ -4,6 +4,7 @@ import {
   createBusinessPickup,
   deleteBusinessProperty,
   getBusinessOverview,
+  listBusinessInvoices,
   listBusinessPickups,
   listBusinessProperties,
   updateBusinessProperty,
@@ -27,6 +28,8 @@ router.use(requireBusinessAuth)
 router.get('/overview', getBusinessOverview)
 router.get('/pickups', listBusinessPickups)
 router.post('/pickups', businessCreatePickupValidation, validate, createBusinessPickup)
+
+router.get('/invoices', listBusinessInvoices)
 
 router.get('/properties', listBusinessProperties)
 router.post('/properties', businessAddPropertyValidation, validate, addBusinessProperty)

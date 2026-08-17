@@ -1,6 +1,7 @@
 import mongoose from 'mongoose'
 import { ActivityLog } from '../models/ActivityLog.js'
 import { BusinessUser } from '../models/BusinessUser.js'
+import { Invoice } from '../models/Invoice.js'
 import { PickupRequest } from '../models/PickupRequest.js'
 import { geocodeAddress } from '../services/geocodeService.js'
 import { logAssignmentOutcome, resolveAssignment } from '../services/assignmentService.js'
@@ -70,8 +71,9 @@ export const listBusinessPickups = asyncHandler(async (req, res) => {
 })
 
 // Overview + analytics numbers for the dashboard, computed from the
-// business's own pickups. No invoice model yet, so "spending" is derived from
-// paid orders' pricing.amount.
+// business's own pickups. "Spending" is derived from paid orders'
+// pricing.amount directly rather than from Invoice records, since not every
+// paid order has necessarily been rolled into an admin-generated invoice yet.
 export const getBusinessOverview = asyncHandler(async (req, res) => {
   const businessId = new mongoose.Types.ObjectId(req.business.sub)
 
@@ -126,6 +128,14 @@ export const getBusinessOverview = asyncHandler(async (req, res) => {
         : null,
     },
   })
+})
+
+// A business's own generated invoices — admin-created only (see
+// adminInvoicesController.generateInvoice), same "nothing here until an
+// admin acts" shape as Payout for drivers/partners.
+export const listBusinessInvoices = asyncHandler(async (req, res) => {
+  const invoices = await Invoice.find({ businessId: req.business.sub }).sort({ periodStart: -1 })
+  res.json({ success: true, invoices })
 })
 
 export const listBusinessProperties = asyncHandler(async (req, res) => {
