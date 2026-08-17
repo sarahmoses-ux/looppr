@@ -14,6 +14,7 @@ import driverAuthRoutes from './routes/driverAuthRoutes.js'
 import driverRoutes from './routes/driverRoutes.js'
 import contactRoutes from './routes/contactRoutes.js'
 import guestPickupRoutes from './routes/guestPickupRoutes.js'
+import notificationRoutes from './routes/notificationRoutes.js'
 import partnerLeadRoutes from './routes/partnerLeadRoutes.js'
 import pickupRoutes from './routes/pickupRoutes.js'
 import stripeWebhookRoutes from './routes/stripeWebhookRoutes.js'
@@ -67,6 +68,7 @@ export function createApp() {
   // /api/driver-auth), isolated from customer/admin/business/partner sessions.
   app.use('/api/driver-auth', driverAuthRoutes)
   app.use('/api/driver', driverRoutes)
+  app.use('/api/notifications', notificationRoutes)
   app.use('/api/waitlist', waitlistRoutes)
   app.use('/api/contact', contactRoutes)
   app.use('/api/partner-leads', partnerLeadRoutes)

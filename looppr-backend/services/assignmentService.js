@@ -1,5 +1,6 @@
 import { ActivityLog } from '../models/ActivityLog.js'
 import { PartnerUser } from '../models/PartnerUser.js'
+import { notify } from './notificationService.js'
 
 // The ONE place order → laundromat assignment decisions get made. Every
 // order-creation controller (pickupController, guestPickupController,
@@ -55,6 +56,14 @@ export async function logAssignmentOutcome(pickup, assignment) {
         entityType: 'PickupRequest',
         entityId: pickup._id,
         metadata: { partnerUserId: assignment.partnerUserId, rule: 'default_laundromat' },
+      })
+      await notify({
+        ownerType: 'partner',
+        ownerId: assignment.partnerUserId,
+        title: 'New order assigned',
+        body: `A ${pickup.loadSize} load at ${pickup.address?.street ?? 'a new address'} is ready for pickup.`,
+        type: 'order_assigned',
+        data: { pickupId: pickup._id.toString() },
       })
     } else {
       // Soft-fail path: order was created fully unassigned because no

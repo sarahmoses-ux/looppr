@@ -92,3 +92,43 @@ export function requireDriverAuth(req, _res, next) {
     next(new ApiError(401, 'Session expired.'))
   }
 }
+
+// Shared guard for the one /api/notifications router used by all four
+// mobile portals (customer/business/partner/driver each carry a differently
+// -signed token, see the four guards above). Tries each verifier in turn and
+// normalizes the result to req.actor = { ownerType, ownerId } so
+// notificationsController doesn't need to know which portal called it.
+// Deliberately excludes admin — the admin dashboard is web-only and has no
+// use for device push tokens.
+export function identifyAnyPortalUser(req, _res, next) {
+  const header = req.headers.authorization || ''
+  const token = header.startsWith('Bearer ') ? header.slice(7) : null
+  if (!token) return next(new ApiError(401, 'Not authenticated.'))
+
+  try {
+    const user = verifyAccessToken(token)
+    if (user.role !== 'client') throw new Error('not a residential token')
+    req.actor = { ownerType: 'residential', ownerId: user.sub }
+    return next()
+  } catch { /* try the next portal's secret */ }
+
+  try {
+    const business = verifyBusinessAccessToken(token)
+    req.actor = { ownerType: 'business', ownerId: business.sub }
+    return next()
+  } catch { /* try the next portal's secret */ }
+
+  try {
+    const partner = verifyPartnerAccessToken(token)
+    req.actor = { ownerType: 'partner', ownerId: partner.sub }
+    return next()
+  } catch { /* try the next portal's secret */ }
+
+  try {
+    const driver = verifyDriverAccessToken(token)
+    req.actor = { ownerType: 'driver', ownerId: driver.sub }
+    return next()
+  } catch {
+    return next(new ApiError(401, 'Session expired.'))
+  }
+}

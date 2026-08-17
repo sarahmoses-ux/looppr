@@ -3,6 +3,7 @@ import { ActivityLog } from '../models/ActivityLog.js'
 import { DriverUser } from '../models/DriverUser.js'
 import { Payout } from '../models/Payout.js'
 import { PickupRequest } from '../models/PickupRequest.js'
+import { notifyPickupOwner } from '../services/notificationService.js'
 import { ApiError } from '../utils/ApiError.js'
 import { asyncHandler } from '../utils/asyncHandler.js'
 import { recomputeSubtotalForWeight } from '../utils/pricing.js'
@@ -21,6 +22,14 @@ const STAGE_MAP = {
   at_laundromat: { stage: 'at_laundromat' },
   out_for_delivery: { stage: 'out_for_delivery' },
   delivered: { stage: 'delivered', status: 'ready_delivered' },
+}
+
+// Customer-facing copy for each driver action that's worth notifying about
+// -- at_laundromat is internal detail, not shown to the customer.
+const CUSTOMER_MESSAGE = {
+  pickup_completed: 'Your driver has picked up your laundry.',
+  out_for_delivery: 'Your laundry is out for delivery.',
+  delivered: 'Your laundry has been delivered.',
 }
 
 function customerName(p) {
@@ -104,6 +113,13 @@ export const acceptDelivery = asyncHandler(async (req, res) => {
     entityId: pickup._id,
   }).catch(() => {})
 
+  await notifyPickupOwner(pickup, {
+    title: 'Driver assigned',
+    body: 'A driver has been assigned to your order.',
+    type: 'driver_assigned',
+    data: { pickupId: pickup._id.toString() },
+  })
+
   res.json({ success: true, delivery: shapeDelivery(pickup) })
 })
 
@@ -164,6 +180,15 @@ export const updateDeliveryStage = asyncHandler(async (req, res) => {
     entityType: 'PickupRequest',
     entityId: pickup._id,
   }).catch(() => {})
+
+  if (CUSTOMER_MESSAGE[action]) {
+    await notifyPickupOwner(pickup, {
+      title: 'Order update',
+      body: CUSTOMER_MESSAGE[action],
+      type: `delivery_${mapping.stage}`,
+      data: { pickupId: pickup._id.toString() },
+    })
+  }
 
   res.json({ success: true, delivery: shapeDelivery(pickup) })
 })

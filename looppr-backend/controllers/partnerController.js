@@ -3,6 +3,7 @@ import { ActivityLog } from '../models/ActivityLog.js'
 import { PartnerUser } from '../models/PartnerUser.js'
 import { Payout } from '../models/Payout.js'
 import { PickupRequest } from '../models/PickupRequest.js'
+import { notifyPickupOwner } from '../services/notificationService.js'
 import { ApiError } from '../utils/ApiError.js'
 import { asyncHandler } from '../utils/asyncHandler.js'
 import { publicPartner } from '../utils/session.js'
@@ -17,6 +18,14 @@ const STAGE_MAP = {
   laundry_in_progress: { stage: 'laundry_in_progress', status: 'laundry_in_progress' },
   ready_for_delivery: { stage: 'ready_for_delivery', status: 'ready_delivered' },
   delivered: { stage: 'delivered', status: 'ready_delivered' },
+}
+
+// Customer-facing copy for each partner action, keyed the same as STAGE_MAP.
+const CUSTOMER_MESSAGE = {
+  pickup_completed: 'Your laundry has arrived at the wash facility.',
+  laundry_in_progress: 'Your laundry is being washed and folded.',
+  ready_for_delivery: 'Your laundry is ready and waiting for delivery.',
+  delivered: 'Your laundry has been delivered.',
 }
 
 // Resolves a display name for whoever placed the order (account / business /
@@ -98,6 +107,13 @@ export const acceptOrder = asyncHandler(async (req, res) => {
     entityId: pickup._id,
   }).catch(() => {})
 
+  await notifyPickupOwner(pickup, {
+    title: 'Order accepted',
+    body: 'A laundry partner has accepted your order.',
+    type: 'order_accepted',
+    data: { pickupId: pickup._id.toString() },
+  })
+
   res.json({ success: true, order: shapeOrder(pickup) })
 })
 
@@ -148,6 +164,13 @@ export const updateOrderStage = asyncHandler(async (req, res) => {
     entityType: 'PickupRequest',
     entityId: pickup._id,
   }).catch(() => {})
+
+  await notifyPickupOwner(pickup, {
+    title: 'Order update',
+    body: CUSTOMER_MESSAGE[action],
+    type: `order_${mapping.stage}`,
+    data: { pickupId: pickup._id.toString() },
+  })
 
   res.json({ success: true, order: shapeOrder(pickup) })
 })
