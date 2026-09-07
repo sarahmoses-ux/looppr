@@ -51,6 +51,22 @@ export const CUSTOMER_PLANS = [
     highlight: true,
     badge: 'Best Value',
   },
+  {
+    name: 'Looppr Super',
+    price: '$170',
+    unit: '/mo',
+    detail: 'For high-volume households & frequent laundry users.',
+    features: [
+      'Up to 200 lbs of laundry per month',
+      'Approximately 50 lbs per week',
+      'Priority pickup & delivery',
+      'Faster turnaround times',
+      'Premium customer support',
+    ],
+    cta: 'Get Looppr Super',
+    to: '/signup',
+    highlight: false,
+  },
 ]
 
 // Business pricing lives exclusively on pages/Business.jsx — never on the

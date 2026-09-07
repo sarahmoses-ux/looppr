@@ -9,15 +9,15 @@ const BREADCRUMB_JSON_LD = breadcrumbJsonLd([{ name: 'Pricing', path: '/pricing'
 
 // Mirrors CUSTOMER_PLANS (data/pricingPlans.js) as a feature-by-feature
 // comparison — kept in the same order as that array (Free, Looppr+, Looppr
-// Gold) so a column never silently points at the wrong plan.
+// Gold, Looppr Super) so a column never silently points at the wrong plan.
 const COMPARISON_ROWS = [
-  { label: 'Schedule pickups', values: ['✓', '✓', '✓'] },
-  { label: 'Track orders', values: ['✓', '✓', '✓'] },
-  { label: 'Delivery fee', values: ['$4.99 (free on first 2)', 'Free every order', 'Included'] },
-  { label: 'Driver matching', values: ['Standard', 'Priority', 'Priority'] },
-  { label: 'Monthly laundry included', values: ['Pay per order', 'Pay per order', 'Up to 100 lbs'] },
-  { label: 'Turnaround time', values: ['Standard', 'Standard', 'Faster'] },
-  { label: 'Customer support', values: ['Standard', 'Standard', 'Premium'] },
+  { label: 'Schedule pickups', values: ['✓', '✓', '✓', '✓'] },
+  { label: 'Track orders', values: ['✓', '✓', '✓', '✓'] },
+  { label: 'Delivery fee', values: ['$4.99 (free on first 2)', 'Free every order', 'Included', 'Included'] },
+  { label: 'Driver matching', values: ['Standard', 'Priority', 'Priority', 'Priority'] },
+  { label: 'Monthly laundry included', values: ['Pay per order', 'Pay per order', 'Up to 100 lbs', 'Up to 200 lbs'] },
+  { label: 'Turnaround time', values: ['Standard', 'Standard', 'Faster', 'Faster'] },
+  { label: 'Customer support', values: ['Standard', 'Standard', 'Premium', 'Premium'] },
 ]
 
 const ADDONS = [
@@ -87,14 +87,14 @@ export default function Pricing() {
           </h1>
           <p className="mt-4 text-lg leading-relaxed text-periwinkle-text">
             $1.59 per pound for wash &amp; fold. Subscribe to Looppr+ for free delivery, or go
-            Looppr Gold for priority service on up to 100 lbs a month. Your first pickup is
-            always on us.
+            Looppr Gold for priority service on up to 100 lbs a month, or Looppr Super for up
+            to 200 lbs. Your first pickup is always on us.
           </p>
         </div>
       </section>
 
       <section className="mx-auto max-w-[1100px] px-4 pb-16 sm:px-6 lg:px-8">
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {CUSTOMER_PLANS.map((plan) => (
             <div
               key={plan.name}
@@ -140,7 +140,7 @@ export default function Pricing() {
       </section>
 
       <section className="border-t border-line bg-white px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto max-w-4xl">
           <h2 className="text-center font-display text-2xl font-semibold tracking-tight text-ink sm:text-3xl">
             Compare the plans
           </h2>
@@ -154,6 +154,7 @@ export default function Pricing() {
                     Looppr+
                   </th>
                   <th className="px-3 py-3.5 text-center text-sm font-semibold text-ink">Looppr Gold</th>
+                  <th className="px-3 py-3.5 text-center text-sm font-semibold text-ink">Looppr Super</th>
                 </tr>
               </thead>
               <tbody>
