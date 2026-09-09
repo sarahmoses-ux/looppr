@@ -44,6 +44,7 @@ function shapeOrder(p) {
     foldStyle: p.foldStyle,
     detergent: p.detergent,
     waterTemperature: p.waterTemperature,
+    shoeLaundry: p.shoeLaundry,
     source: p.source,
     preferredDate: p.preferredDate,
     window: p.window,

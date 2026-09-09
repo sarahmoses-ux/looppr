@@ -56,6 +56,36 @@ describe('authenticated pickup creation & pricing', () => {
     })
   })
 
+  it('adds Shoe Laundry as a separate $30-per-pair line item', async () => {
+    const { token } = await clientToken()
+    const res = await request(app)
+      .post('/api/pickups')
+      .set('Authorization', `Bearer ${token}`)
+      .send(pickupPayload({ loadSize: 'small', shoeLaundry: { pairs: 3 } }))
+
+    expect(res.status).toBe(201)
+    expect(res.body.pickup.shoeLaundry).toMatchObject({ pairs: 3 })
+    expect(res.body.pickup.pricing).toMatchObject({
+      amount: 105.9,
+      subtotal: 15.9,
+      shoeLaundrySubtotal: 90,
+      deliveryFee: 0,
+      currency: 'usd',
+    })
+    expect(res.body.pickup.pricing.lineItems).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'shoe_laundry',
+          label: 'Shoe Laundry - Clean & Polish',
+          quantity: 3,
+          unit: 'pair',
+          unitPrice: 30,
+          amount: 90,
+        }),
+      ]),
+    )
+  })
+
   it('charges delivery fee starting on the 3rd order (free-delivery limit is 2)', async () => {
     const { token } = await clientToken()
     await request(app).post('/api/pickups').set('Authorization', `Bearer ${token}`).send(pickupPayload())
@@ -86,6 +116,15 @@ describe('authenticated pickup creation & pricing', () => {
       .post('/api/pickups')
       .set('Authorization', `Bearer ${token}`)
       .send(pickupPayload({ loadSize: 'extra-large' }))
+    expect(res.status).toBe(422)
+  })
+
+  it('rejects a negative Shoe Laundry pair quantity', async () => {
+    const { token } = await clientToken()
+    const res = await request(app)
+      .post('/api/pickups')
+      .set('Authorization', `Bearer ${token}`)
+      .send(pickupPayload({ shoeLaundry: { pairs: -1 } }))
     expect(res.status).toBe(422)
   })
 })

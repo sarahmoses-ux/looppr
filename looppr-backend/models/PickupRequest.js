@@ -70,6 +70,9 @@ const pickupRequestSchema = new mongoose.Schema(
       enum: ['cold', 'warm', 'hot'],
       default: 'cold',
     },
+    shoeLaundry: {
+      pairs: { type: Number, min: 0, max: 50, default: 0 },
+    },
     // Driver-confirmed actual weight, set at pickup to correct a customer/
     // business mistake in the `loadSize` estimate above. When present, this
     // is authoritative over loadSize for display and pricing — loadSize
@@ -218,6 +221,23 @@ const pickupRequestSchema = new mongoose.Schema(
       currency: { type: String, default: 'usd' },
       subtotal: { type: Number, min: 0 },
       deliveryFee: { type: Number, min: 0 },
+      shoeLaundrySubtotal: { type: Number, min: 0 },
+      lineItems: {
+        type: [
+          new mongoose.Schema(
+            {
+              type: { type: String, trim: true, maxlength: 50 },
+              label: { type: String, trim: true, maxlength: 100 },
+              quantity: { type: Number, min: 0 },
+              unit: { type: String, trim: true, maxlength: 20 },
+              unitPrice: { type: Number, min: 0 },
+              amount: { type: Number, min: 0 },
+            },
+            { _id: false },
+          ),
+        ],
+        default: undefined,
+      },
     },
 
     // 'pending' = a payment request has been sent and we're waiting on it.

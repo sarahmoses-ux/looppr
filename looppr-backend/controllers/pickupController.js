@@ -11,7 +11,8 @@ import { computeOrderPrice } from '../utils/pricing.js'
 import { stripe } from '../utils/stripeClient.js'
 
 export const createPickup = asyncHandler(async (req, res) => {
-  const { address, preferredDate, window, loadSize, foldStyle, detergent, waterTemperature, notes, deliveryWindow, deliveryAddress } = req.body
+  const { address, preferredDate, window, loadSize, foldStyle, detergent, waterTemperature, shoeLaundry, notes, deliveryWindow, deliveryAddress } = req.body
+  const shoePairs = Number.parseInt(shoeLaundry?.pairs, 10) || 0
 
   const priorOrderCount = await PickupRequest.countDocuments({
     clientId: req.user.sub,
@@ -29,10 +30,11 @@ export const createPickup = asyncHandler(async (req, res) => {
     foldStyle,
     detergent,
     waterTemperature,
+    shoeLaundry: { pairs: shoePairs },
     notes,
     deliveryWindow,
     deliveryAddress,
-    pricing: computeOrderPrice(loadSize, priorOrderCount),
+    pricing: computeOrderPrice(loadSize, priorOrderCount, shoePairs),
     // Charged immediately at booking (see createOrReusePaymentIntent below)
     // rather than waiting on an admin to send a payment request — 'pending'
     // is what unlocks createOrReusePaymentIntent's paymentStatus guard.

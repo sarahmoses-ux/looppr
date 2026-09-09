@@ -41,6 +41,11 @@ const ADDONS = [
     price: 'Free',
     body: 'Fragrance-free, dye-free detergent on request — no charge.',
   },
+  {
+    name: 'Shoe Laundry',
+    price: '$30 / pair',
+    body: 'Clean and polish sneakers or shoes so they look fresh and ready to wear again.',
+  },
 ]
 
 function CheckIcon({ className }) {
@@ -195,7 +200,7 @@ export default function Pricing() {
               Tack on exactly what you need
             </h2>
           </div>
-          <div className="mt-8 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-8 grid gap-3.5 sm:grid-cols-2 lg:grid-cols-5">
             {ADDONS.map((a) => (
               <div key={a.name} className="rounded-2xl border border-line bg-white p-6">
                 <div className="flex items-baseline justify-between gap-2">

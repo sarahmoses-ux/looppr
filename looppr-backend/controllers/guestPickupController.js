@@ -20,6 +20,7 @@ function guestPublic(pickup) {
     foldStyle: pickup.foldStyle,
     detergent: pickup.detergent,
     waterTemperature: pickup.waterTemperature,
+    shoeLaundry: pickup.shoeLaundry,
     notes: pickup.notes,
     deliveryWindow: pickup.deliveryWindow,
     deliveryAddress: pickup.deliveryAddress,
@@ -42,7 +43,8 @@ async function findGuestPickupByToken(id, token) {
 }
 
 export const createGuestPickup = asyncHandler(async (req, res) => {
-  const { guest, address, preferredDate, window, loadSize, foldStyle, detergent, waterTemperature, notes, deliveryWindow, deliveryAddress } = req.body
+  const { guest, address, preferredDate, window, loadSize, foldStyle, detergent, waterTemperature, shoeLaundry, notes, deliveryWindow, deliveryAddress } = req.body
+  const shoePairs = Number.parseInt(shoeLaundry?.pairs, 10) || 0
 
   const guestAccessToken = crypto.randomBytes(24).toString('hex')
 
@@ -63,11 +65,12 @@ export const createGuestPickup = asyncHandler(async (req, res) => {
     foldStyle,
     detergent,
     waterTemperature,
+    shoeLaundry: { pairs: shoePairs },
     notes,
     deliveryWindow,
     deliveryAddress,
     guestAccessToken,
-    pricing: computeOrderPrice(loadSize, priorOrderCount),
+    pricing: computeOrderPrice(loadSize, priorOrderCount, shoePairs),
     // Charged immediately at booking (see createOrReusePaymentIntent below)
     // rather than waiting on an admin to send a payment request — 'pending'
     // is what unlocks createOrReusePaymentIntent's paymentStatus guard.

@@ -43,6 +43,7 @@ export default function DeliveryCard({ delivery, onAccept, onReject, onAdvance, 
   const [busy, setBusy] = useState(false)
   const stage = stageOf(delivery)
   const next = NEXT_ACTION[stage]
+  const shoePairs = delivery.shoeLaundry?.pairs || 0
 
   async function run(fn) {
     if (!fn) return
@@ -73,7 +74,14 @@ export default function DeliveryCard({ delivery, onAccept, onReject, onAdvance, 
       <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
         <Field label="Pickup address">{formatAddress(delivery.address)}</Field>
         <Field label="Delivery address">{delivery.deliveryAddress ? formatAddress(delivery.deliveryAddress) : 'Same as pickup'}</Field>
-        <Field label="Weight">{displayWeight(delivery)}</Field>
+        <Field label="Weight">
+          {displayWeight(delivery)}
+          {shoePairs > 0 && (
+            <span className="block text-xs text-ink/50">
+              Shoe Laundry: {shoePairs} {shoePairs === 1 ? 'pair' : 'pairs'}
+            </span>
+          )}
+        </Field>
         <Field label="Fold style">{FOLD_STYLE_LABELS[delivery.foldStyle] || 'Standard fold'}</Field>
         <Field label="Pickup window">{formatDate(delivery.preferredDate)} · {WINDOW_LABELS[delivery.window]?.split(' ')[0]}</Field>
         <Field label="Delivery window">{WINDOW_LABELS[delivery.deliveryWindow]?.split(' ')[0] || '—'}</Field>

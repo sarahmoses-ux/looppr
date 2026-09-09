@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import Input from '../components/Input'
 import Select from '../components/Select'
 import FoldStylePicker from '../components/FoldStylePicker'
+import ShoeLaundryPicker, { SHOE_LAUNDRY_PRICE_PER_PAIR } from '../components/ShoeLaundryPicker'
 import { FOLD_STYLE_OPTIONS } from '../constants/foldStyles'
 import Button from '../components/Button'
 import SEO from '../components/SEO'
@@ -68,6 +69,7 @@ export default function Book() {
     foldStyle: rebook?.foldStyle || '',
     detergent: rebook?.detergent || '',
     waterTemperature: rebook?.waterTemperature || '',
+    shoeLaundryPairs: rebook?.shoeLaundryPairs || 0,
     notes: rebook?.notes || '',
     deliveryWindow: '',
     deliverySameAsPickup: true,
@@ -136,6 +138,10 @@ export default function Book() {
     if (!form.foldStyle) next.foldStyle = 'Choose a fold style.'
     if (!form.detergent) next.detergent = 'Choose a detergent.'
     if (!form.waterTemperature) next.waterTemperature = 'Choose a water temperature.'
+    if (form.shoeLaundryPairs < 0) next.shoeLaundryPairs = 'Shoe pairs cannot be negative.'
+    if (form.shoeLaundryPairs > 0 && !Number.isInteger(Number(form.shoeLaundryPairs))) {
+      next.shoeLaundryPairs = 'Enter a whole number of shoe pairs.'
+    }
     if (!form.deliveryWindow) next.deliveryWindow = 'Choose a delivery window.'
     if (!form.deliverySameAsPickup) {
       if (form.deliveryStreet.trim().length < 3) next.deliveryStreet = 'Enter the delivery street address.'
@@ -171,9 +177,10 @@ export default function Book() {
   const selectedDetergent = DETERGENTS.find((d) => d.value === form.detergent)
   const selectedWaterTemperature = WATER_TEMPERATURES.find((t) => t.value === form.waterTemperature)
   const subtotal = selectedLoad ? selectedLoad.lbs * PRICE_PER_LB : 0
+  const shoeLaundryTotal = form.shoeLaundryPairs * SHOE_LAUNDRY_PRICE_PER_PAIR
   const freeDelivery = priorOrderCount !== null && priorOrderCount < FREE_DELIVERY_ORDER_LIMIT
   const deliveryFee = freeDelivery ? 0 : DELIVERY_FEE
-  const total = subtotal + deliveryFee
+  const total = subtotal + shoeLaundryTotal + deliveryFee
 
   async function handlePay(e) {
     e.preventDefault()
@@ -189,6 +196,7 @@ export default function Book() {
         foldStyle: form.foldStyle,
         detergent: form.detergent,
         waterTemperature: form.waterTemperature,
+        shoeLaundry: { pairs: form.shoeLaundryPairs },
         notes: form.notes,
         deliveryWindow: form.deliveryWindow,
         deliveryAddress: form.deliverySameAsPickup
@@ -362,6 +370,14 @@ export default function Book() {
               <dt className="text-ink/50">Water temperature</dt>
               <dd className="text-ink">{selectedWaterTemperature?.label}</dd>
             </div>
+            {form.shoeLaundryPairs > 0 && (
+              <div className="flex justify-between">
+                <dt className="text-ink/50">Shoe Laundry</dt>
+                <dd className="text-ink">
+                  {form.shoeLaundryPairs} {form.shoeLaundryPairs === 1 ? 'pair' : 'pairs'}
+                </dd>
+              </div>
+            )}
           </dl>
         </div>
 
@@ -418,6 +434,15 @@ export default function Book() {
               </dt>
               <dd className="text-ink">{formatMoney(subtotal)}</dd>
             </div>
+            {form.shoeLaundryPairs > 0 && (
+              <div className="flex justify-between">
+                <dt className="text-ink/70">
+                  Shoe Laundry · {form.shoeLaundryPairs} {form.shoeLaundryPairs === 1 ? 'pair' : 'pairs'} @{' '}
+                  {formatMoney(SHOE_LAUNDRY_PRICE_PER_PAIR)}/pair
+                </dt>
+                <dd className="text-ink">{formatMoney(shoeLaundryTotal)}</dd>
+              </div>
+            )}
             <div className="flex items-center justify-between">
               <dt className="flex items-center gap-2 text-ink/70">
                 Delivery fee
@@ -647,6 +672,12 @@ export default function Book() {
         </p>
 
         <FoldStylePicker name="foldStyle" value={form.foldStyle} onChange={handleChange} error={errors.foldStyle} />
+
+        <ShoeLaundryPicker
+          pairs={form.shoeLaundryPairs}
+          onChange={(pairs) => setForm((f) => ({ ...f, shoeLaundryPairs: pairs }))}
+          error={errors.shoeLaundryPairs}
+        />
 
         <Select
           id="detergent"

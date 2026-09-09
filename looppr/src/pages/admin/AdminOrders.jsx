@@ -67,6 +67,7 @@ function AdminOrderRow({ pickup, onChange, partners, drivers, readOnly }) {
   const { showToast } = useToast()
   const contact = pickup.clientId || pickup.guest
   const notificationsOff = pickup.source === 'account' && pickup.clientId?.emailNotifications === false
+  const shoePairs = pickup.shoeLaundry?.pairs || 0
   const dateLabel = new Date(pickup.preferredDate).toLocaleDateString(undefined, {
     weekday: 'short',
     month: 'short',
@@ -133,6 +134,11 @@ function AdminOrderRow({ pickup, onChange, partners, drivers, readOnly }) {
         <p className="mt-0.5 text-sm text-ink/55">
           {LOAD_SIZE_LABELS[pickup.loadSize] || pickup.loadSize} · {FOLD_STYLE_LABELS[pickup.foldStyle] || 'Standard fold'}
         </p>
+        {shoePairs > 0 && (
+          <p className="mt-0.5 text-sm text-ink/55">
+            Shoe Laundry - Clean &amp; Polish - {shoePairs} {shoePairs === 1 ? 'pair' : 'pairs'}
+          </p>
+        )}
         <p className="mt-1 text-sm font-semibold text-ink">
           {formatMoney(pickup.pricing.amount, pickup.pricing.currency)}
           <span className={`ml-2 rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${PAYMENT_STYLES[pickup.paymentStatus]}`}>

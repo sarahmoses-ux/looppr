@@ -42,6 +42,7 @@ export default function OrderCard({ order, onAccept, onReject, onAdvance }) {
   const [busy, setBusy] = useState(false)
   const stage = stageOf(order)
   const next = NEXT_ACTION[stage]
+  const shoePairs = order.shoeLaundry?.pairs || 0
 
   async function run(fn) {
     if (!fn) return
@@ -72,7 +73,14 @@ export default function OrderCard({ order, onAccept, onReject, onAdvance }) {
       <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
         <Field label="Pickup address">{formatAddress(order.address)}</Field>
         <Field label="Delivery address">{order.deliveryAddress ? formatAddress(order.deliveryAddress) : 'Same as pickup'}</Field>
-        <Field label="Services">{LOAD_SIZE_LABELS[order.loadSize] || order.loadSize}</Field>
+        <Field label="Services">
+          {LOAD_SIZE_LABELS[order.loadSize] || order.loadSize}
+          {shoePairs > 0 && (
+            <span className="block text-xs text-ink/50">
+              Shoe Laundry: {shoePairs} {shoePairs === 1 ? 'pair' : 'pairs'}
+            </span>
+          )}
+        </Field>
         <Field label="Fold style">{FOLD_STYLE_LABELS[order.foldStyle] || 'Standard fold'}</Field>
         <Field label="Pickup time">{formatDate(order.preferredDate)} · {WINDOW_LABELS[order.window]?.split(' ')[0]}</Field>
         <Field label="Delivery deadline">{WINDOW_LABELS[order.deliveryWindow]?.split(' ')[0] || '—'}</Field>

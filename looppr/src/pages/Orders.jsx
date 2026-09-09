@@ -77,6 +77,8 @@ const FOLD_STYLE_LABELS = {
   hangers: 'On hangers',
 }
 
+const SHOE_LAUNDRY_PRICE_PER_PAIR = 30
+
 function statusBadgeClass(status) {
   if (status === 'cancelled') return 'bg-red-50 text-red-600'
   if (status === 'ready_delivered') return 'bg-success-soft text-success-dark'
@@ -107,6 +109,8 @@ function formatDate(value) {
 function OrderReceipt({ pickup }) {
   const { pricing } = pickup
   const hasBreakdown = typeof pricing?.subtotal === 'number' && typeof pricing?.deliveryFee === 'number'
+  const shoePairs = pickup.shoeLaundry?.pairs || 0
+  const shoeLaundrySubtotal = pricing?.shoeLaundrySubtotal ?? shoePairs * SHOE_LAUNDRY_PRICE_PER_PAIR
 
   return (
     <div className="mt-4 rounded-2xl bg-linen-soft p-4 text-sm">
@@ -127,6 +131,14 @@ function OrderReceipt({ pickup }) {
               <span>{LOAD_SIZE_LABELS[pickup.loadSize] || 'Wash & fold'}</span>
               <span>{formatMoney(pricing.subtotal, pricing.currency)}</span>
             </div>
+            {shoePairs > 0 && (
+              <div className="flex justify-between text-ink/70">
+                <span>
+                  Shoe Laundry - Clean &amp; Polish ({shoePairs} {shoePairs === 1 ? 'pair' : 'pairs'})
+                </span>
+                <span>{formatMoney(shoeLaundrySubtotal, pricing.currency)}</span>
+              </div>
+            )}
             <div className="flex justify-between text-ink/70">
               <span>Delivery fee</span>
               <span>{pricing.deliveryFee === 0 ? 'Free' : formatMoney(pricing.deliveryFee, pricing.currency)}</span>
@@ -228,7 +240,7 @@ export function PickupCard({ pickup, detailed = false, onChange }) {
           {detailed && (
             <Button
               to="/book"
-              state={{ rebook: { street: pickup.address.street, city: pickup.address.city, zip: pickup.address.zip, loadSize: pickup.loadSize, foldStyle: pickup.foldStyle, notes: pickup.notes || '' } }}
+              state={{ rebook: { street: pickup.address.street, city: pickup.address.city, zip: pickup.address.zip, loadSize: pickup.loadSize, foldStyle: pickup.foldStyle, shoeLaundryPairs: pickup.shoeLaundry?.pairs || 0, notes: pickup.notes || '' } }}
               variant="ghost"
               className="px-3! py-1.5! text-xs!"
             >

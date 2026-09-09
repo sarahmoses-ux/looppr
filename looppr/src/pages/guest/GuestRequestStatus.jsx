@@ -16,6 +16,8 @@ const FOLD_STYLE_LABELS = {
   hangers: 'On hangers',
 }
 
+const SHOE_LAUNDRY_PRICE_PER_PAIR = 30
+
 export default function GuestRequestStatus() {
   const { id } = useParams()
   const [searchParams] = useSearchParams()
@@ -108,6 +110,8 @@ export default function GuestRequestStatus() {
     month: 'long',
     day: 'numeric',
   })
+  const shoePairs = pickup.shoeLaundry?.pairs || 0
+  const shoeLaundrySubtotal = pickup.pricing?.shoeLaundrySubtotal ?? shoePairs * SHOE_LAUNDRY_PRICE_PER_PAIR
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 sm:px-6 lg:px-8">
@@ -127,6 +131,16 @@ export default function GuestRequestStatus() {
         <p className="mt-2 font-display text-3xl font-semibold text-ink">
           {formatMoney(pickup.pricing.amount, pickup.pricing.currency)}
         </p>
+        {shoePairs > 0 && (
+          <div className="mt-4 rounded-2xl bg-linen-soft p-4 text-sm">
+            <div className="flex justify-between text-ink/70">
+              <span>
+                Shoe Laundry - Clean &amp; Polish ({shoePairs} {shoePairs === 1 ? 'pair' : 'pairs'})
+              </span>
+              <span>{formatMoney(shoeLaundrySubtotal, pickup.pricing.currency)}</span>
+            </div>
+          </div>
+        )}
 
         {pickup.paymentStatus === 'paid' && (
           <p className="mt-3 inline-flex rounded-full bg-success-soft px-3 py-1 text-xs font-semibold text-success-dark">

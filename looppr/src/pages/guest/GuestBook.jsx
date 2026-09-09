@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import Input from '../../components/Input'
 import Select from '../../components/Select'
 import FoldStylePicker from '../../components/FoldStylePicker'
+import ShoeLaundryPicker from '../../components/ShoeLaundryPicker'
 import Button from '../../components/Button'
 import SEO from '../../components/SEO'
 import { PUBLIC_PAGES } from '../../seo/publicPages'
@@ -62,6 +63,7 @@ export default function GuestBook() {
     foldStyle: '',
     detergent: '',
     waterTemperature: '',
+    shoeLaundryPairs: 0,
     notes: '',
     deliveryWindow: '',
     deliverySameAsPickup: true,
@@ -94,6 +96,10 @@ export default function GuestBook() {
     if (!form.foldStyle) next.foldStyle = 'Choose a fold style.'
     if (!form.detergent) next.detergent = 'Choose a detergent.'
     if (!form.waterTemperature) next.waterTemperature = 'Choose a water temperature.'
+    if (form.shoeLaundryPairs < 0) next.shoeLaundryPairs = 'Shoe pairs cannot be negative.'
+    if (form.shoeLaundryPairs > 0 && !Number.isInteger(Number(form.shoeLaundryPairs))) {
+      next.shoeLaundryPairs = 'Enter a whole number of shoe pairs.'
+    }
     if (!form.deliveryWindow) next.deliveryWindow = 'Choose a delivery window.'
     if (!form.deliverySameAsPickup) {
       if (form.deliveryStreet.trim().length < 3) next.deliveryStreet = 'Enter the delivery street address.'
@@ -122,6 +128,7 @@ export default function GuestBook() {
         foldStyle: form.foldStyle,
         detergent: form.detergent,
         waterTemperature: form.waterTemperature,
+        shoeLaundry: { pairs: form.shoeLaundryPairs },
         notes: form.notes,
         deliveryWindow: form.deliveryWindow,
         deliveryAddress: form.deliverySameAsPickup
@@ -280,6 +287,12 @@ export default function GuestBook() {
         </Select>
 
         <FoldStylePicker name="foldStyle" value={form.foldStyle} onChange={handleChange} error={errors.foldStyle} />
+
+        <ShoeLaundryPicker
+          pairs={form.shoeLaundryPairs}
+          onChange={(pairs) => setForm((f) => ({ ...f, shoeLaundryPairs: pairs }))}
+          error={errors.shoeLaundryPairs}
+        />
 
         <Select
           id="detergent"

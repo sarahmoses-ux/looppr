@@ -44,6 +44,7 @@ function shapeDelivery(p) {
     deliveryAddress: p.deliveryAddress || null,
     location: p.location || null,
     loadSize: p.loadSize,
+    shoeLaundry: p.shoeLaundry,
     // Driver-confirmed weight, when set, is authoritative over loadSize —
     // frontend should prefer this for display.
     actualWeightLbs: p.actualWeightLbs ?? null,
@@ -213,7 +214,11 @@ export const confirmWeight = asyncHandler(async (req, res) => {
   if (weighInPhoto) pickup.weighInPhoto = weighInPhoto
 
   if (pickup.paymentStatus !== 'paid') {
-    const { amount, subtotal } = recomputeSubtotalForWeight(actualWeightLbs, pickup.pricing?.deliveryFee || 0)
+    const { amount, subtotal } = recomputeSubtotalForWeight(
+      actualWeightLbs,
+      pickup.pricing?.deliveryFee || 0,
+      pickup.pricing?.shoeLaundrySubtotal || 0,
+    )
     pickup.pricing.amount = amount
     pickup.pricing.subtotal = subtotal
   }

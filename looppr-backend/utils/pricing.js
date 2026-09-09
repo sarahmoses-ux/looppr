@@ -5,6 +5,7 @@
 const PRICE_PER_LB = 1.59
 const DELIVERY_FEE = 4.99
 const FREE_DELIVERY_ORDER_LIMIT = 2
+export const SHOE_LAUNDRY_PRICE_PER_PAIR = 30
 
 const LOAD_SIZE_LBS = { small: 10, medium: 20, large: 35 }
 
@@ -12,19 +13,42 @@ const LOAD_SIZE_LBS = { small: 10, medium: 20, large: 35 }
 // customer/guest, used for the "free delivery on your first two orders"
 // promo. Callers count this however is cheapest for them (clientId lookup
 // for accounts, email lookup for guests).
-export function computeOrderPrice(loadSize, priorOrderCount = 0) {
+export function computeOrderPrice(loadSize, priorOrderCount = 0, shoePairs = 0) {
   const lbs = LOAD_SIZE_LBS[loadSize] ?? LOAD_SIZE_LBS.medium
-  return priceForWeight(lbs, priorOrderCount)
+  return priceForWeight(lbs, priorOrderCount, shoePairs)
 }
 
-function priceForWeight(lbs, priorOrderCount = 0) {
+function priceForWeight(lbs, priorOrderCount = 0, shoePairs = 0) {
   const subtotal = Math.round(lbs * PRICE_PER_LB * 100) / 100
+  const normalizedShoePairs = Math.max(0, Number.parseInt(shoePairs, 10) || 0)
+  const shoeLaundrySubtotal = normalizedShoePairs * SHOE_LAUNDRY_PRICE_PER_PAIR
   const freeDelivery = priorOrderCount < FREE_DELIVERY_ORDER_LIMIT
   const deliveryFee = freeDelivery ? 0 : DELIVERY_FEE
-  const amount = Math.round((subtotal + deliveryFee) * 100) / 100
+  const amount = Math.round((subtotal + shoeLaundrySubtotal + deliveryFee) * 100) / 100
   // subtotal/deliveryFee are kept alongside amount so paid orders can show
   // an itemized receipt later (see Orders.jsx) instead of just a total.
-  return { amount, currency: 'usd', subtotal, deliveryFee }
+  return {
+    amount,
+    currency: 'usd',
+    subtotal,
+    deliveryFee,
+    shoeLaundrySubtotal,
+    lineItems: [
+      { type: 'wash_fold', label: `Wash & fold - ${lbs} lbs`, quantity: lbs, unit: 'lb', unitPrice: PRICE_PER_LB, amount: subtotal },
+      ...(normalizedShoePairs > 0
+        ? [
+            {
+              type: 'shoe_laundry',
+              label: 'Shoe Laundry - Clean & Polish',
+              quantity: normalizedShoePairs,
+              unit: 'pair',
+              unitPrice: SHOE_LAUNDRY_PRICE_PER_PAIR,
+              amount: shoeLaundrySubtotal,
+            },
+          ]
+        : []),
+    ],
+  }
 }
 
 // Recomputes subtotal/amount from a driver-confirmed actual weight (in lbs)
@@ -33,8 +57,9 @@ function priceForWeight(lbs, priorOrderCount = 0) {
 // existing deliveryFee as-is (it reflects the customer's own order-history
 // promo eligibility, computed at booking time) rather than re-deriving it,
 // since a driver correcting weight has no bearing on that promo.
-export function recomputeSubtotalForWeight(lbs, existingDeliveryFee = 0) {
+export function recomputeSubtotalForWeight(lbs, existingDeliveryFee = 0, existingShoeLaundrySubtotal = 0) {
   const subtotal = Math.round(lbs * PRICE_PER_LB * 100) / 100
-  const amount = Math.round((subtotal + existingDeliveryFee) * 100) / 100
+  const shoeLaundrySubtotal = Math.round((existingShoeLaundrySubtotal || 0) * 100) / 100
+  const amount = Math.round((subtotal + shoeLaundrySubtotal + existingDeliveryFee) * 100) / 100
   return { amount, subtotal }
 }

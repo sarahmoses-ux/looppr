@@ -63,6 +63,10 @@ export const createPickupValidation = [
     .optional({ values: 'falsy' })
     .isIn(['cold', 'warm', 'hot'])
     .withMessage('Choose a valid water temperature.'),
+  body('shoeLaundry.pairs')
+    .optional({ values: 'null' })
+    .isInt({ min: 0, max: 50 })
+    .withMessage('Choose at least 1 shoe pair when adding Shoe Laundry.'),
   body('notes').optional({ values: 'falsy' }).trim().isLength({ max: 500 }).withMessage('Notes must be 500 characters or fewer.'),
   body('deliveryWindow').isIn(['morning', 'afternoon', 'evening']).withMessage('Choose a delivery window.'),
   deliveryAddressValidator('deliveryAddress'),
