@@ -17,10 +17,10 @@ export const PUBLIC_PAGES = [
     path: '/',
     title: null, // Landing uses the bare default title
     description:
-      'Looppr — laundry pickup and delivery in minutes. A trusted local laundry pro washes and folds your clothes, then delivers them back to your door.',
+      'Looppr — laundry pickup and delivery in minutes, plus Shoe Laundry sneaker cleaning and polishing. A trusted local laundry pro washes and folds your clothes, then delivers them back to your door.',
     keywords: [
       'laundry pickup and delivery', 'laundry service', 'laundry near me', 'wash and fold',
-      'laundry marketplace', 'laundromat', 'looppr laundry', 'getlooppr',
+      'laundry marketplace', 'laundromat', 'sneaker cleaning', 'shoe laundry', 'looppr laundry', 'getlooppr',
     ],
     changefreq: 'weekly',
     priority: 1.0,

@@ -14,9 +14,9 @@ const HOME_PAGE_META = PUBLIC_PAGES.find((p) => p.path === '/')
 // LocalBusiness (most relevant on the homepage and Cities, where "laundry
 // near me" search intent is highest).
 const SERVICE_JSON_LD = serviceJsonLd({
-  serviceType: 'Laundry pickup and delivery',
+  serviceType: 'Laundry pickup, delivery, and shoe cleaning',
   price: '1.59',
-  description: 'Wash & fold laundry service, priced per pound',
+  description: 'Wash & fold laundry service priced per pound, plus Shoe Laundry sneaker cleaning and polishing at $30 per pair',
 })
 
 // In-content links to the site's other major pages — the global Navbar
@@ -44,6 +44,30 @@ const VALUE_PROPS = [
   {
     title: 'Pay securely, once',
     body: 'Card on file, charged when your order is confirmed. No cash, no surprise fees.',
+  },
+]
+
+const POPULAR_SERVICES = [
+  {
+    name: 'Wash & Fold',
+    price: '$1.59 / lb',
+    body: 'Everyday laundry washed, folded, and delivered back to your door.',
+    cta: 'Schedule pickup',
+    to: '/signup',
+  },
+  {
+    name: 'Shoe Laundry',
+    price: '$30 / pair',
+    body: 'Clean & Polish sneaker and shoe care that refreshes your footwear so it is ready to wear again.',
+    cta: 'Clean my shoes',
+    to: '/guest/book',
+  },
+  {
+    name: 'Pickup & Delivery',
+    price: '$4.99',
+    body: 'Doorstep pickup and return delivery, free on your first two orders.',
+    cta: 'Book without an account',
+    to: '/guest/book',
   },
 ]
 
@@ -110,6 +134,41 @@ export default function Landing() {
             </div>
           </div>
           <HeroCarousel images={heroImages} />
+        </div>
+      </section>
+
+      <section className="border-t border-line bg-white">
+        <div className="mx-auto max-w-[1600px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-xl">
+              <p className="text-sm font-semibold uppercase tracking-[0.08em] text-periwinkle">
+                Services
+              </p>
+              <h2 className="mt-3 font-display text-3xl font-semibold tracking-tight text-ink sm:text-4xl">
+                Laundry care, now for your shoes too.
+              </h2>
+            </div>
+            <p className="max-w-md text-sm leading-relaxed text-ink/60">
+              Add Shoe Laundry when you book and choose exactly how many pairs need cleaning.
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            {POPULAR_SERVICES.map((service) => (
+              <div key={service.name} className="rounded-2xl border border-line bg-linen-soft p-6">
+                <div className="flex items-start justify-between gap-4">
+                  <h3 className="font-display text-xl font-semibold text-ink">{service.name}</h3>
+                  <span className="shrink-0 rounded-full bg-white px-3 py-1 text-sm font-semibold text-periwinkle-text">
+                    {service.price}
+                  </span>
+                </div>
+                <p className="mt-3 text-sm leading-relaxed text-ink/60">{service.body}</p>
+                <Button to={service.to} variant="ghost" className="mt-5 px-4! py-2.5! text-sm!">
+                  {service.cta}
+                </Button>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
