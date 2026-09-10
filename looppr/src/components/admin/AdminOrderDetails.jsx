@@ -45,7 +45,7 @@ export default function AdminOrderDetails({ pickup }) {
     style: 'currency', currency: (pricing.currency || 'usd').toUpperCase(),
   }).format(value)
 
-  return <div className="grid gap-4 border-t border-line pt-4 md:grid-cols-2 xl:grid-cols-3">
+  return <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
     <Section title="Client & order">
       <Field label="Order ID">{pickup._id}</Field>
       <Field label="Booking type">{{ account: 'Account', guest: 'Guest', business: 'Business' }[pickup.source] || 'Account'}</Field>

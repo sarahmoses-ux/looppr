@@ -15,31 +15,6 @@ import {
   updateOrderStatus,
 } from '../../services/adminApi'
 
-const WINDOW_LABELS = {
-  morning: 'Morning · 8am – 11am',
-  afternoon: 'Afternoon · 12pm – 3pm',
-  evening: 'Evening · 4pm – 7pm',
-}
-
-const LOAD_SIZE_LABELS = {
-  small: 'Small (10–15 lbs)',
-  medium: 'Medium (16–25 lbs)',
-  large: 'Large (26–35 lbs)',
-}
-
-const FOLD_STYLE_LABELS = {
-  standard: 'Standard fold',
-  konmari: 'KonMari fold',
-  hangers: 'On hangers',
-}
-
-const PAYMENT_STYLES = {
-  unpaid: 'bg-ink/5 text-ink/50',
-  pending: 'bg-periwinkle-soft text-periwinkle-text',
-  paid: 'bg-success-soft text-success-dark',
-  failed: 'bg-red-50 text-red-600',
-}
-
 // Partner Portal lifecycle labels — mirrors the partner-side stages so admins
 // see exactly what a laundromat has done with an order.
 const PARTNER_STAGE_LABELS = {
@@ -60,22 +35,9 @@ const DRIVER_STAGE_LABELS = {
   delivered: 'Delivered',
 }
 
-function formatMoney(amount, currency = 'usd') {
-  if (amount == null) return 'Price not recorded'
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency.toUpperCase() }).format(amount)
-}
-
 function AdminOrderRow({ pickup, onChange, partners, drivers, readOnly }) {
   const { showToast } = useToast()
-  const contact = pickup.source === 'business' ? pickup.businessId : pickup.clientId || pickup.guest
   const notificationsOff = pickup.source === 'account' && pickup.clientId?.emailNotifications === false
-  const shoePairs = pickup.shoeLaundry?.pairs || 0
-  const dateLabel = new Date(pickup.preferredDate).toLocaleDateString(undefined, {
-    timeZone: 'UTC',
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-  })
 
   async function handleStatusChange(e) {
     const status = e.target.value
@@ -113,43 +75,9 @@ function AdminOrderRow({ pickup, onChange, partners, drivers, readOnly }) {
 
   return (
     <div className="space-y-4 rounded-2xl border border-line px-5 py-4">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+      <AdminOrderDetails pickup={pickup} />
+      <div className="flex flex-col gap-3 border-t border-line pt-4 lg:flex-row lg:items-center lg:justify-between">
       <div className="min-w-0">
-        <p className="font-medium text-ink">
-          {contact?.name || contact?.contactPerson || contact?.businessName || 'Unknown'}
-          <span className="font-normal text-ink/45"> · {contact?.email}</span>
-          {pickup.source === 'guest' && (
-            <span className="ml-2 rounded-full bg-ink/5 px-2 py-0.5 text-xs font-semibold text-ink/50">
-              Guest
-            </span>
-          )}
-          {notificationsOff && (
-            <span className="ml-2 rounded-full bg-ink/5 px-2 py-0.5 text-xs font-semibold text-ink/50">
-              Notifications off
-            </span>
-          )}
-        </p>
-        <p className="mt-0.5 text-sm text-ink/55">
-          {dateLabel} · {WINDOW_LABELS[pickup.window]}
-        </p>
-        <p className="mt-0.5 text-sm text-ink/55">
-          {pickup.address?.street}, {pickup.address?.city}, {pickup.address?.state} {pickup.address?.zip}
-        </p>
-        <p className="mt-0.5 text-sm text-ink/55">
-          {pickup.weightLbs != null ? `${pickup.weightLbs} lbs (${pickup.loadSize})` : LOAD_SIZE_LABELS[pickup.loadSize] || pickup.loadSize} · {FOLD_STYLE_LABELS[pickup.foldStyle] || 'Standard fold'}
-        </p>
-        {shoePairs > 0 && (
-          <p className="mt-0.5 text-sm text-ink/55">
-            Shoe Laundry - Clean &amp; Polish - {shoePairs} {shoePairs === 1 ? 'pair' : 'pairs'}
-          </p>
-        )}
-        <p className="mt-1 text-sm font-semibold text-ink">
-          {formatMoney(pickup.pricing?.amount, pickup.pricing?.currency)}
-          <span className={`ml-2 rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${PAYMENT_STYLES[pickup.paymentStatus]}`}>
-            {pickup.paymentStatus}
-          </span>
-        </p>
-
         {/* Partner Portal attribution — reflects any accept/advance action a
             laundromat took on this order. */}
         {pickup.partnerUserId ? (
@@ -225,16 +153,8 @@ function AdminOrderRow({ pickup, onChange, partners, drivers, readOnly }) {
           </select>
         )}
 
-        {/* Driver-confirmed weight overrides the customer/business's
-            original loadSize estimate — flag it so admins know a correction
-            was made and can see what it was. */}
-        {pickup.actualWeightLbs != null && (
-          <p className="mt-1.5 text-xs">
-            <span className="rounded-full bg-amber-50 px-2 py-0.5 font-semibold text-amber-700">
-              Weight corrected: {pickup.actualWeightLbs} lbs (was {pickup.loadSize})
-            </span>
-          </p>
-        )}
+        {notificationsOff && <p className="mt-2 text-xs text-ink/50">Notifications off</p>}
+
       </div>
 
       <div className="flex shrink-0 flex-col items-stretch gap-2 sm:flex-row sm:items-center">
@@ -252,7 +172,6 @@ function AdminOrderRow({ pickup, onChange, partners, drivers, readOnly }) {
         </select>
       </div>
       </div>
-      <AdminOrderDetails pickup={pickup} />
     </div>
   )
 }
