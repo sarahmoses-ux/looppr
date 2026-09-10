@@ -14,6 +14,7 @@ import { MongoMemoryServer } from 'mongodb-memory-server'
 // straight off the mock's captured call arguments (see tests/helpers/auth.js
 // and individual test files), never a real inbox.
 vi.mock('../services/emailService.js', () => ({
+  sendAdminBookingNotification: vi.fn(async () => {}),
   sendOtpEmail: vi.fn(async () => {}),
   sendPaymentRequestEmail: vi.fn(async () => {}),
   sendPasswordResetEmail: vi.fn(async () => {}),
@@ -65,6 +66,11 @@ vi.mock('../utils/stripeClient.js', () => {
     },
   }
 })
+
+// Booking tests must not depend on the public geocoding service.
+vi.mock('../services/geocodeService.js', () => ({
+  geocodeAddress: vi.fn(async () => null),
+}))
 
 let mongod
 

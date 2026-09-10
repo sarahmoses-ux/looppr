@@ -132,7 +132,7 @@ function AdminOrderRow({ pickup, onChange, partners, drivers, readOnly }) {
           {pickup.address.street}, {pickup.address.city}, {pickup.address.state} {pickup.address.zip}
         </p>
         <p className="mt-0.5 text-sm text-ink/55">
-          {LOAD_SIZE_LABELS[pickup.loadSize] || pickup.loadSize} · {FOLD_STYLE_LABELS[pickup.foldStyle] || 'Standard fold'}
+          {pickup.weightLbs != null ? `${pickup.weightLbs} lbs (${pickup.loadSize})` : LOAD_SIZE_LABELS[pickup.loadSize] || pickup.loadSize} · {FOLD_STYLE_LABELS[pickup.foldStyle] || 'Standard fold'}
         </p>
         {shoePairs > 0 && (
           <p className="mt-0.5 text-sm text-ink/55">

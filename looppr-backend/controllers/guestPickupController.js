@@ -1,3 +1,4 @@
+import { notifyAdminsOfBooking } from '../services/bookingNotificationService.js'
 import crypto from 'crypto'
 import { PickupRequest } from '../models/PickupRequest.js'
 import { geocodeAddress } from '../services/geocodeService.js'
@@ -17,6 +18,7 @@ function guestPublic(pickup) {
     preferredDate: pickup.preferredDate,
     window: pickup.window,
     loadSize: pickup.loadSize,
+    weightLbs: pickup.weightLbs,
     foldStyle: pickup.foldStyle,
     detergent: pickup.detergent,
     waterTemperature: pickup.waterTemperature,
@@ -43,7 +45,7 @@ async function findGuestPickupByToken(id, token) {
 }
 
 export const createGuestPickup = asyncHandler(async (req, res) => {
-  const { guest, address, preferredDate, window, loadSize, foldStyle, detergent, waterTemperature, shoeLaundry, notes, deliveryWindow, deliveryAddress } = req.body
+  const { guest, address, preferredDate, window, loadSize, weightLbs, foldStyle, detergent, waterTemperature, shoeLaundry, notes, deliveryWindow, deliveryAddress } = req.body
   const shoePairs = Number.parseInt(shoeLaundry?.pairs, 10) || 0
 
   const guestAccessToken = crypto.randomBytes(24).toString('hex')
@@ -62,6 +64,7 @@ export const createGuestPickup = asyncHandler(async (req, res) => {
     preferredDate,
     window,
     loadSize,
+    weightLbs,
     foldStyle,
     detergent,
     waterTemperature,
@@ -70,13 +73,15 @@ export const createGuestPickup = asyncHandler(async (req, res) => {
     deliveryWindow,
     deliveryAddress,
     guestAccessToken,
-    pricing: computeOrderPrice(loadSize, priorOrderCount, shoePairs),
+    pricing: computeOrderPrice(loadSize, priorOrderCount, shoePairs, weightLbs),
     // Charged immediately at booking (see createOrReusePaymentIntent below)
     // rather than waiting on an admin to send a payment request — 'pending'
     // is what unlocks createOrReusePaymentIntent's paymentStatus guard.
     paymentStatus: 'pending',
     ...(assignment || {}),
   })
+
+  await notifyAdminsOfBooking(pickup)
 
   try {
     const location = await geocodeAddress(address)

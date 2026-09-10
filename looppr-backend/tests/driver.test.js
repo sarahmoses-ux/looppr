@@ -54,7 +54,7 @@ async function createClaimableDelivery() {
     preferredDate: new Date(Date.now() + 86400000),
     window: 'morning',
     deliveryWindow: 'afternoon',
-    loadSize: 'medium',
+    loadSize: 'medium', weightLbs: 20,
     pricing: { amount: 31.8, currency: 'usd', deliveryFee: 4.99 },
   })
 }
@@ -99,6 +99,7 @@ describe('driver delivery management', () => {
     const incoming = await request(app).get('/api/driver/deliveries/incoming').set('Authorization', `Bearer ${token}`)
     expect(incoming.status).toBe(200)
     expect(incoming.body.deliveries).toHaveLength(1)
+    expect(incoming.body.deliveries[0].weightLbs).toBe(20)
 
     const accept = await request(app).post(`/api/driver/deliveries/${delivery._id}/accept`).set('Authorization', `Bearer ${token}`)
     expect(accept.status).toBe(200)

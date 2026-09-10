@@ -93,6 +93,7 @@ export const businessCreatePickupValidation = [
   body('deliveryWindow').isIn(['morning', 'afternoon', 'evening']).withMessage('Choose a delivery window.'),
   // 'small' (~10 lbs) is the smallest accepted load — enforces the 10 lb
   // per-pickup minimum server-side, same as the customer flow.
+  body('weightLbs').isFloat({ min: 10, max: 500 }).withMessage('Enter the exact weight between 10 and 500 lbs.').toFloat(),
   body('loadSize').isIn(['small', 'medium', 'large']).withMessage('Choose a load size (10 lb minimum).'),
   body('foldStyle')
     .optional({ values: 'falsy' })

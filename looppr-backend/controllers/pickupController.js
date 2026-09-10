@@ -1,3 +1,4 @@
+import { notifyAdminsOfBooking } from '../services/bookingNotificationService.js'
 import mongoose from 'mongoose'
 import { DriverUser } from '../models/DriverUser.js'
 import { PartnerUser } from '../models/PartnerUser.js'
@@ -11,7 +12,7 @@ import { computeOrderPrice } from '../utils/pricing.js'
 import { stripe } from '../utils/stripeClient.js'
 
 export const createPickup = asyncHandler(async (req, res) => {
-  const { address, preferredDate, window, loadSize, foldStyle, detergent, waterTemperature, shoeLaundry, notes, deliveryWindow, deliveryAddress } = req.body
+  const { address, preferredDate, window, loadSize, weightLbs, foldStyle, detergent, waterTemperature, shoeLaundry, notes, deliveryWindow, deliveryAddress } = req.body
   const shoePairs = Number.parseInt(shoeLaundry?.pairs, 10) || 0
 
   const priorOrderCount = await PickupRequest.countDocuments({
@@ -27,6 +28,7 @@ export const createPickup = asyncHandler(async (req, res) => {
     preferredDate,
     window,
     loadSize,
+    weightLbs,
     foldStyle,
     detergent,
     waterTemperature,
@@ -34,13 +36,15 @@ export const createPickup = asyncHandler(async (req, res) => {
     notes,
     deliveryWindow,
     deliveryAddress,
-    pricing: computeOrderPrice(loadSize, priorOrderCount, shoePairs),
+    pricing: computeOrderPrice(loadSize, priorOrderCount, shoePairs, weightLbs),
     // Charged immediately at booking (see createOrReusePaymentIntent below)
     // rather than waiting on an admin to send a payment request — 'pending'
     // is what unlocks createOrReusePaymentIntent's paymentStatus guard.
     paymentStatus: 'pending',
     ...(assignment || {}),
   })
+
+  await notifyAdminsOfBooking(pickup)
 
   try {
     const location = await geocodeAddress(address)

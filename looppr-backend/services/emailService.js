@@ -27,6 +27,8 @@ export async function sendOtpEmail(toEmail, name, code) {
   return provider.sendOtpEmail(toEmail, name, code)
 }
 
+
+
 export async function sendPaymentRequestEmail(toEmail, name, amount, currency, link) {
   return provider.sendPaymentRequestEmail(toEmail, name, amount, currency, link)
 }
@@ -60,4 +62,8 @@ export async function sendApplicationApprovedEmail(toEmail, name, portalType, lo
 
 export async function sendApplicationRejectedEmail(toEmail, name, reason) {
   return provider.sendApplicationRejectedEmail(toEmail, name, reason)
+}
+
+export async function sendAdminBookingNotification(details) {
+  return provider.sendAdminBookingNotification(details)
 }

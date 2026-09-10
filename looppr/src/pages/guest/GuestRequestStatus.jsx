@@ -123,7 +123,7 @@ export default function GuestRequestStatus() {
         {pickup.address.street}, {pickup.address.city}
       </h1>
       <p className="mt-2 text-sm text-ink/60">
-        {dateLabel} · {pickup.window} · {pickup.loadSize} load · {FOLD_STYLE_LABELS[pickup.foldStyle] || 'Standard fold'}
+        {dateLabel} · {pickup.window} · {pickup.weightLbs != null ? `${pickup.weightLbs} lbs` : `${pickup.loadSize} load`} · {FOLD_STYLE_LABELS[pickup.foldStyle] || 'Standard fold'}
       </p>
 
       <div className="mt-8 rounded-3xl border border-line bg-white p-6 sm:p-8">

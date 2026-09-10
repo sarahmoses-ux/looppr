@@ -44,6 +44,7 @@ function shapeDelivery(p) {
     deliveryAddress: p.deliveryAddress || null,
     location: p.location || null,
     loadSize: p.loadSize,
+    weightLbs: p.weightLbs,
     shoeLaundry: p.shoeLaundry,
     // Driver-confirmed weight, when set, is authoritative over loadSize —
     // frontend should prefer this for display.

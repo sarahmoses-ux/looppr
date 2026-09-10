@@ -36,6 +36,7 @@ export const createGuestPickupValidation = [
       return true
     }),
   body('window').isIn(['morning', 'afternoon', 'evening']).withMessage('Choose a pickup window.'),
+  body('weightLbs').isFloat({ min: 10, max: 500 }).withMessage('Enter the exact weight between 10 and 500 lbs.').toFloat(),
   body('loadSize').isIn(['small', 'medium', 'large']).withMessage('Choose a load size.'),
   body('foldStyle')
     .optional({ values: 'falsy' })

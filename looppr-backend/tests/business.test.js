@@ -1,3 +1,4 @@
+import { sendAdminBookingNotification } from '../services/emailService.js'
 // Distinct business JWT secrets so isolation is actually exercised — without
 // these they'd fall back to the shared test secret and a client token would
 // (wrongly) verify on business routes. Set before app.js is imported.
@@ -104,12 +105,18 @@ describe('business portal dashboard data', () => {
         preferredDate: new Date(Date.now() + 86400000).toISOString(),
         window: 'morning',
         deliveryWindow: 'afternoon',
-        loadSize: 'medium',
+        loadSize: 'medium', weightLbs: 22.5,
         notes: 'Front desk',
       })
     expect(create.status).toBe(201)
     expect(create.body.pickup.source).toBe('business')
-    expect(create.body.pickup.pricing.amount).toBeGreaterThan(0)
+    expect(sendAdminBookingNotification).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({
+      orderId: create.body.pickup._id, source: 'business',
+      name: BASE_BUSINESS.contactPerson, email: 'pickup@riverside.test',
+      businessName: BASE_BUSINESS.businessName,
+    }))
+    expect(create.body.pickup.weightLbs).toBe(22.5)
+    expect(create.body.pickup.pricing.amount).toBe(35.78)
 
     const list = await request(app).get('/api/business/pickups').set('Authorization', `Bearer ${token}`)
     expect(list.status).toBe(200)

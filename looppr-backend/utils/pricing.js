@@ -1,7 +1,7 @@
 // Mirrors the pricing shown on the website (looppr/src/pages/Book.jsx) so
 // every order — guest or logged-in — gets the same price computed the same
 // way at creation time. No admin pricing step; if the formula changes,
-// update both this file and Book.jsx's constants together.
+// keep the frontend's utils/laundryPricing.js rate in sync.
 const PRICE_PER_LB = 1.59
 const DELIVERY_FEE = 4.99
 const FREE_DELIVERY_ORDER_LIMIT = 2
@@ -13,8 +13,9 @@ const LOAD_SIZE_LBS = { small: 10, medium: 20, large: 35 }
 // customer/guest, used for the "free delivery on your first two orders"
 // promo. Callers count this however is cheapest for them (clientId lookup
 // for accounts, email lookup for guests).
-export function computeOrderPrice(loadSize, priorOrderCount = 0, shoePairs = 0) {
-  const lbs = LOAD_SIZE_LBS[loadSize] ?? LOAD_SIZE_LBS.medium
+export function computeOrderPrice(loadSize, priorOrderCount = 0, shoePairs = 0, weightLbs) {
+  // Category estimates remain a fallback for legacy demo seed scripts.
+  const lbs = weightLbs ?? LOAD_SIZE_LBS[loadSize] ?? LOAD_SIZE_LBS.medium
   return priceForWeight(lbs, priorOrderCount, shoePairs)
 }
 

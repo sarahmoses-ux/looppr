@@ -62,11 +62,12 @@ export const LOAD_SIZE_LBS = { small: 10, medium: 20, large: 35 }
 // which number wins, so cards/labels never disagree.
 export function displayWeight(delivery) {
   if (delivery.actualWeightLbs != null) return `${delivery.actualWeightLbs} lbs (confirmed)`
+  if (delivery.weightLbs != null) return `${delivery.weightLbs} lbs`
   return LOAD_SIZE_LABELS[delivery.loadSize] || delivery.loadSize
 }
 
 export function estimatedLbs(delivery) {
-  return delivery.actualWeightLbs ?? LOAD_SIZE_LBS[delivery.loadSize] ?? LOAD_SIZE_LBS.medium
+  return delivery.actualWeightLbs ?? delivery.weightLbs ?? LOAD_SIZE_LBS[delivery.loadSize] ?? LOAD_SIZE_LBS.medium
 }
 
 export const WINDOW_LABELS = {

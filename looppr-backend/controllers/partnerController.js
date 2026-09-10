@@ -41,6 +41,8 @@ function shapeOrder(p) {
     address: p.address,
     deliveryAddress: p.deliveryAddress || null,
     loadSize: p.loadSize,
+    weightLbs: p.weightLbs,
+    actualWeightLbs: p.actualWeightLbs ?? null,
     foldStyle: p.foldStyle,
     detergent: p.detergent,
     waterTemperature: p.waterTemperature,

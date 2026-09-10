@@ -1,3 +1,4 @@
+import { notifyAdminsOfBooking } from '../services/bookingNotificationService.js'
 import mongoose from 'mongoose'
 import { ActivityLog } from '../models/ActivityLog.js'
 import { BusinessUser } from '../models/BusinessUser.js'
@@ -13,7 +14,7 @@ import { computeOrderPrice } from '../utils/pricing.js'
 // (controllers/pickupController.js) but scoped to businessId + source
 // 'business', and it logs to the ActivityLog so the ops team sees it.
 export const createBusinessPickup = asyncHandler(async (req, res) => {
-  const { address, preferredDate, window, loadSize, foldStyle, notes, deliveryWindow, deliveryAddress } = req.body
+  const { address, preferredDate, window, loadSize, weightLbs, foldStyle, notes, deliveryWindow, deliveryAddress } = req.body
 
   const priorOrderCount = await PickupRequest.countDocuments({
     businessId: req.business.sub,
@@ -29,13 +30,16 @@ export const createBusinessPickup = asyncHandler(async (req, res) => {
     preferredDate,
     window,
     loadSize,
+    weightLbs,
     foldStyle,
     notes,
     deliveryWindow,
     deliveryAddress,
-    pricing: computeOrderPrice(loadSize, priorOrderCount),
+    pricing: computeOrderPrice(loadSize, priorOrderCount, 0, weightLbs),
     ...(assignment || {}),
   })
+
+  await notifyAdminsOfBooking(pickup)
 
   try {
     const location = await geocodeAddress(address)

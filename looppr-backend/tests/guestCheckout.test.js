@@ -1,3 +1,4 @@
+import { sendAdminBookingNotification } from '../services/emailService.js'
 import { describe, expect, it } from 'vitest'
 import request from 'supertest'
 import { createApp } from '../app.js'
@@ -11,7 +12,7 @@ const guestPayload = {
   address: { street: '100 Test Ave', apartment: 'Apt 1', city: 'Edmond', state: 'OK', zip: '73003' },
   preferredDate: '2027-01-15',
   window: 'morning',
-  loadSize: 'large',
+  loadSize: 'large', weightLbs: 35,
   notes: '',
   deliveryWindow: 'evening',
 }
@@ -29,12 +30,17 @@ async function adminToken() {
 }
 
 describe('guest booking pricing', () => {
+
   it('auto-computes price from load size, with free delivery on the first order', async () => {
-    const { pickup } = await createGuestPickup()
-    // large = 35 lbs * $1.59/lb, no delivery fee (first order for this email)
-    expect(pickup.pricing.amount).toBeCloseTo(55.65, 2)
+    const { pickup } = await createGuestPickup({ weightLbs: 30 })
+    expect(pickup.weightLbs).toBe(30)
+    // Exact weight overrides the category estimate; first delivery is free.
+    expect(pickup.pricing.amount).toBeCloseTo(47.7, 2)
     expect(pickup.paymentStatus).toBe('pending')
     expect(pickup.status).toBe('request_received')
+    expect(sendAdminBookingNotification).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({
+      orderId: pickup.id, source: 'guest', ...guestPayload.guest,
+    }))
   })
 
   it('creates a PaymentIntent immediately and returns its clientSecret', async () => {

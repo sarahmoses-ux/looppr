@@ -1,3 +1,5 @@
+import LaundryWeightInput from '../../components/LaundryWeightInput'
+import { weightError } from '../../utils/laundryPricing'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Input from '../../components/Input'
@@ -60,6 +62,7 @@ export default function GuestBook() {
     preferredDate: '',
     window: '',
     loadSize: '',
+    weightLbs: '',
     foldStyle: '',
     detergent: '',
     waterTemperature: '',
@@ -83,6 +86,8 @@ export default function GuestBook() {
 
   function validate() {
     const next = {}
+    const invalidWeight = weightError(form.weightLbs)
+    if (invalidWeight) next.weightLbs = invalidWeight
     if (form.name.trim().length < 2) next.name = 'Enter your full name.'
     if (!/^\S+@\S+\.\S+$/.test(form.email)) next.email = 'Enter a valid email address.'
     if (!/^\+?[0-9\s()-]{7,20}$/.test(form.phone)) next.phone = 'Enter a valid phone number.'
@@ -125,6 +130,7 @@ export default function GuestBook() {
         preferredDate: form.preferredDate,
         window: form.window,
         loadSize: form.loadSize,
+        weightLbs: Number(form.weightLbs),
         foldStyle: form.foldStyle,
         detergent: form.detergent,
         waterTemperature: form.waterTemperature,
@@ -285,6 +291,8 @@ export default function GuestBook() {
             </option>
           ))}
         </Select>
+
+        <LaundryWeightInput value={form.weightLbs} onChange={handleChange} error={errors.weightLbs} />
 
         <FoldStylePicker name="foldStyle" value={form.foldStyle} onChange={handleChange} error={errors.foldStyle} />
 

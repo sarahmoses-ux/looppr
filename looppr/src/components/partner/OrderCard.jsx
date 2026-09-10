@@ -74,7 +74,7 @@ export default function OrderCard({ order, onAccept, onReject, onAdvance }) {
         <Field label="Pickup address">{formatAddress(order.address)}</Field>
         <Field label="Delivery address">{order.deliveryAddress ? formatAddress(order.deliveryAddress) : 'Same as pickup'}</Field>
         <Field label="Services">
-          {LOAD_SIZE_LABELS[order.loadSize] || order.loadSize}
+          {order.actualWeightLbs != null || order.weightLbs != null ? `${order.actualWeightLbs ?? order.weightLbs} lbs` : LOAD_SIZE_LABELS[order.loadSize] || order.loadSize}
           {shoePairs > 0 && (
             <span className="block text-xs text-ink/50">
               Shoe Laundry: {shoePairs} {shoePairs === 1 ? 'pair' : 'pairs'}

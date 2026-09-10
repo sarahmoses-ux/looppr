@@ -1,3 +1,5 @@
+import LaundryWeightInput from '../../components/LaundryWeightInput'
+import { weightError } from '../../utils/laundryPricing'
 import { useEffect, useState } from 'react'
 import Input from '../Input'
 import Select from '../Select'
@@ -15,6 +17,7 @@ const EMPTY = {
   window: 'morning',
   deliveryWindow: 'afternoon',
   loadSize: 'medium',
+  weightLbs: '',
   foldStyle: 'standard',
   notes: '',
 }
@@ -48,6 +51,8 @@ export default function RequestPickupModal({ open, onClose, onCreated }) {
 
   function validate() {
     const next = {}
+    const invalidWeight = weightError(form.weightLbs)
+    if (invalidWeight) next.weightLbs = invalidWeight
     if (!form.street.trim()) next.street = 'Enter a pickup address.'
     if (!form.apartment.trim()) next.apartment = 'Enter a suite/unit number.'
     if (!form.city.trim()) next.city = 'Enter a city.'
@@ -77,6 +82,7 @@ export default function RequestPickupModal({ open, onClose, onCreated }) {
         window: form.window,
         deliveryWindow: form.deliveryWindow,
         loadSize: form.loadSize,
+        weightLbs: Number(form.weightLbs),
         foldStyle: form.foldStyle,
         notes: form.notes.trim(),
       })
@@ -155,7 +161,9 @@ export default function RequestPickupModal({ open, onClose, onCreated }) {
               Minimum order is 10 lbs (Small) — the least we take per pickup.
             </p>
           </div>
-          <FoldStylePicker name="foldStyle" value={form.foldStyle} onChange={handleChange} />
+          <LaundryWeightInput value={form.weightLbs} onChange={handleChange} error={errors.weightLbs} />
+
+        <FoldStylePicker name="foldStyle" value={form.foldStyle} onChange={handleChange} />
           <Input id="notes" name="notes" label="Notes (optional)" value={form.notes} onChange={handleChange} placeholder="Gate code, linen specs, etc." />
 
           {formError && (

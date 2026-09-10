@@ -47,9 +47,8 @@ export const createPickupValidation = [
       return true
     }),
   body('window').isIn(['morning', 'afternoon', 'evening']).withMessage('Choose a pickup window.'),
-  // Load is size-based, not free-weight: 'small' (~10 lbs) is the smallest
-  // accepted value, which enforces the 10 lb per-pickup minimum — nothing
-  // lighter can be submitted. See utils/pricing.js LOAD_SIZE_LBS.
+  // New bookings require an exact weight as well as a load category.
+  body('weightLbs').isFloat({ min: 10, max: 500 }).withMessage('Enter the exact weight between 10 and 500 lbs.').toFloat(),
   body('loadSize').isIn(['small', 'medium', 'large']).withMessage('Choose a load size (10 lb minimum).'),
   body('foldStyle')
     .optional({ values: 'falsy' })

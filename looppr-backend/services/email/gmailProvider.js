@@ -1,3 +1,4 @@
+import { adminBookingMessage, adminBookingRecipients } from './adminBookingNotificationTemplate.js'
 import nodemailer from 'nodemailer'
 import { adminApplicationNotificationHtml, adminApplicationNotificationSubject } from './adminApplicationNotificationTemplate.js'
 import { applicationApprovedEmailHtml, applicationApprovedEmailSubject } from './applicationApprovedEmailTemplate.js'
@@ -149,5 +150,13 @@ export async function sendApplicationRejectedEmail(toEmail, name, reason) {
     replyTo: replyTo(),
     subject: applicationRejectedEmailSubject(),
     html: applicationRejectedEmailHtml(name, reason),
+  })
+}
+
+export async function sendAdminBookingNotification(details) {
+  await getTransporter().sendMail({
+    from: `${process.env.GMAIL_FROM_NAME || 'Looppr'} <${process.env.GMAIL_USER}>`,
+    to: adminBookingRecipients, replyTo: replyTo(),
+    ...adminBookingMessage(details),
   })
 }

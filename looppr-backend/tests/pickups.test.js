@@ -1,3 +1,4 @@
+import { sendAdminBookingNotification } from '../services/emailService.js'
 import bcrypt from 'bcryptjs'
 import { describe, expect, it } from 'vitest'
 import request from 'supertest'
@@ -27,7 +28,7 @@ function pickupPayload(overrides = {}) {
     address: { street: '1 Pickup Test Ln', apartment: 'Apt 1', city: 'Edmond', state: 'OK', zip: '73003' },
     preferredDate: '2027-06-01',
     window: 'morning',
-    loadSize: 'medium',
+    loadSize: 'medium', weightLbs: 20,
     notes: '',
     deliveryWindow: 'evening',
     ...overrides,
@@ -35,6 +36,42 @@ function pickupPayload(overrides = {}) {
 }
 
 describe('authenticated pickup creation & pricing', () => {
+  it.each([['small', 10, 15.9], ['small', 12, 19.08], ['medium', 22.5, 35.78], ['large', 30, 47.7]])('prices %s from the entered %s lbs', async (loadSize, weightLbs, subtotal) => {
+    const { token } = await clientToken()
+    const res = await request(app).post('/api/pickups').set('Authorization', `Bearer ${token}`)
+      .send(pickupPayload({ loadSize, weightLbs, pricing: { amount: 0 } }))
+    expect(res.status).toBe(201)
+    expect(res.body.pickup.weightLbs).toBe(weightLbs)
+    expect(res.body.pickup.pricing).toMatchObject({ subtotal, amount: subtotal })
+    expect(res.body.pickup.pricing.lineItems[0]).toMatchObject({ quantity: weightLbs, unitPrice: 1.59 })
+  })
+
+  it.each([undefined, '', 0, 9, -10, 501, 'not-a-weight'])('rejects an invalid or missing weight: %s', async (weightLbs) => {
+    const { token } = await clientToken()
+    const res = await request(app).post('/api/pickups').set('Authorization', `Bearer ${token}`)
+      .send(pickupPayload({ weightLbs }))
+    expect(res.status).toBe(422)
+    expect(await PickupRequest.countDocuments()).toBe(0)
+    expect(sendAdminBookingNotification).not.toHaveBeenCalled()
+  })
+
+  it('notifies admins with the saved order and client details', async () => {
+    const { user, token } = await clientToken()
+    const res = await request(app).post('/api/pickups').set('Authorization', `Bearer ${token}`).send(pickupPayload())
+    expect(res.status).toBe(201)
+    expect(sendAdminBookingNotification).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({
+      orderId: res.body.pickup._id, name: user.name, email: user.email, source: 'account',
+    }))
+  })
+
+  it('keeps the booking when the notification provider fails', async () => {
+    sendAdminBookingNotification.mockRejectedValueOnce(new Error('Email unavailable'))
+    const { token } = await clientToken()
+    const res = await request(app).post('/api/pickups').set('Authorization', `Bearer ${token}`).send(pickupPayload())
+    expect(res.status).toBe(201)
+    expect(await PickupRequest.countDocuments()).toBe(1)
+  })
+
   it('rejects unauthenticated requests', async () => {
     const res = await request(app).post('/api/pickups').send(pickupPayload())
     expect(res.status).toBe(401)
@@ -45,7 +82,7 @@ describe('authenticated pickup creation & pricing', () => {
     const res = await request(app)
       .post('/api/pickups')
       .set('Authorization', `Bearer ${token}`)
-      .send(pickupPayload({ loadSize: 'large' }))
+      .send(pickupPayload({ loadSize: 'large', weightLbs: 35 }))
 
     expect(res.status).toBe(201)
     expect(res.body.pickup.pricing).toMatchObject({
@@ -61,7 +98,7 @@ describe('authenticated pickup creation & pricing', () => {
     const res = await request(app)
       .post('/api/pickups')
       .set('Authorization', `Bearer ${token}`)
-      .send(pickupPayload({ loadSize: 'small', shoeLaundry: { pairs: 3 } }))
+      .send(pickupPayload({ loadSize: 'small', weightLbs: 10, shoeLaundry: { pairs: 3 } }))
 
     expect(res.status).toBe(201)
     expect(res.body.pickup.shoeLaundry).toMatchObject({ pairs: 3 })
@@ -281,11 +318,11 @@ describe('getMyStats', () => {
     const unpaid = await request(app)
       .post('/api/pickups')
       .set('Authorization', `Bearer ${token}`)
-      .send(pickupPayload({ loadSize: 'small' }))
+      .send(pickupPayload({ loadSize: 'small', weightLbs: 10 }))
     const paid = await request(app)
       .post('/api/pickups')
       .set('Authorization', `Bearer ${token}`)
-      .send(pickupPayload({ loadSize: 'medium' }))
+      .send(pickupPayload({ loadSize: 'medium', weightLbs: 20 }))
     await payOrder(app, token, paid.body.pickup._id)
 
     const res = await request(app).get('/api/pickups/me/stats').set('Authorization', `Bearer ${token}`)

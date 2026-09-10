@@ -128,7 +128,7 @@ function OrderReceipt({ pickup }) {
         {hasBreakdown ? (
           <>
             <div className="flex justify-between text-ink/70">
-              <span>{LOAD_SIZE_LABELS[pickup.loadSize] || 'Wash & fold'}</span>
+              <span>{pickup.actualWeightLbs != null || pickup.weightLbs != null ? `${pickup.actualWeightLbs ?? pickup.weightLbs} lbs` : LOAD_SIZE_LABELS[pickup.loadSize] || 'Wash & fold'}</span>
               <span>{formatMoney(pricing.subtotal, pricing.currency)}</span>
             </div>
             {shoePairs > 0 && (
@@ -146,7 +146,7 @@ function OrderReceipt({ pickup }) {
           </>
         ) : (
           <div className="flex justify-between text-ink/70">
-            <span>{LOAD_SIZE_LABELS[pickup.loadSize] || 'Wash & fold'}</span>
+            <span>{pickup.actualWeightLbs != null || pickup.weightLbs != null ? `${pickup.actualWeightLbs ?? pickup.weightLbs} lbs` : LOAD_SIZE_LABELS[pickup.loadSize] || 'Wash & fold'}</span>
             <span>—</span>
           </div>
         )}

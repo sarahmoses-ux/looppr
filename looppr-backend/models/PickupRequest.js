@@ -46,6 +46,9 @@ const pickupRequestSchema = new mongoose.Schema(
       enum: ['small', 'medium', 'large'],
       required: true,
     },
+    // Client-entered booking weight; separate from the driver's confirmed weight.
+    // Optional on historical orders, required by all new booking endpoints.
+    weightLbs: { type: Number, min: 10, max: 500 },
     // How the customer wants their laundry folded/packed for delivery.
     // Defaults to 'standard' so older orders and flows that don't collect
     // this yet (e.g. tests) still validate.

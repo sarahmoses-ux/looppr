@@ -27,7 +27,7 @@ async function createPickup() {
       address: { street: '1 Webhook Test Ln', apartment: 'Apt 1', city: 'Edmond', state: 'OK', zip: '73003' },
       preferredDate: '2027-06-01',
       window: 'morning',
-      loadSize: 'medium',
+      loadSize: 'medium', weightLbs: 20,
       notes: '',
       deliveryWindow: 'evening',
     })

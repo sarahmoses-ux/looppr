@@ -1,3 +1,4 @@
+import { adminBookingMessage, adminBookingRecipients } from './adminBookingNotificationTemplate.js'
 import { Resend } from 'resend'
 import { adminApplicationNotificationHtml, adminApplicationNotificationSubject } from './adminApplicationNotificationTemplate.js'
 import { applicationApprovedEmailHtml, applicationApprovedEmailSubject } from './applicationApprovedEmailTemplate.js'
@@ -175,4 +176,13 @@ export async function sendApplicationRejectedEmail(toEmail, name, reason) {
   if (error) {
     throw new Error(error.message || 'Failed to send email')
   }
+}
+
+export async function sendAdminBookingNotification(details) {
+  const { error } = await getClient().emails.send({
+    from: process.env.OTP_FROM_EMAIL || 'Looppr <onboarding@resend.dev>',
+    to: adminBookingRecipients, replyTo: replyTo(),
+    ...adminBookingMessage(details),
+  })
+  if (error) throw new Error(error.message || 'Failed to send booking notification')
 }

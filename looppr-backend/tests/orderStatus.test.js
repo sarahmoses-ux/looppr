@@ -14,7 +14,7 @@ async function createGuestPickup() {
       address: { street: '1 Status Ave', apartment: 'Apt 1', city: 'Edmond', state: 'OK', zip: '73003' },
       preferredDate: '2027-01-20',
       window: 'evening',
-      loadSize: 'small',
+      loadSize: 'small', weightLbs: 10,
       notes: '',
       deliveryWindow: 'evening',
     })

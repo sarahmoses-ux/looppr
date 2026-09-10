@@ -1,3 +1,5 @@
+import LaundryWeightInput from '../components/LaundryWeightInput'
+import { laundrySubtotal, weightError, PRICE_PER_LB } from '../utils/laundryPricing'
 import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import Input from '../components/Input'
@@ -35,7 +37,6 @@ const WATER_TEMPERATURES = [
   { value: 'hot', label: 'Hot' },
 ]
 
-const PRICE_PER_LB = 1.59
 const DELIVERY_FEE = 4.99
 const FREE_DELIVERY_ORDER_LIMIT = 2
 
@@ -66,6 +67,7 @@ export default function Book() {
     preferredDate: '',
     window: '',
     loadSize: rebook?.loadSize || '',
+    weightLbs: '',
     foldStyle: rebook?.foldStyle || '',
     detergent: rebook?.detergent || '',
     waterTemperature: rebook?.waterTemperature || '',
@@ -128,6 +130,8 @@ export default function Book() {
 
   function validate() {
     const next = {}
+    const invalidWeight = weightError(form.weightLbs)
+    if (invalidWeight) next.weightLbs = invalidWeight
     if (form.street.trim().length < 3) next.street = 'Enter your street address.'
     if (!form.apartment.trim()) next.apartment = 'Enter your apartment/unit number.'
     if (form.city.trim().length < 2) next.city = 'Enter your city.'
@@ -176,7 +180,7 @@ export default function Book() {
   const selectedFold = FOLD_STYLE_OPTIONS.find((f) => f.value === form.foldStyle)
   const selectedDetergent = DETERGENTS.find((d) => d.value === form.detergent)
   const selectedWaterTemperature = WATER_TEMPERATURES.find((t) => t.value === form.waterTemperature)
-  const subtotal = selectedLoad ? selectedLoad.lbs * PRICE_PER_LB : 0
+  const subtotal = laundrySubtotal(form.weightLbs)
   const shoeLaundryTotal = form.shoeLaundryPairs * SHOE_LAUNDRY_PRICE_PER_PAIR
   const freeDelivery = priorOrderCount !== null && priorOrderCount < FREE_DELIVERY_ORDER_LIMIT
   const deliveryFee = freeDelivery ? 0 : DELIVERY_FEE
@@ -193,6 +197,7 @@ export default function Book() {
         preferredDate: form.preferredDate,
         window: form.window,
         loadSize: form.loadSize,
+        weightLbs: Number(form.weightLbs),
         foldStyle: form.foldStyle,
         detergent: form.detergent,
         waterTemperature: form.waterTemperature,
@@ -356,7 +361,7 @@ export default function Book() {
             </div>
             <div className="flex justify-between">
               <dt className="text-ink/50">Load size</dt>
-              <dd className="text-ink">{selectedLoad?.label}</dd>
+              <dd className="text-ink">{selectedLoad?.label} ({form.weightLbs} lbs)</dd>
             </div>
             <div className="flex justify-between">
               <dt className="text-ink/50">Fold style</dt>
@@ -430,7 +435,7 @@ export default function Book() {
           <dl className="mt-4 space-y-2.5 text-sm">
             <div className="flex justify-between">
               <dt className="text-ink/70">
-                Wash &amp; fold · ~{selectedLoad?.lbs} lbs @ {formatMoney(PRICE_PER_LB)}/lb
+                Wash &amp; fold · {form.weightLbs} lbs @ {formatMoney(PRICE_PER_LB)}/lb
               </dt>
               <dd className="text-ink">{formatMoney(subtotal)}</dd>
             </div>
@@ -670,6 +675,8 @@ export default function Book() {
         <p className="-mt-3 text-xs font-medium text-ink/50">
           Minimum order is 10 lbs (Small) — the least we take per pickup.
         </p>
+
+        <LaundryWeightInput value={form.weightLbs} onChange={handleChange} error={errors.weightLbs} />
 
         <FoldStylePicker name="foldStyle" value={form.foldStyle} onChange={handleChange} error={errors.foldStyle} />
 
