@@ -126,6 +126,24 @@ describe('business portal dashboard data', () => {
     expect(overview.status).toBe(200)
     expect(overview.body.overview.activeOrders).toBe(1)
     expect(overview.body.overview.ordersThisMonth).toBe(1)
+
+    const admin = await createTestUser({ role: 'admin', email: 'order-details-admin@example.com' })
+    const adminAuth = `Bearer ${tokenFor(admin)}`
+    const adminList = await request(app).get('/api/admin/pickups').query({ search: 'Riverside' }).set('Authorization', adminAuth)
+    expect(adminList.status).toBe(200)
+    expect(adminList.body.pickups).toHaveLength(1)
+    expect(adminList.body.pickups[0].businessId).toMatchObject({
+      businessName: BASE_BUSINESS.businessName, contactPerson: BASE_BUSINESS.contactPerson,
+      email: 'pickup@riverside.test', phone: BASE_BUSINESS.phone,
+    })
+    expect(adminList.body.pickups[0].address.apartment).toBe('Suite 200')
+    expect(adminList.body.pickups[0].deliveryWindow).toBe('afternoon')
+
+    const updated = await request(app).patch(`/api/admin/pickups/${create.body.pickup._id}/status`)
+      .set('Authorization', adminAuth).send({ status: 'pickup' })
+    expect(updated.status).toBe(200)
+    expect(updated.body.pickup.businessId.contactPerson).toBe(BASE_BUSINESS.contactPerson)
+
   })
 })
 

@@ -1,3 +1,4 @@
+import { ADMIN_ORDER_POPULATION } from '../utils/adminOrderPopulation.js'
 import { ALL_STATUSES, TERMINAL_STATUSES } from '../constants/orderStatus.js'
 import { PickupRequest } from '../models/PickupRequest.js'
 import { User } from '../models/User.js'
@@ -13,14 +14,7 @@ export const listAllPickups = asyncHandler(async (req, res) => {
 
   let pickups = await PickupRequest.find(match)
     .sort({ createdAt: -1 })
-    .populate('clientId', 'name email phone emailNotifications')
-    // Surface the Partner Portal claim so admins see which laundromat took
-    // the order and how far along it is (partnerStage), reflecting any
-    // accept/advance/reject action a partner took.
-    .populate('partnerUserId', 'businessName ownerName isDefaultLaundromat')
-    // Same for the Driver Portal — which driver claimed the delivery, its
-    // stage, and any actualWeightLbs correction they made at pickup.
-    .populate('driverUserId', 'name')
+    .populate(ADMIN_ORDER_POPULATION)
 
   // Filtered in application code rather than a $lookup aggregation — simpler
   // to read/maintain, and fine at MVP order volumes. Revisit with a Mongo
@@ -29,6 +23,16 @@ export const listAllPickups = asyncHandler(async (req, res) => {
     const term = search.trim().toLowerCase()
     pickups = pickups.filter((p) => {
       const haystack = [
+        p._id.toString(),
+        p.businessId?.businessName,
+        p.businessId?.contactPerson,
+        p.businessId?.email,
+        p.businessId?.phone,
+        p.address?.apartment,
+        p.deliveryAddress?.street,
+        p.deliveryAddress?.apartment,
+        p.deliveryAddress?.city,
+        p.deliveryAddress?.zip,
         p.guest?.name,
         p.guest?.email,
         p.guest?.phone,
@@ -159,5 +163,6 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
   const pickup = await PickupRequest.findByIdAndUpdate(req.params.id, { status }, { new: true })
   if (!pickup) throw new ApiError(404, 'Order not found.')
 
+  await pickup.populate(ADMIN_ORDER_POPULATION)
   res.json({ success: true, pickup })
 })

@@ -1,3 +1,4 @@
+import { ADMIN_ORDER_POPULATION } from '../utils/adminOrderPopulation.js'
 import { ActivityLog } from '../models/ActivityLog.js'
 import { DriverUser } from '../models/DriverUser.js'
 import { PartnerUser } from '../models/PartnerUser.js'
@@ -35,6 +36,7 @@ export const assignPartnerToOrder = asyncHandler(async (req, res) => {
     metadata: { partnerUserId: partner._id },
   }).catch(() => {})
 
+  await pickup.populate(ADMIN_ORDER_POPULATION)
   res.json({ success: true, pickup })
 })
 
@@ -72,5 +74,6 @@ export const assignDriverToOrder = asyncHandler(async (req, res) => {
     metadata: { driverUserId: driver._id },
   }).catch(() => {})
 
+  await pickup.populate(ADMIN_ORDER_POPULATION)
   res.json({ success: true, pickup })
 })

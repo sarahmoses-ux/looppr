@@ -1,3 +1,4 @@
+import AdminOrderDetails from '../../components/admin/AdminOrderDetails'
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import SEO from '../../components/SEO'
@@ -60,15 +61,17 @@ const DRIVER_STAGE_LABELS = {
 }
 
 function formatMoney(amount, currency = 'usd') {
+  if (amount == null) return 'Price not recorded'
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: currency.toUpperCase() }).format(amount)
 }
 
 function AdminOrderRow({ pickup, onChange, partners, drivers, readOnly }) {
   const { showToast } = useToast()
-  const contact = pickup.clientId || pickup.guest
+  const contact = pickup.source === 'business' ? pickup.businessId : pickup.clientId || pickup.guest
   const notificationsOff = pickup.source === 'account' && pickup.clientId?.emailNotifications === false
   const shoePairs = pickup.shoeLaundry?.pairs || 0
   const dateLabel = new Date(pickup.preferredDate).toLocaleDateString(undefined, {
+    timeZone: 'UTC',
     weekday: 'short',
     month: 'short',
     day: 'numeric',
@@ -109,10 +112,11 @@ function AdminOrderRow({ pickup, onChange, partners, drivers, readOnly }) {
   }
 
   return (
-    <div className="flex flex-col gap-3 rounded-2xl border border-line px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+    <div className="space-y-4 rounded-2xl border border-line px-5 py-4">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
       <div className="min-w-0">
         <p className="font-medium text-ink">
-          {contact?.name || 'Unknown'}
+          {contact?.name || contact?.contactPerson || contact?.businessName || 'Unknown'}
           <span className="font-normal text-ink/45"> · {contact?.email}</span>
           {pickup.source === 'guest' && (
             <span className="ml-2 rounded-full bg-ink/5 px-2 py-0.5 text-xs font-semibold text-ink/50">
@@ -129,7 +133,7 @@ function AdminOrderRow({ pickup, onChange, partners, drivers, readOnly }) {
           {dateLabel} · {WINDOW_LABELS[pickup.window]}
         </p>
         <p className="mt-0.5 text-sm text-ink/55">
-          {pickup.address.street}, {pickup.address.city}, {pickup.address.state} {pickup.address.zip}
+          {pickup.address?.street}, {pickup.address?.city}, {pickup.address?.state} {pickup.address?.zip}
         </p>
         <p className="mt-0.5 text-sm text-ink/55">
           {pickup.weightLbs != null ? `${pickup.weightLbs} lbs (${pickup.loadSize})` : LOAD_SIZE_LABELS[pickup.loadSize] || pickup.loadSize} · {FOLD_STYLE_LABELS[pickup.foldStyle] || 'Standard fold'}
@@ -140,7 +144,7 @@ function AdminOrderRow({ pickup, onChange, partners, drivers, readOnly }) {
           </p>
         )}
         <p className="mt-1 text-sm font-semibold text-ink">
-          {formatMoney(pickup.pricing.amount, pickup.pricing.currency)}
+          {formatMoney(pickup.pricing?.amount, pickup.pricing?.currency)}
           <span className={`ml-2 rounded-full px-2 py-0.5 text-xs font-semibold capitalize ${PAYMENT_STYLES[pickup.paymentStatus]}`}>
             {pickup.paymentStatus}
           </span>
@@ -235,7 +239,7 @@ function AdminOrderRow({ pickup, onChange, partners, drivers, readOnly }) {
 
       <div className="flex shrink-0 flex-col items-stretch gap-2 sm:flex-row sm:items-center">
         <select
-          value={pickup.status}
+          aria-label="Order status" value={pickup.status}
           onChange={handleStatusChange}
           disabled={readOnly}
           className="rounded-xl border border-line bg-white px-3 py-2 text-sm text-ink outline-none focus:border-periwinkle disabled:opacity-50"
@@ -247,6 +251,8 @@ function AdminOrderRow({ pickup, onChange, partners, drivers, readOnly }) {
           ))}
         </select>
       </div>
+      </div>
+      <AdminOrderDetails pickup={pickup} />
     </div>
   )
 }
